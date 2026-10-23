@@ -369,3 +369,619 @@
   text-decoration: none;
   color: inherit;
 }
+
+.login-page-redesign {
+  min-height: 100vh;
+  min-height: 100svh;
+  justify-content: center;
+  padding: 30px;
+  background:
+    radial-gradient(ellipse at 50% 0%, #fffdf9 0%, transparent 62%),
+    #f5f0e8;
+  font-family: "Be Vietnam Pro", "Segoe UI", Arial, sans-serif;
+}
+
+.login-page-redesign .login-container {
+  grid-template-columns: minmax(320px, 0.92fr) minmax(500px, 1.08fr);
+  gap: 0;
+  width: min(1280px, 100%);
+  max-width: 1280px;
+  min-height: min(780px, calc(100svh - 60px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e8dfd4;
+  border-radius: 24px;
+  background: #fffdfa;
+  box-shadow: 0 20px 55px rgb(61 42 27 / 10%);
+}
+
+.login-page-redesign .login-banner {
+  min-height: 100%;
+  justify-content: flex-end;
+  padding: clamp(28px, 4vw, 58px);
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgb(31 25 18 / 8%) 0%, rgb(31 25 18 / 76%) 100%),
+    url("https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1200&q=85") center/cover;
+}
+
+.login-page-redesign .banner-content {
+  position: relative;
+}
+
+.login-page-redesign .quote-icon {
+  color: #e2b88d;
+}
+
+.login-page-redesign .login-banner h1 {
+  max-width: 480px;
+  margin: 10px 0 14px;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.3;
+}
+
+.login-page-redesign .login-banner h1 i {
+  color: #e5c39f;
+}
+
+.login-page-redesign .login-banner p {
+  max-width: 440px;
+  margin-bottom: 22px;
+  color: rgb(255 255 255 / 83%);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.login-page-redesign .banner-features {
+  gap: 13px;
+  padding-top: 17px;
+}
+
+.login-page-redesign .feature-item {
+  align-items: center;
+}
+
+.login-page-redesign .feat-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 50%;
+  color: #f0d0ae;
+}
+
+.login-page-redesign .feature-item strong {
+  font-size: 12px;
+}
+
+.login-page-redesign .feature-item small {
+  display: block;
+  margin-top: 2px;
+  color: rgb(255 255 255 / 68%);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.login-page-redesign .login-form-wrapper {
+  min-width: 0;
+  padding: clamp(24px, 3.4vw, 48px);
+  border: 0;
+  border-radius: 0;
+  background: #fffdfa;
+}
+
+.login-page-redesign .login-card {
+  width: 100%;
+  max-width: 680px;
+  margin: auto;
+}
+
+.login-page-redesign .login-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 27px;
+  padding: 8px 10px;
+  border: 1px solid #e9e0d4;
+  border-radius: 15px;
+  background: #f4eee4;
+}
+
+.login-page-redesign .account-tabs,
+.login-page-redesign .auth-tabs {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+  padding: 4px;
+  border-radius: 12px;
+  background: #e9dfd1;
+}
+
+.login-page-redesign .account-tab,
+.login-page-redesign .tab-btn {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #76685b;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.login-page-redesign .account-tab {
+  cursor: pointer;
+}
+
+.login-page-redesign .account-tab.active {
+  background: #744023;
+  color: #fff;
+}
+
+.login-page-redesign .auth-tabs {
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: #e8dfd3;
+}
+
+.login-page-redesign .auth-tabs .tab-btn.active {
+  background: #fff;
+  color: #35251f;
+  box-shadow: 0 2px 6px rgb(61 42 27 / 14%);
+}
+
+.login-page-redesign .login-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 17px;
+}
+
+.login-page-redesign .login-brand-mark {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: #744023;
+  box-shadow: 0 3px 8px rgb(74 40 21 / 20%);
+  color: #fff9f0;
+  font-size: 24px;
+}
+
+.login-page-redesign .login-brand strong {
+  display: block;
+  color: #32251e;
+  font-family: "Lora", Georgia, serif;
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.login-page-redesign .login-brand small {
+  display: block;
+  margin-top: 2px;
+  color: #8c7968;
+  font-size: 8px;
+  letter-spacing: 0.7px;
+}
+
+.login-page-redesign .form-header {
+  margin-bottom: 20px;
+}
+
+.login-page-redesign .form-header h2 {
+  margin: 0 0 3px;
+  color: #35251f;
+  font-family: "Lora", Georgia, serif;
+  font-size: 29px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.login-page-redesign .form-header p {
+  margin: 0;
+  color: #81776d;
+  font-size: 11px;
+  line-height: 1.7;
+  text-align: left;
+}
+
+.login-page-redesign .input-group {
+  gap: 5px;
+  margin-bottom: 14px;
+  color: #67594d;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.login-page-redesign .label-row {
+  align-items: center;
+}
+
+.login-page-redesign .forgot-link {
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.login-page-redesign .input-box input {
+  min-width: 0;
+  height: 42px;
+  padding: 0 38px;
+  border-color: #e8dfd4;
+  border-radius: 12px;
+  background: #f7f3ed;
+  color: #35251f;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.login-page-redesign .input-box input::placeholder {
+  color: #9b9ead;
+}
+
+.login-page-redesign .input-box input:focus {
+  border-color: #a66b4c;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgb(116 64 35 / 8%);
+}
+
+.login-page-redesign .field-icon {
+  left: 12px;
+  color: #76695c;
+}
+
+.login-page-redesign .eye-btn {
+  display: grid;
+  width: 34px;
+  height: 38px;
+  place-items: center;
+  padding: 0;
+  color: #76695c;
+}
+
+.login-page-redesign .remember-row {
+  margin: 3px 0 16px;
+  color: #84796e;
+  font-size: 10px;
+}
+
+.login-page-redesign .checkbox-label {
+  gap: 8px;
+}
+
+.login-page-redesign .checkbox-label input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  accent-color: #744023;
+}
+
+.login-page-redesign .submit-btn {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  background: #744023;
+  box-shadow: 0 5px 12px rgb(74 40 21 / 15%);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.login-page-redesign .submit-btn:hover {
+  background: #60341d;
+}
+
+.login-page-redesign .divider {
+  position: relative;
+  margin: 23px 0 18px;
+  border: 0;
+  line-height: 1;
+}
+
+.login-page-redesign .divider::before {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: #ece4d9;
+  content: "";
+}
+
+.login-page-redesign .divider span {
+  position: relative;
+  background: #fffdfa;
+  color: #8b7e70;
+  font-size: 9px;
+  letter-spacing: 0.3px;
+}
+
+.login-page-redesign .google-login {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid #e7dfd5;
+  border-radius: 11px;
+  background: #fff;
+  color: #35251f;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgb(61 42 27 / 4%);
+}
+
+.login-page-redesign .google-login:hover {
+  background: #faf7f2;
+}
+
+.login-page-redesign .google-mark {
+  color: #4285f4;
+  font-family: Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  text-shadow: 1px 1px #34a853, -1px -1px #ea4335;
+}
+
+.login-page-redesign .login-register-prompt {
+  margin-top: 17px;
+  color: #8b7e70;
+  font-size: 10px;
+  text-align: center;
+}
+
+.login-page-redesign .login-register-prompt a {
+  margin-left: 4px;
+  color: #744023;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-page-redesign .login-register-prompt a:hover,
+.login-page-redesign .forgot-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .login-page-redesign {
+    padding: 18px;
+  }
+
+  .login-page-redesign .login-container {
+    grid-template-columns: minmax(230px, 0.78fr) minmax(390px, 1.22fr);
+    min-height: calc(100svh - 36px);
+  }
+
+  .login-page-redesign .login-form-wrapper {
+    padding: 26px;
+  }
+
+  .login-page-redesign .login-banner {
+    padding: 25px;
+  }
+
+  .login-page-redesign .banner-features {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 680px) {
+  .login-page-redesign {
+    padding: 0;
+    background: #fffdfa;
+  }
+
+  .login-page-redesign .login-container {
+    display: flex;
+    min-height: 100svh;
+    flex-direction: column;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .login-page-redesign .login-banner {
+    min-height: 210px;
+    padding: 24px 22px;
+    background-position: center 55%;
+  }
+
+  .login-page-redesign .quote-icon,
+  .login-page-redesign .banner-features {
+    display: none;
+  }
+
+  .login-page-redesign .login-banner h1 {
+    max-width: 380px;
+    margin: 0 0 8px;
+    font-size: 25px;
+  }
+
+  .login-page-redesign .login-banner p {
+    max-width: 440px;
+    margin: 0;
+    font-size: 11px;
+  }
+
+  .login-page-redesign .login-form-wrapper {
+    flex: 1;
+    justify-content: flex-start;
+    padding: 20px clamp(18px, 5vw, 32px) 28px;
+  }
+
+  .login-page-redesign .login-toolbar {
+    margin-bottom: 22px;
+  }
+}
+
+@media (max-width: 400px) {
+  .login-page-redesign .login-toolbar {
+    gap: 5px;
+    padding: 6px;
+  }
+
+  .login-page-redesign .account-tab,
+  .login-page-redesign .tab-btn {
+    gap: 4px;
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+
+  .login-page-redesign .login-brand strong {
+    font-size: 21px;
+  }
+}
+
+.register-page-redesign {
+  padding: 30px;
+}
+
+.register-page-redesign .register-container {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.88fr) minmax(500px, 1.12fr);
+  width: min(1160px, 100%);
+  max-width: 1160px;
+  min-height: min(820px, calc(100svh - 60px));
+  padding: 0;
+  border-radius: 24px;
+}
+
+.register-page-redesign .register-banner {
+  min-height: 100%;
+  padding: clamp(28px, 4vw, 50px);
+}
+
+.register-page-redesign .register-form-wrapper {
+  min-height: 0;
+  padding: clamp(24px, 3.2vw, 42px);
+}
+
+.register-page-redesign .register-card {
+  max-width: none;
+}
+
+.register-page-redesign .login-toolbar {
+  margin-bottom: 20px;
+}
+
+.register-page-redesign .login-brand {
+  margin-bottom: 10px;
+}
+
+.register-page-redesign .form-header {
+  margin-bottom: 16px;
+}
+
+.register-page-redesign .form-header h2 {
+  font-size: 25px;
+}
+
+.register-page-redesign .input-group {
+  gap: 4px;
+  margin-bottom: 11px;
+  font-size: 9px;
+}
+
+.register-page-redesign .input-box input {
+  height: 39px;
+}
+
+.register-page-redesign .remember-row {
+  margin: 4px 0 13px;
+}
+
+.register-page-redesign .submit-btn {
+  min-height: 44px;
+}
+
+.register-page-redesign .divider {
+  margin: 19px 0 15px;
+}
+
+.register-page-redesign .google-login {
+  min-height: 39px;
+}
+
+.register-page-redesign .login-register-prompt {
+  margin-top: 14px;
+}
+
+@media (max-width: 680px) {
+  .register-page-redesign {
+    padding: 0;
+    background: #fffdfa;
+  }
+
+  .register-page-redesign .register-container {
+    display: flex;
+    width: 100%;
+    min-height: 100svh;
+    flex-direction: column;
+    padding: 0 0 28px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .register-page-redesign .register-banner {
+    min-height: 210px;
+    padding: 24px 22px;
+    background-position: center 55%;
+  }
+
+  .register-page-redesign .register-form-wrapper {
+    padding: 20px clamp(18px, 5vw, 30px) 0;
+  }
+}
+
+@media (min-width: 681px) and (max-width: 1000px) {
+  .register-page-redesign .register-container {
+    grid-template-columns: minmax(230px, 0.78fr) minmax(390px, 1.22fr);
+  }
+
+  .register-page-redesign .register-form-wrapper {
+    padding: 26px;
+  }
+
+  .register-page-redesign .register-banner {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 400px) {
+  .register-page-redesign .login-toolbar {
+    gap: 5px;
+    padding: 6px;
+  }
+
+  .register-page-redesign .account-tab,
+  .register-page-redesign .tab-btn {
+    gap: 4px;
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+}

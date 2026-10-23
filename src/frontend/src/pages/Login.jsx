@@ -1,12 +1,12 @@
 import { useState } from "react";
 import "../style/Login.css";
-import logoImg from "../assets/logo.png"; // Đường dẫn tới logo của bạn
+import { ArrowRight, Compass, Eye, EyeOff, Hammer, LockKeyhole, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { ROUTES } from "../routes/paths.js";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [accountType, setAccountType] = useState("artisan");
+  const [accountType, setAccountType] = useState("visitor");
   const navigate = useNavigate();
 
   const handleLogin = (event) => {
@@ -15,121 +15,82 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
-      {/* Header nhỏ phía trên */}
-      <header className="login-top-bar">
-        <div className="login-brand">
-          <img src={logoImg} alt="Tinh Hoa Việt Logo" className="brand-logo" />
-          
-          {/*<div className="brand-icon-box">H</div>*/}
-          <div>
-            <strong>Tinh Hoa Việt</strong>
-            <small>Nền tảng di sản - Tinh hoa tương lai</small>
-          </div>
-        </div>
-        <div className="top-actions">
-          <Link to={ROUTES.HOME} className="back-link">← Trang chủ</Link>
-        </div>
-      </header>
-
-      {/* Main Container chia 2 cột */}
+    <div className="login-page login-page-redesign">
       <main className="login-container">
-        {/* Cột Trái: Banner giới thiệu nghệ nhân */}
         <div className="login-banner">
-          <div className="banner-overlay"></div>
           <div className="banner-content">
             <span className="quote-icon">“</span>
             <h1>
-              Đồng hành cùng <i>350+ nghệ nhân</i> gìn giữ dòng chảy di sản Việt.
+              Gìn giữ tinh hoa, <i>tiếp nối</i> câu chuyện Việt.
             </h1>
             <p>
-              Mỗi chuyến ghé thăm làng nghề không chỉ là một hành trình trải nghiệm,
-              mà còn là nguồn trợ lực trực tiếp cho các thế hệ nghệ nhân nuôi dưỡng tinh hoa ngàn năm.
+              Gặp gỡ nghệ nhân, khám phá làng nghề và cùng lan tỏa những giá trị văn hóa Việt.
             </p>
-
             <div className="banner-features">
               <div className="feature-item">
-                <span className="feat-icon">🛡</span>
+                <span className="feat-icon"><Compass size={17} /></span>
                 <div>
-                  <strong>Trải nghiệm văn hóa chân thực</strong>
-                  <small>Tham gia trực tiếp cùng nghệ nhân tại xưởng truyền thống</small>
+                  <strong>Khám phá di sản sống</strong>
+                  <small>Những câu chuyện và trải nghiệm từ khắp các làng nghề.</small>
                 </div>
               </div>
               <div className="feature-item">
-                <span className="feat-icon">💎</span>
+                <span className="feat-icon"><Hammer size={17} /></span>
                 <div>
-                  <strong>Hỗ trợ trực tiếp cộng đồng nghệ nhân</strong>
-                  <small>100% học phí workshop gửi về quỹ phát triển làng nghề</small>
-                </div>
-              </div>
-              <div className="feature-item">
-                <span className="feat-icon">📜</span>
-                <div>
-                  <strong>Bảo lưu giá trị ngàn năm</strong>
-                  <small>Số hóa tư liệu và câu chuyện truyền thừa từ các bậc cao niên</small>
+                  <strong>Đồng hành cùng nghệ nhân</strong>
+                  <small>Góp phần gìn giữ nghề truyền thống qua từng thế hệ.</small>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Cột Phải: Form đăng nhập */}
         <div className="login-form-wrapper">
           <div className="login-card">
-            {/* Tabs chọn Đăng nhập / Đăng ký */}
-            <div className="auth-tabs">
-              <button className="tab-btn active">Đăng nhập</button>
-              <Link to={ROUTES.REGISTER} className="tab-btn">Đăng ký</Link>
+            <div className="login-toolbar">
+              <div className="account-tabs" role="group" aria-label="Loại tài khoản">
+                <button
+                  className={`account-tab ${accountType === "visitor" ? "active" : ""}`}
+                  type="button"
+                  aria-pressed={accountType === "visitor"}
+                  onClick={() => setAccountType("visitor")}
+                >
+                  <Compass size={13} /> Du khách
+                </button>
+                <button
+                  className={`account-tab ${accountType === "artisan" ? "active" : ""}`}
+                  type="button"
+                  aria-pressed={accountType === "artisan"}
+                  onClick={() => setAccountType("artisan")}
+                >
+                  <Hammer size={13} /> Nghệ nhân
+                </button>
+              </div>
+              <nav className="auth-tabs" aria-label="Tài khoản">
+                <span className="tab-btn active" aria-current="page">Đăng nhập</span>
+                <Link to={ROUTES.REGISTER} className="tab-btn">Đăng ký</Link>
+              </nav>
+            </div>
+
+            <div className="login-brand">
+              <span className="login-brand-mark" aria-hidden="true">✥</span>
+              <span>
+                <strong>Tinh Hoa Việt</strong>
+                <small>GÌN GIỮ &amp; LAN TỎA BẢN SẮC</small>
+              </span>
             </div>
 
             <div className="form-header">
-              <h2>{accountType === "artisan" ? "Cổng đăng nhập Nghệ nhân" : "Chào mừng du khách trở lại"}</h2>
-              <p>
-                {accountType === "artisan"
-                  ? "Quản lý hồ sơ, sản phẩm và hoạt động làng nghề của bạn."
-                  : "Tiếp tục hành trình khám phá những miền di sản ngàn đời của Việt Nam."}
-              </p>
+              <h2>Đăng nhập</h2>
+              <p>Đăng nhập để lưu lại những trải nghiệm yêu thích và khám phá thêm nhiều nội dung hấp dẫn.</p>
             </div>
 
-            {/* Nút đăng nhập mạng xã hội */}
-            <div className="social-login">
-              <button className="social-btn">
-                <span className="soc-icon g">G</span> Google
-              </button>
-              <button className="social-btn">
-                <span className="soc-icon f">f</span> Facebook
-              </button>
-              <button className="social-btn">
-                <span className="soc-icon a"></span> Apple ID
-              </button>
-            </div>
-
-            <div className="divider">
-              <span>HOẶC QUA TÀI KHOẢN</span>
-            </div>
-
-            {/* Form nhập liệu */}
             <form onSubmit={handleLogin}>
               <label className="input-group">
-                <span>Loại tài khoản</span>
+                <span>Email hoặc số điện thoại</span>
                 <div className="input-box">
-                  <span className="field-icon">👤</span>
-                  <select
-                    className="account-type-select"
-                    value={accountType}
-                    onChange={(event) => setAccountType(event.target.value)}
-                  >
-                    <option value="artisan">Nghệ nhân / Đại diện làng nghề</option>
-                    <option value="visitor">Du khách</option>
-                  </select>
-                </div>
-              </label>
-
-              <label className="input-group">
-                <span>Địa chỉ Email</span>
-                <div className="input-box">
-                  <span className="field-icon">✉</span>
-                  <input type="email" placeholder="nguyen.van@example.com" required />
+                  <Mail className="field-icon" size={15} aria-hidden="true" />
+                  <input type="text" autoComplete="username" placeholder="example@gmail.com hoặc 0912345678" required />
                 </div>
               </label>
 
@@ -139,18 +100,20 @@ export default function Login() {
                   <a href="#forgot" className="forgot-link">Quên mật khẩu?</a>
                 </div>
                 <div className="input-box">
-                  <span className="field-icon">🔒</span>
+                  <LockKeyhole className="field-icon" size={15} aria-hidden="true" />
                   <input 
                     type={showPassword ? "text" : "password"} 
-                    placeholder="Nhập mật khẩu của bạn" 
+                    autoComplete="current-password"
+                    placeholder="••••••••"
                     required
                   />
                   <button 
                     type="button" 
                     className="eye-btn" 
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                   >
-                    👁
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </label>
@@ -158,36 +121,30 @@ export default function Login() {
               <div className="remember-row">
                 <label className="checkbox-label">
                   <input type="checkbox" />
-                  <span>Ghi nhớ đăng nhập trên thiết bị này</span>
+                  <span>Ghi nhớ đăng nhập</span>
                 </label>
               </div>
 
               <button type="submit" className="submit-btn">
-                Đăng nhập vào Hồn Việt →
+                Đăng nhập <ArrowRight size={16} />
               </button>
             </form>
 
-            {/* Liên kết chuyển đổi cho Nghệ nhân */}
-            <div className="artisan-switch-footer">
-              <span>🏠 Bạn là Nghệ nhân hoặc Đại diện Làng nghề?</span>
-              <Link to={ROUTES.ARTISAN_REGISTER}>Đăng ký tại Cổng Nghệ Nhân →</Link>
+            <div className="divider">
+              <span>HOẶC</span>
+            </div>
+
+            <button className="google-login" type="button">
+              <span className="google-mark" aria-hidden="true">G</span>
+              Đăng nhập bằng Google
+            </button>
+
+            <div className="login-register-prompt">
+              Chưa có tài khoản? <Link to={ROUTES.REGISTER}>Đăng ký ngay</Link>
             </div>
           </div>
         </div>
       </main>
-
-      {/* Footer nhỏ phía dưới */}
-      <footer className="login-footer">
-        <div>
-          <strong>Tinh Hoa Việt</strong>
-          <p>© 2025 Tinh Hoa Việt — Nền tảng du lịch văn hóa & bảo tồn làng nghề truyền thống Việt Nam. Bảo lưu mọi quyền.</p>
-        </div>
-        <div className="footer-links">
-          <a href="#about">Về dự án Tinh Hoa Việt</a>
-          <a href="#privacy">Chính sách bảo tồn</a>
-          <a href="#lang">Tiếng Việt (VN)</a>
-        </div>
-      </footer>
     </div>
   );
 }

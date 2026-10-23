@@ -1,5 +1,5 @@
 import "./App.css";
-import logoImg from "./assets/logo.png";
+import logoImg from "./assets/logo_v1.png";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "./routes/paths.js";
@@ -7,77 +7,83 @@ import { ROUTES } from "./routes/paths.js";
 
 const crafts = [
   {
-    title: "Gốm sứ & Điêu khắc đất",
+    title: "Bát Tràng",
     category: "Gốm truyền thống",
-    location: "Bát Tràng, Hà Nội",
+    location: "Giữ hồn đất thành những tác phẩm gốm.",
     image:
       "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=900&q=85",
   },
   {
-    title: "Dệt lụa & Thổ cẩm",
+    title: "Vạn Phúc",
     category: "Dệt thủ công",
-    location: "Vạn Phúc, Hà Nội",
+    location: "Theo sợi tơ, tìm về một miền ký ức.",
     image:
       "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=85",
   },
   {
-    title: "Mây tre & Mộc chạm khắc",
-    category: "Thủ công mỹ nghệ",
-    location: "Các làng nghề Việt Nam",
+    title: "Thanh Hà",
+    category: "Làng nghề di sản",
+    location: "Nhịp sống bình yên bên dòng Thu Bồn.",
     image:
-      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    title: "Tranh dân gian & Sơn mài",
-    category: "Nghệ thuật truyền thống",
-    location: "Đông Hồ, Bắc Ninh",
-    image:
-      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    title: "Đúc đồng & Kim hoàn bạc",
-    category: "Kim loại thủ công",
-    location: "Các làng nghề Việt Nam",
-    image:
-      "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    title: "Ẩm thực dân gian & Trà thủ công",
-    category: "Văn hóa ẩm thực",
-    location: "Di sản ẩm thực Việt",
-    image:
-      "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=85",
   },
 ];
 
 const artisans = [
   {
-    name: "Trần Văn Độ",
+    name: "Nguyễn Văn Lâm",
     craft: "Nghệ nhân gốm truyền thống",
     place: "Bát Tràng, Hà Nội",
     image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=85",
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=600&q=85",
   },
   {
-    name: "Thạch Thị Trúc",
-    craft: "Nghệ nhân dệt thổ cẩm",
-    place: "Trà Vinh",
+    name: "Trần Thị Hương",
+    craft: "Nghệ nhân dệt lụa",
+    place: "Vạn Phúc, Hà Nội",
     image:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=85",
+      "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=600&q=85",
   },
   {
-    name: "Nguyễn Đăng Chế",
-    craft: "Nghệ nhân tranh dân gian",
-    place: "Bắc Ninh",
+    name: "Lê Văn Bình",
+    craft: "Nghệ nhân mây tre đan",
+    place: "Phú Vinh, Hà Nội",
     image:
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=85",
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=600&q=85",
   },
   {
-    name: "Quách Phan Tuấn Anh",
-    craft: "Nghệ nhân điêu khắc gỗ",
-    place: "Miền Tây Nam Bộ",
+    name: "Phạm Thị Liên",
+    craft: "Nghệ nhân nón lá",
+    place: "Tây Hồ, Huế",
     image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=85",
+      "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=600&q=85",
+  },
+];
+
+const products = [
+  {
+    title: "Bình gốm men tro",
+    category: "Gốm Bát Tràng",
+    image:
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=85",
+  },
+  {
+    title: "Khăn lụa tơ tằm",
+    category: "Tơ tằm · Dệt thủ công",
+    image:
+      "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=800&q=85",
+  },
+  {
+    title: "Giỏ mây đan tay",
+    category: "Mây tre · Bền vững",
+    image:
+      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=800&q=85",
+  },
+  {
+    title: "Nón lá xứ Huế",
+    category: "Lá nón · Thủ công",
+    image:
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=85",
   },
 ];
 
@@ -152,16 +158,17 @@ function Header() {
 
       <nav className="main-nav">
         <Link className="active" to={ROUTES.HOME}>Trang chủ</Link>
-        <a href="#crafts">Nghề làng</a>
-        <a href="#artisans">Làng nghề & Nghệ nhân</a>
-        <a href="#activities">Trải nghiệm</a>
-        <a href="#stories">Khám phá văn hóa</a>
+        <a href="#artisans">Nghệ nhân</a>
+        <a href="#crafts">Làng nghề</a>
+        <a href="#products">Sản phẩm thủ công</a>
+        <a href="#stories">Câu chuyện văn hóa</a>
+        <a href="#activities">Hoạt động trải nghiệm</a>
       </nav>
 
       <div className="header-actions">
-      <Link className="login-link" to={ROUTES.LOGIN}>Đăng nhập</Link>
-      <Link className="login-link" to={ROUTES.REGISTER}>Đăng ký</Link>
-        {/*<a className="button button-small" href="#join">Đăng ký nghệ nhân</a>*/}
+        <button className="header-search" type="button" aria-label="Tìm kiếm">⌕</button>
+        <Link className="login-link" to={ROUTES.LOGIN}>Đăng nhập</Link>
+        <Link className="button button-small" to={ROUTES.REGISTER}>Đăng ký</Link>
       </div>
     </header>
   );
@@ -179,44 +186,24 @@ function SearchPanel() {
       }}
     >
       <div className="search-tabs">
-        <span className="selected">◉ Tất cả</span>
-        <span>⌕ Tìm nghệ nhân</span>
-        <span>▧ Nghề truyền thống</span>
-        <span>♧ Làng nghề & Trải nghiệm</span>
+        <span>Tìm kiếm:</span>
+        <span className="selected">Nghệ nhân</span>
+        <span>Làng nghề</span>
+        <span>Sản phẩm</span>
+        <span>Câu chuyện văn hóa</span>
+        <span>Hoạt động trải nghiệm</span>
       </div>
 
       <div className="search-fields">
-        <label>
-          <span>Ngành nghề / Nghệ nhân</span>
-          <input
-            type="search"
-            placeholder="Tên nghệ nhân, nghề truyền thống..."
-          />
-        </label>
-
-        <label>
-          <span>Vùng miền / Địa điểm</span>
-          <select defaultValue="">
-            <option value="">Toàn quốc</option>
-            <option>Miền Bắc</option>
-            <option>Miền Trung</option>
-            <option>Miền Nam</option>
-            <option>Trà Vinh</option>
-          </select>
-        </label>
+        <input
+          type="search"
+          aria-label="Tìm nghệ nhân, làng nghề hoặc sản phẩm"
+          placeholder="Bạn muốn khám phá nghệ nhân, làng nghề hay câu chuyện nào?"
+        />
 
         <button className="button search-button" type="submit">
-          <span>⌕</span> Khám phá
+          Tìm kiếm
         </button>
-      </div>
-
-      <div className="popular-searches">
-        <span>Gợi ý:</span>
-        <a href="#crafts">Gốm Bát Tràng</a>
-        <a href="#crafts">Dệt Chăm</a>
-        <a href="#crafts">Đúc đồng</a>
-        <a href="#crafts">Tranh Đông Hồ</a>
-        <a href="#activities">Workshop</a>
       </div>
     </form>
   );
@@ -226,9 +213,9 @@ function SearchPanel() {
 const heroSlides = [
   {
     image:
-      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1600&q=85",
-    title: "Tinh hoa nghề gốm Việt",
-    description: "Khám phá hành trình tạo nên những sản phẩm thủ công độc đáo.",
+      "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=1600&q=85",
+    title: "Khám phá tinh hoa nghề Việt",
+    description: "Kết nối cùng nghệ nhân, khám phá những câu chuyện và giá trị văn hóa được gìn giữ qua nhiều thế hệ.",
   },
   {
     image:
@@ -326,54 +313,24 @@ function Hero() {
   return (
     <>
       <section className="hero" id="home">
-        <div className="hero-inner">
-          <h1>
-            Kết nối nghệ nhân
-            <br className="desktop-break" /> lan tỏa giá trị văn hóa Việt
-          </h1>
-
-          {/*slidebar */}
-          <HeroSlider />
-
-          <p className="hero-description">
-            Kết nối trực tiếp du khách với nghệ nhân và các làng nghề
-            truyền thống trên khắp miền đất nước - Trải nghiệm, tìm hiểu và
-            tiếp nối tinh hoa văn hóa Việt.
-          </p>
-          <SearchPanel />
-        </div>
+        <HeroSlider />
       </section>
 
-      <section className="stats-bar" aria-label="Hồn Việt qua những con số">
-        <div className="stat">
-          <strong>350+</strong>
-          <span>Nghệ nhân & Thợ lành nghề</span>
-        </div>
-        <div className="stat">
-          <strong>120+</strong>
-          <span>Làng nghề di sản</span>
-        </div>
-        <div className="stat">
-          <strong>15.000+</strong>
-          <span>Du khách trải nghiệm</span>
-        </div>
-        <div className="stat">
-          <strong>100%</strong>
-          <span>Trực tiếp từ nghệ nhân</span>
-        </div>
-      </section>
+      <div className="search-wrap">
+        <SearchPanel />
+      </div>
     </>
   );
 }
 
 function CraftSection() {
   return (
-    <section className="section" id="crafts">
+    <section className="section section-green" id="crafts">
       <SectionHeading
-        eyebrow="✧ Tinh hoa làng nghề Việt"
-        title="Khám phá tinh hoa nghề truyền thống Việt Nam"
-        description="Mỗi sản phẩm là một câu chuyện, mỗi làng nghề là một di sản đang được tiếp nối."
-        link="Khám phá tất cả"
+        eyebrow="✧ Miền di sản"
+        title="Mỗi làng nghề, một miền văn hóa"
+        description="Chạm lời kể của những nghệ nhân và khám phá bản sắc từng vùng đất."
+        link="Xem tất cả"
       />
 
       <div className="craft-grid">
@@ -396,12 +353,12 @@ function CraftSection() {
 
 function ArtisanSection() {
   return (
-    <section className="section section-tinted" id="artisans">
+    <section className="section" id="artisans">
       <SectionHeading
-        eyebrow="✧ Nghệ nhân Việt"
-        title="Gặp gỡ những nghệ nhân tài hoa"
-        description="Gặp gỡ những con người dành cả cuộc đời để gìn giữ tinh hoa nghề truyền thống."
-        link="Xem danh sách nghệ nhân"
+        eyebrow="✧ Người gìn giữ tinh hoa"
+        title="Những người gìn giữ tinh hoa nghề Việt"
+        description="Đằng sau mỗi tác phẩm là một đôi tay khéo léo và một đời gắn bó với nghề."
+        link="Xem tất cả"
       />
 
       <div className="artisan-grid">
@@ -436,9 +393,35 @@ function ArtisanSection() {
   );
 }
 
+function ProductSection() {
+  return (
+    <section className="section product-section" id="products">
+      <SectionHeading
+        eyebrow="✧ Từ đôi tay đến đời sống"
+        title="Mang một chút hồn Việt về nhà"
+        description="Những vật phẩm mộc mạc, chứa đựng sự tỉ mỉ và vẻ đẹp của chất liệu bản địa."
+        link="Xem tất cả"
+      />
+
+      <div className="product-grid">
+        {products.map((product) => (
+          <a className="product-card" href="#join" key={product.title}>
+            <img src={product.image} alt={product.title} loading="lazy" />
+            <div className="product-info">
+              <span>{product.category}</span>
+              <h3>{product.title}</h3>
+              <span className="product-arrow" aria-hidden="true">↗</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ActivitySection() {
   return (
-    <section className="section" id="activities">
+    <section className="section section-tinted" id="activities">
       <SectionHeading
         eyebrow="✧ Trải nghiệm sống cùng văn hóa"
         title="Workshop văn hóa & Trải nghiệm làng nghề sắp diễn ra"
@@ -473,30 +456,62 @@ function ActivitySection() {
 }
 
 function StorySection() {
+  const [featuredStory, ...sideStories] = stories;
+
   return (
     <section className="section stories-section" id="stories">
       <SectionHeading
-        eyebrow="✧ Di sản sống trong đời sống"
-        title="Câu chuyện Di sản & Phong tục làng nghề"
-        description="Đọc để hiểu hơn về những câu chuyện và giá trị được lưu truyền qua nhiều thế hệ."
-        link="Khám phá câu chuyện"
+        eyebrow="✧ Lắng nghe di sản"
+        title="Có những câu chuyện còn mãi"
+        description="Những câu chuyện về đôi bàn tay, ký ức và tình yêu dành cho nghề."
+        link="Đọc thêm câu chuyện"
       />
 
-      <div className="story-grid">
-        {stories.map((story) => (
-          <a className="story-card" href="#join" key={story.title}>
+      <div className="story-layout">
+        <a className="story-feature" href="#join">
+          <img src={featuredStory.image} alt={featuredStory.title} loading="lazy" />
+          <span className="story-tag">{featuredStory.tag}</span>
+          <h3>Giữ hồn đất trong từng dáng gốm</h3>
+          <p>Từ nắm đất ven sông đến chiếc bình trên kệ, hành trình ấy bắt đầu bằng sự kiên nhẫn và tình yêu với nghề.</p>
+          <span className="read-more">Đọc câu chuyện ↗</span>
+        </a>
+        <div className="story-side-list">
+          {sideStories.map((story) => (
+            <a className="story-side-card" href="#join" key={story.title}>
             <img src={story.image} alt={story.title} loading="lazy" />
             <div className="story-content">
               <span className="story-tag">{story.tag}</span>
               <h3>{story.title}</h3>
-              <span className="read-more">5 phút đọc <span>Đọc tiếp ↗</span></span>
             </div>
-          </a>
-        ))}
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
+
+function JoinSection() {
+  return (
+    <section className="join-section" id="join">
+      <div className="join-copy">
+        <span className="join-eyebrow">✧ Kết nối ký ức, nuôi dưỡng bản sắc</span>
+        <h2>Cùng viết tiếp câu chuyện nghề Việt</h2>
+        <p>Dù bạn là người yêu văn hóa hay người gìn giữ nghề, Hồn Việt luôn là một mái nhà cho câu chuyện của bạn.</p>
+        <div className="join-actions">
+          <a className="button join-primary" href="#artisans">Tham gia Hồn Việt ↗</a>
+          <Link className="join-button join-secondary" to={ROUTES.ARTISAN_REGISTER}>Dành cho nghệ nhân</Link>
+        </div>
+      </div>
+      <img
+        src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=85"
+        alt="Nghệ nhân hướng dẫn làm gốm"
+        loading="lazy"
+      />
+    </section>
+  );
+}
+
 function Footer() {
   return (
     <footer className="site-footer">
@@ -555,10 +570,12 @@ export default function HomePage() {
       <Header />
       <main>
         <Hero />
-        <CraftSection />
         <ArtisanSection />
-        <ActivitySection />
+        <CraftSection />
+        <ProductSection />
         <StorySection />
+        <ActivitySection />
+        <JoinSection />
       </main>
       <Footer />
     </>
