@@ -9,6 +9,7 @@ import ArtisanLayout from "../layouts/ArtisanLayout.jsx";
 import ArtisanDashboard from "../pages/ArtisanDashboard";
 import ArtisanProfile from "../pages/ArtisanProfile";
 import ArtisanAddProduct from "../pages/ArtisanAddProduct";
+import ArtisanStory from "../pages/ArtisanStory.jsx";
 
 import { ROUTES } from "./paths.js";
 
@@ -26,6 +27,7 @@ export default function AppRouter() {
           <Route path={ROUTES.ARTISAN_DASHBOARD} element={<ArtisanDashboard />} />
           <Route path={ROUTES.ARTISAN_PROFILE} element={<ArtisanProfile />} />
           <Route path={ROUTES.ARTISAN_ADD_PRODUCT} element={<ArtisanAddProduct />} />
+          <Route path={ROUTES.ARTISAN_STORY} element={<ArtisanStory />} />
         </Route>
 
       <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

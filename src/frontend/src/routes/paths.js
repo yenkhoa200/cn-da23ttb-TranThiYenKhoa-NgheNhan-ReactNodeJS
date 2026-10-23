@@ -6,4 +6,5 @@ export const ROUTES = {
   ARTISAN_DASHBOARD: "/artisan-dashboard",
   ARTISAN_PROFILE: "/artisan-profile",
   ARTISAN_ADD_PRODUCT: "/artisan-add-product",
+  ARTISAN_STORY: "/artisan-story",
 };

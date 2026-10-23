@@ -1,6 +1,9 @@
 import "../style/ArtisanDashboard.css"; // Dùng chung file CSS
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ROUTES } from "../routes/paths.js";
+//import header và footer
+import ArtisanHeader from "../components/Header.jsx";
+import ArtisanFooter from "../components/Footer.jsx";
 
 export default function ArtisanLayout() {
   const location = useLocation();
@@ -10,28 +13,9 @@ export default function ArtisanLayout() {
 
   return (
     <div className="artisan-dashboard-container">
-      {/* 1. THANH ĐIỀU HƯỚNG TRÊN CÙNG (TOP HEADER) */}
-      <header className="artisan-top-nav">
-        <div className="brand-box">
-          <div className="logo-square">H</div>
-          <div>
-            <strong>Tinh Hoa Việt</strong>
-            <small>Nền tảng di sản - Tinh hoa tương lai</small>
-          </div>
-        </div>
-        <div className="top-nav-right">
-          <span className="nav-link-item">Cộng đồng</span>
-          <span className="nav-link-item">Tài liệu hướng dẫn</span>
-          <span className="bell-icon">🔔</span>
-          <div className="hotline-pill">
-            <span>📞</span> Gọi trợ giúp ngay: <strong>1900 8888</strong>
-          </div>
-        </div>
-      </header>
-
+      <ArtisanHeader />
       {/* 2. LAYOUT CHÍNH: SIDEBAR TRÁI & NỘI DUNG PHẢI */}
       <div className="dashboard-main-layout">
-        
         {/* SIDEBAR BÊN TRÁI */}
         <aside className="artisan-sidebar">
           <div className="artisan-profile-mini">
@@ -65,7 +49,12 @@ export default function ArtisanLayout() {
               📦 Thêm sản phẩm
             </Link>
             <a href="#products" className="menu-item">📦 Sản phẩm</a>
-            <a href="#culture" className="menu-item">📖 Câu chuyện văn hóa</a>
+            <Link
+              to={ROUTES.ARTISAN_STORY}
+              className={`menu-item ${isActive(ROUTES.ARTISAN_STORY) ? "active" : ""}`}
+            >
+              📖 Câu chuyện văn hóa
+            </Link>
             <a href="#activities" className="menu-item">📅 Hoạt động trải nghiệm</a>
             <a href="#bookings" className="menu-item">👥 Đăng ký của du khách</a>
           </nav>
@@ -83,12 +72,7 @@ export default function ArtisanLayout() {
         {/* NỘI DUNG CHÍNH THAY ĐỔI LINH HOẠT GIỮA CÁC TRANG */}
         <main className="dashboard-content">
           <Outlet />
-
-          {/* Footer nhỏ bên trong trang quản trị */}
-          <footer className="dashboard-footer">
-            <p>Không Gian Nghệ Nhân Làng Nghề Việt Nam © 2025 • Đồng hành gìn giữ tinh hoa gốm Bát Tràng</p>
-            <p>Dành riêng cho Bác Nguyễn Văn An • Hệ thống hỗ trợ nghệ nhân 24/7 qua tổng đài 1900 8888</p>
-          </footer>
+          <ArtisanFooter />
         </main>
       </div>
     </div>

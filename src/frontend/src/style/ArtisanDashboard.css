@@ -524,3 +524,117 @@ body {
   margin-top: 10px;
 }
 .dashboard-footer p { margin: 3px 0; }
+
+@media (max-width: 900px) {
+  .artisan-top-nav {
+    padding: 10px 16px;
+  }
+
+  .top-nav-right {
+    gap: 12px;
+    font-size: 11px;
+  }
+
+  .dashboard-main-layout {
+    grid-template-columns: 162px minmax(0, 1fr);
+  }
+
+  .artisan-sidebar {
+    padding: 12px;
+    gap: 14px;
+  }
+
+  .artisan-profile-mini {
+    gap: 7px;
+  }
+
+  .artisan-profile-mini img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .artisan-profile-mini h3 {
+    overflow: hidden;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .artisan-profile-mini small {
+    display: block;
+    overflow: hidden;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .menu-item {
+    padding: 9px 8px;
+    font-size: 11px;
+  }
+
+  .sidebar-footer-menu {
+    font-size: 10px;
+  }
+
+  .dashboard-content {
+    min-width: 0;
+    padding: 14px;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .artisan-top-nav {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .brand-box small,
+  .top-nav-right .nav-link-item,
+  .top-nav-right .bell-icon {
+    display: none;
+  }
+
+  .brand-box strong {
+    font-size: 13px;
+  }
+
+  .hotline-pill {
+    padding: 6px 9px;
+    font-size: 10px;
+  }
+
+  .dashboard-main-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .artisan-sidebar {
+    padding: 8px 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .artisan-profile-mini,
+  .sidebar-footer-menu {
+    display: none;
+  }
+
+  .sidebar-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 4px;
+  }
+
+  .menu-item {
+    flex: 0 0 auto;
+    padding: 8px;
+    white-space: nowrap;
+  }
+
+  .dashboard-content {
+    padding: 12px;
+  }
+}
