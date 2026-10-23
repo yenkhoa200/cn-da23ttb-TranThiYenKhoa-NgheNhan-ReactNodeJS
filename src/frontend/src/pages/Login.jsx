@@ -1,11 +1,18 @@
 import { useState } from "react";
 import "../style/Login.css";
 import logoImg from "../assets/logo.png"; // Đường dẫn tới logo của bạn
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ROUTES } from "../routes/paths.js";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [accountType, setAccountType] = useState("artisan");
+  const navigate = useNavigate();
+
+  const handleLogin = (event) => {
+    event.preventDefault();
+    navigate(accountType === "artisan" ? ROUTES.ARTISAN_DASHBOARD : ROUTES.HOME);
+  };
 
   return (
     <div className="login-page">
@@ -76,8 +83,12 @@ export default function Login() {
             </div>
 
             <div className="form-header">
-              <h2>Chào mừng du khách trở lại</h2>
-              <p>Tiếp tục hành trình khám phá những miền di sản ngàn đời của Việt Nam.</p>
+              <h2>{accountType === "artisan" ? "Cổng đăng nhập Nghệ nhân" : "Chào mừng du khách trở lại"}</h2>
+              <p>
+                {accountType === "artisan"
+                  ? "Quản lý hồ sơ, sản phẩm và hoạt động làng nghề của bạn."
+                  : "Tiếp tục hành trình khám phá những miền di sản ngàn đời của Việt Nam."}
+              </p>
             </div>
 
             {/* Nút đăng nhập mạng xã hội */}
@@ -98,12 +109,27 @@ export default function Login() {
             </div>
 
             {/* Form nhập liệu */}
-            <form onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={handleLogin}>
+              <label className="input-group">
+                <span>Loại tài khoản</span>
+                <div className="input-box">
+                  <span className="field-icon">👤</span>
+                  <select
+                    className="account-type-select"
+                    value={accountType}
+                    onChange={(event) => setAccountType(event.target.value)}
+                  >
+                    <option value="artisan">Nghệ nhân / Đại diện làng nghề</option>
+                    <option value="visitor">Du khách</option>
+                  </select>
+                </div>
+              </label>
+
               <label className="input-group">
                 <span>Địa chỉ Email</span>
                 <div className="input-box">
                   <span className="field-icon">✉</span>
-                  <input type="email" placeholder="nguyen.van@example.com" defaultValue="nguyen.van@example.com" />
+                  <input type="email" placeholder="nguyen.van@example.com" required />
                 </div>
               </label>
 
@@ -117,6 +143,7 @@ export default function Login() {
                   <input 
                     type={showPassword ? "text" : "password"} 
                     placeholder="Nhập mật khẩu của bạn" 
+                    required
                   />
                   <button 
                     type="button" 

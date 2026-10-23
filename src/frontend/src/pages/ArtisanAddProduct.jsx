@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "../style/ArtisanAddProduct.css";
 import { ROUTES } from "../routes/paths.js";
@@ -7,68 +7,7 @@ export default function ArtisanAddProduct() {
   const [selectedCategory, setSelectedCategory] = useState("Gốm trang trí");
 
   return (
-    <div className="artisan-product-page">
-      {/* 1. TOP HEADER */}
-      <header className="product-top-nav">
-        <div className="brand-info">
-          <div className="brand-logo-sq">H</div>
-          <div>
-            <strong>Làng Nghề Việt – Không Gian Nghệ Nhân</strong>
-          </div>
-        </div>
-        <div className="top-nav-actions">
-          <span className="pill-badge green">Xưởng Gốm An Hương</span>
-          <span className="nav-link">Cộng đồng</span>
-          <span className="nav-link">Tài liệu hướng dẫn</span>
-          <span className="bell-btn">🔔</span>
-          <button className="hotline-btn">
-            📞 Gọi trợ giúp ngay: <strong>1900 8888</strong>
-          </button>
-        </div>
-      </header>
-
-      {/* 2. MAIN LAYOUT */}
-      <div className="product-main-layout">
-        {/* SIDEBAR TRÁI */}
-        <aside className="product-sidebar">
-          <div className="artisan-mini-card">
-            <img 
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=85" 
-              alt="Bác Nguyễn Văn An" 
-            />
-            <div>
-              <h3>Bác Nguyễn Văn An</h3>
-              <small>Nghệ nhân Gốm Bát Tràng</small>
-            </div>
-          </div>
-
-          <nav className="sidebar-menu-list">
-            <Link to={ROUTES?.ARTISAN_DASHBOARD || "/artisan-dashboard"} className="menu-link">
-              📊 Tổng quan
-            </Link>
-            <Link to={ROUTES?.ARTISAN_PROFILE || "/artisan-profile"} className="menu-link">
-              👤 Hồ sơ nghệ nhân
-            </Link>
-            <Link to={ROUTES?.ARTISAN_PRODUCTS || "/artisan-products"} className="menu-link active">
-              📦 Sản phẩm
-            </Link>
-            <a href="#stories" className="menu-link">📖 Câu chuyện văn hóa</a>
-            <a href="#experiences" className="menu-link">📅 Hoạt động trải nghiệm</a>
-            <a href="#bookings" className="menu-link">👥 Đăng ký của du khách</a>
-          </nav>
-
-          <div className="sidebar-bottom-box">
-            <div className="help-box-red">
-              <span>📞 Hỗ trợ nghệ nhân</span>
-              <strong>1900 8888</strong>
-            </div>
-            <a href="#help" className="sub-link">❓ Trợ giúp & Hướng dẫn</a>
-            <a href="#settings" className="sub-link">⚙ Cài đặt</a>
-          </div>
-        </aside>
-
-        {/* NỘI DUNG CHÍNH BÊN PHẢI */}
-        <main className="product-content">
+    <main className="product-content">
           {/* Nút quay lại */}
           <div className="back-button-row">
             <Link to={ROUTES?.ARTISAN_PRODUCTS || "/artisan-products"} className="btn-back">
@@ -287,8 +226,6 @@ export default function ArtisanAddProduct() {
             </div>
           </div>
 
-        </main>
-      </div>
-    </div>
+    </main>
   );
 }

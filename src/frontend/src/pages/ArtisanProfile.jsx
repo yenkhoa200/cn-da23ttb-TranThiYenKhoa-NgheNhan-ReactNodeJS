@@ -1,67 +1,15 @@
-import React from "react";
 import "../style/ArtisanProfile.css";
+import { Link } from "react-router-dom";
+import { ROUTES } from "../routes/paths.js";
 
 export default function ArtisanProfile() {
   return (
-    <div className="artisan-profile-page">
-      {/* 1. TOP HEADER */}
-      <header className="profile-top-nav">
-        <div className="brand-info">
-          <div className="brand-logo-sq">H</div>
-          <div>
-            <strong>Làng Nghề Việt – Không Gian Nghệ Nhân</strong>
-          </div>
-        </div>
-        <div className="top-nav-actions">
-          <span className="pill-badge green">Bảo lưu điện tử chính thức</span>
-          <span className="nav-link">Cộng đồng</span>
-          <span className="nav-link">Tài liệu hướng dẫn</span>
-          <button className="hotline-btn">
-            📞 Gọi trợ giúp ngay: <strong>1900 8888</strong>
-          </button>
-          <span className="bell-btn">🔔</span>
-        </div>
-      </header>
-
-      {/* 2. MAIN LAYOUT */}
-      <div className="profile-main-layout">
-        {/* SIDEBAR TRÁI */}
-        <aside className="profile-sidebar">
-          <div className="artisan-mini-card">
-            <img 
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=85" 
-              alt="Bác Nguyễn Văn An" 
-            />
-            <div>
-              <h3>Bác Nguyễn Văn An</h3>
-              <small>Nghệ nhân Gốm Bát Tràng</small>
-            </div>
-          </div>
-
-          <nav className="sidebar-menu-list">
-            <a href="#overview" className="menu-link">📊 Tổng quan</a>
-            <a href="#profile" className="menu-link active">🎴 Hồ sơ nghệ nhân</a>
-            <a href="#products" className="menu-link">📦 Sản phẩm</a>
-            <a href="#stories" className="menu-link">📖 Câu chuyện văn hóa</a>
-            <a href="#experiences" className="menu-link">📅 Hoạt động trải nghiệm</a>
-            <a href="#bookings" className="menu-link">👥 Đăng ký của du khách</a>
-          </nav>
-
-          <div className="sidebar-bottom-box">
-            <div className="help-box-red">
-              <span>📞 Hỗ trợ nghệ nhân</span>
-              <strong>1900 8888</strong>
-            </div>
-            <a href="#help" className="sub-link">❓ Trợ giúp & Hướng dẫn</a>
-            <a href="#settings" className="sub-link">⚙ Cài đặt</a>
-          </div>
-        </aside>
-
-        {/* NỘI DUNG CHÍNH BÊN PHẢI */}
-        <main className="profile-content">
+    <main className="profile-content">
           {/* Breadcrumb & Title */}
           <div className="breadcrumb-row">
-            <span>Trang chủ</span> <span>›</span> <span className="active">Hồ sơ nghệ nhân</span>
+            <Link to={ROUTES.ARTISAN_DASHBOARD}>Tổng quan</Link>
+            <span>›</span>
+            <span className="active">Hồ sơ nghệ nhân</span>
           </div>
 
           <div className="title-section-row">
@@ -229,8 +177,6 @@ export default function ArtisanProfile() {
             </div>
             <button className="call-now-btn">📞 Bấm gọi 1900 8888</button>
           </div>
-        </main>
-      </div>
-    </div>
+    </main>
   );
 }

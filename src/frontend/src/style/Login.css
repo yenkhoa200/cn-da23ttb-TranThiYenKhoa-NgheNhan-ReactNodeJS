@@ -276,6 +276,22 @@
   background: white;
 }
 
+.account-type-select {
+  width: 100%;
+  padding: 12px 12px 12px 36px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #faf8f5;
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+}
+
+.account-type-select:focus {
+  border-color: var(--primary-color);
+  background: white;
+}
+
 .eye-btn {
   position: absolute;
   right: 12px;

@@ -1,166 +1,11 @@
-:root {
-  --primary-brown: #8a3a22;
-  --primary-hover: #702d19;
-  --bg-cream: #faf5ee;
-  --card-bg: #ffffff;
-  --text-main: #35251f;
-  --text-muted: #77655d;
-  --border-color: #e5ded5;
-  --green-badge: #e8f5e9;
-  --green-text: #2e7d32;
-}
-
-body {
-  margin: 0;
-  background-color: var(--bg-cream);
-  font-family: "Arial", sans-serif;
-  color: var(--text-main);
-}
-
-.artisan-product-page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* TOP NAV */
-.product-top-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 30px;
-  background: white;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.brand-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand-logo-sq {
-  width: 32px;
-  height: 32px;
-  background-color: var(--primary-brown);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  border-radius: 4px;
-}
-
-.top-nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  font-size: 13px;
-}
-
-.pill-badge.green {
-  background: var(--green-badge);
-  color: var(--green-text);
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 11px;
-}
-
-.nav-link { cursor: pointer; }
-
-.hotline-btn {
-  background: #fdf3f0;
-  color: var(--primary-brown);
-  border: 1px solid #f2d4cd;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-/* LAYOUT MAIN */
-.product-main-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  flex: 1;
-}
-
-/* SIDEBAR */
-.product-sidebar {
-  background: white;
-  border-right: 1px solid var(--border-color);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.artisan-mini-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.artisan-mini-card img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.artisan-mini-card h3 { font-size: 13px; margin: 0; }
-.artisan-mini-card small { font-size: 11px; color: var(--text-muted); }
-
-.sidebar-menu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.menu-link {
-  padding: 10px 12px;
-  text-decoration: none;
-  color: var(--text-main);
-  font-size: 13px;
-  border-radius: 6px;
-  font-weight: 500;
-}
-
-.menu-link.active, .menu-link:hover {
-  background-color: var(--primary-brown);
-  color: white;
-}
-
-.sidebar-bottom-box {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-size: 12px;
-}
-
-.help-box-red {
-  background: var(--primary-brown);
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
-  text-align: center;
-}
-.help-box-red span { display: block; font-size: 11px; }
-.help-box-red strong { font-size: 15px; display: block; margin-top: 2px; }
-
-.sub-link { text-decoration: none; color: var(--text-muted); }
-
 /* CONTENT RIGHT */
 .product-content {
-  padding: 25px 35px 100px 35px;
+  width: 100%;
+  max-width: none;
+  padding-bottom: 90px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  max-width: 950px;
 }
 
 .back-button-row .btn-back {
@@ -482,7 +327,7 @@ body {
   position: fixed;
   bottom: 0;
   right: 0;
-  left: 240px;
+  left: 260px;
   background: white;
   border-top: 1px solid var(--border-color);
   padding: 12px 35px;
