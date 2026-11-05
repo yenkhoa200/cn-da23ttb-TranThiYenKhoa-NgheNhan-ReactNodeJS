@@ -1,0 +1,15 @@
+export const ROUTES = {
+  HOME: "/",
+  TOURIST: "/tourist",
+  LOGIN: "/login",
+  ARTISAN_LOGIN: "/artisan-login",
+  REGISTER: "/register",
+  ARTISAN_REGISTER: "/artisan-register",
+  ARTISAN_DASHBOARD: "/artisan-dashboard",
+  ARTISAN_PROFILE: "/artisan-profile",
+  ARTISAN_ADD_PRODUCT: "/artisan-add-product",
+  ARTISAN_STORY: "/artisan-story",
+  ARTISAN_EXPERIENCES: "/artisan-experiences",
+  ARTISAN_EXPERIENCE_CREATE: "/artisan-experiences/create",
+  ADMIN_DASHBOARD: "/admin",
+};
