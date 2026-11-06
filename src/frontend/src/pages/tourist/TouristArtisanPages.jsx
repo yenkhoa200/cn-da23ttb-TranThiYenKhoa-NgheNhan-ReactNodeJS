@@ -5,19 +5,13 @@ import {
   BadgeCheck,
   CalendarDays,
   ChevronDown,
-  Clock3,
   Heart,
-  Image,
   MapPin,
-  MessageCircle,
-  Package,
-  Phone,
   Search,
   Star,
   Users,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ROUTES } from "../../routes/path.js";
 
 const routeFor = (artisan) => `/tourist/artisan/${artisan.id}`;
 
@@ -131,113 +125,6 @@ export function ArtisanListing({ artisans, crafts, products, stories, favoriteId
           <DiscoverMore crafts={crafts} products={products} stories={stories} />
         </div>
       </div>
-    </div>
-  );
-}
-
-function BookingCard({ artisan, onNotice }) {
-  const [people, setPeople] = useState(1);
-  const [date, setDate] = useState(() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
-  });
-  const submit = (event) => {
-    event.preventDefault();
-    onNotice(`Đã gửi yêu cầu gặp ${artisan.name} vào ngày ${date} cho ${people} người.`);
-  };
-  return (
-    <aside className="tourist-artisan-contact">
-      <h2>Liên hệ với nghệ nhân</h2>
-      <form onSubmit={submit}>
-        <label htmlFor="artisan-booking-date"><CalendarDays size={15} /> Tham quan/Trải nghiệm tại xưởng</label>
-        <input id="artisan-booking-date" type="date" min={new Date().toISOString().slice(0, 10)} value={date} onChange={(event) => setDate(event.target.value)} required />
-        <strong><Users size={15} /> Số lượng người</strong>
-        <div className="tourist-artisan-quantity">
-          <button type="button" aria-label="Giảm số người" disabled={people <= 1} onClick={() => setPeople((count) => Math.max(1, count - 1))}>−</button>
-          <output>{people}</output>
-          <button type="button" aria-label="Tăng số người" onClick={() => setPeople((count) => count + 1)}>+</button>
-        </div>
-        <button type="submit" className="tourist-artisan-contact-submit"><MessageCircle size={15} /> Gửi yêu cầu</button>
-      </form>
-      <div className="tourist-artisan-contact-info">
-        <b>Liên hệ: học với nghệ nhân</b>
-        <span><Phone size={15} /><a href={`tel:${(artisan.phone || "0900000000").replaceAll(" ", "")}`}>{artisan.phone || "0900 000 000"}</a></span>
-        <span><MapPin size={15} />Địa chỉ: {artisan.place}</span>
-      </div>
-    </aside>
-  );
-}
-
-function ArtisanTabs({ artisan, products }) {
-  const [tab, setTab] = useState("Về nghệ nhân");
-  const tabs = [["Về nghệ nhân", Users], ["Câu chuyện nghề", Image], ["Sản phẩm", Package], [`Đánh giá (${artisan.reviews})`, Star]];
-  const matchedProducts = products.filter((product) => `${product.title} ${product.category}`.toLocaleLowerCase("vi").includes((artisan.product || artisan.craft).toLocaleLowerCase("vi").split(" ")[0]));
-  return (
-    <section className="tourist-artisan-tabs-card">
-      <div className="tourist-artisan-tabs" role="tablist" aria-label="Thông tin nghệ nhân">
-        {tabs.map(([label, Icon]) => <button type="button" role="tab" aria-selected={tab === label} className={tab === label ? "active" : ""} key={label} onClick={() => setTab(label)}><Icon size={15} />{label}</button>)}
-      </div>
-      <div className="tourist-artisan-tab-content" role="tabpanel">
-        {tab === "Về nghệ nhân" && <><b>Về nghệ nhân</b><p><strong>Làng nghề:</strong> {artisan.place}</p><p><strong>Sản phẩm chính:</strong> {artisan.product || artisan.craft}</p><p><strong>Kinh nghiệm:</strong> {artisan.years || 20} năm</p><p>{artisan.description}</p></>}
-        {tab === "Câu chuyện nghề" && <><b>Câu chuyện nghề</b><p>{artisan.description}</p><p>Từ tình yêu với nghề và sự kiên trì qua năm tháng, {artisan.name} mong muốn chia sẻ tri thức và truyền cảm hứng gìn giữ nghề truyền thống cho thế hệ tiếp nối.</p></>}
-        {tab === "Sản phẩm" && <div className="tourist-artisan-products">{(matchedProducts.length ? matchedProducts : products.slice(0, 3)).map((product) => <Link to={`/tourist/product/${product.id}`} key={product.id}><img src={product.image} alt={product.title} /><span>{product.title}</span></Link>)}</div>}
-        {tab.startsWith("Đánh giá") && <div className="tourist-artisan-tab-reviews"><b>Đánh giá từ du khách</b><p>★★★★★ Lê Văn Tùng — Trải nghiệm rất thú vị, nghệ nhân thân thiện và nhiệt tình.</p><p>★★★★★ Nguyễn Thị Hạnh — Được tìm hiểu câu chuyện nghề rất đáng nhớ.</p></div>}
-      </div>
-    </section>
-  );
-}
-
-function ReviewAndMap({ artisan, activities }) {
-  const activity = activities.find((item) => `${item.title} ${item.place}`.toLocaleLowerCase("vi").includes(artisan.place.split(",")[0].toLocaleLowerCase("vi"))) || activities[0];
-  return (
-    <div className="tourist-artisan-detail-aside">
-      <section className="tourist-artisan-reviews-card">
-        <h2><Star size={19} fill="currentColor" /> Nhận xét từ du khách</h2>
-        {[["L", "Lê Văn Tùng", "Trải nghiệm rất thú vị, nghệ nhân thân thiện và nhiệt tình. Tôi rất thích hoạt động này!"], ["N", "Nguyễn Thị Hạnh", "Được tìm hiểu câu chuyện và thử làm sản phẩm thủ công rất đáng nhớ."]].map(([initial, name, review]) => <article key={name}><span className="tourist-artisan-review-avatar">{initial}</span><div><b>{name}</b><small>★★★★★ <i>02/11/2026</i></small><p>{review}</p></div></article>)}
-        <Link to="/tourist/reviews">Xem tất cả nhận xét <ArrowRight size={13} /></Link>
-      </section>
-      <div className="tourist-artisan-map-card"><span><MapPin size={22} fill="currentColor" /></span><b>{artisan.place.split(",")[0]}</b></div>
-      {activity && <Link className="tourist-artisan-activity-card" to={`/tourist/activity/${activity.id}`}><small>HOẠT ĐỘNG TRẢI NGHIỆM</small><b>{activity.title}</b><span>Khám phá cùng nghệ nhân <ArrowRight size={13} /></span><img src={activity.image} alt="" /></Link>}
-    </div>
-  );
-}
-
-export function ArtisanDetail({ artisan, products, activities, favoriteIds, onFavorite, onNotice }) {
-  const [photo, setPhoto] = useState(0);
-  const saved = favoriteIds.includes(artisan.id);
-  const gallery = artisan.gallery?.length ? artisan.gallery : [artisan.image, artisan.image, artisan.image, artisan.image];
-  return (
-    <div className="tourist-view tourist-artisan-detail-page">
-      <div className="tourist-breadcrumb"><Link to={ROUTES.TOURIST}>Trang chủ</Link><span>›</span><Link to="/tourist/artisans">Nghệ nhân</Link><span>›</span>{artisan.name}</div>
-      <section className="tourist-artisan-detail-top">
-        <div className="tourist-artisan-gallery">
-          <div className="tourist-artisan-main-photo">
-            <img src={gallery[photo]} alt={`${artisan.name} tại xưởng`} />
-            <button type="button" className={`tourist-artisan-photo-heart${saved ? " is-saved" : ""}`} aria-label={saved ? "Bỏ yêu thích nghệ nhân" : "Lưu nghệ nhân yêu thích"} onClick={() => onFavorite(artisan)}><Heart size={18} fill={saved ? "currentColor" : "none"} /></button>
-            <button type="button" className="tourist-artisan-photo-next" aria-label="Ảnh tiếp theo" onClick={() => setPhoto((index) => (index + 1) % gallery.length)}><ArrowRight size={18} /></button>
-          </div>
-          <div className="tourist-artisan-thumbnails">{gallery.map((image, index) => <button type="button" key={`${image}-${index}`} aria-label={`Xem ảnh ${index + 1}`} className={photo === index ? "active" : ""} onClick={() => setPhoto(index)}><img src={image} alt="" /></button>)}</div>
-        </div>
-
-        <div className="tourist-artisan-profile">
-          <span className="tourist-artisan-award">🏅 Nghệ nhân ưu tú</span>
-          <h1>{artisan.name}</h1>
-          <div className="tourist-artisan-rating"><span>{"★".repeat(Math.round(Number(artisan.rating) || 5))}</span><small>({artisan.reviews} đánh giá)</small></div>
-          <div className="tourist-artisan-facts">
-            <span><Users size={15} /><b>Làng nghề:</b> {artisan.place}</span>
-            <span><MapPin size={15} /><b>Sản phẩm chính:</b> {artisan.product || artisan.craft}</span>
-            <span><Clock3 size={15} /><b>Kinh nghiệm:</b> {artisan.years || 20} năm</span>
-          </div>
-          <p>{artisan.description} Từ tình yêu với nghề và sự kiên trì qua năm tháng, những giá trị văn hóa được trao truyền và lan tỏa đến cộng đồng.</p>
-        </div>
-
-        <BookingCard artisan={artisan} onNotice={onNotice} />
-      </section>
-      <section className="tourist-artisan-detail-lower">
-        <ArtisanTabs artisan={artisan} products={products} />
-        <ReviewAndMap artisan={artisan} activities={activities} />
-      </section>
     </div>
   );
 }

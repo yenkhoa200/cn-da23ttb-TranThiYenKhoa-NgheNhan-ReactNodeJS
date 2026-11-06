@@ -7,83 +7,20 @@ import {
   CalendarDays,
   Compass,
   Heart,
-  Leaf,
   MapPin,
   Search,
   UserRound,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const discoveryCards = [
-  {
-    title: "Nghệ nhân Nguyễn Thị Lan",
-    category: "Làng gốm Bát Tràng",
-    place: "Hà Nội",
-    image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=900&q=85",
-    to: "/tourist/artisan/artisan-lan",
-    icon: UserRound,
-  },
-  {
-    title: "Làng lụa Hội An",
-    category: "Di sản & làng nghề",
-    place: "Quảng Nam",
-    image: "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=85",
-    to: "/tourist/craft/craft-hoi-an",
-    icon: Compass,
-  },
-  {
-    title: "Nghề mây tre đan",
-    category: "Thủ công truyền thống",
-    place: "Hà Nội",
-    image: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=900&q=85",
-    to: "/tourist/craft/craft-phu-vinh",
-    icon: Bookmark,
-  },
-  {
-    title: "Phố cổ Hội An",
-    category: "Di sản văn hóa",
-    place: "Quảng Nam",
-    image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=85",
-    to: "/tourist/story/story-pho-co",
-    icon: MapPin,
-  },
-];
-
-const featuredStories = [
-  {
-    title: "Giữ lửa lò, giữ hồn đất Bát Tràng",
-    category: "Câu chuyện làng nghề",
-    image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=85",
-    to: "/tourist/story/story-gom",
-  },
-  {
-    title: "Sợi tơ và những hoa văn kể chuyện",
-    category: "Tri thức văn hóa",
-    image: "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=800&q=85",
-    to: "/tourist/story/story-lua",
-  },
-  {
-    title: "Nét đẹp nghề thủ công qua đôi bàn tay",
-    category: "Nghề truyền thống",
-    image: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=800&q=85",
-    to: "/tourist/stories",
-  },
-  {
-    title: "Những miền di sản lưu giữ ký ức Việt",
-    category: "Di sản văn hóa",
-    image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=800&q=85",
-    to: "/tourist/stories",
-  },
-];
-
 const heroSlides = [
   {
-    image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=2000&q=90",
-    alt: "Ngôi đình cổ giữa không gian xanh của làng quê Việt",
+    image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=2000&q=90",
+    alt: "Nghệ nhân đang chế tác sản phẩm gốm thủ công",
     eyebrow: "HÀNH TRÌNH DI SẢN VIỆT",
-    titleLead: "Kết nối trực tiếp du khách",
-    titleEmphasis: "với nghệ nhân và các làng nghề truyền thống",
-    description: "Trải nghiệm, tìm hiểu và tiếp nối tinh hoa văn hóa Việt.",
+    titleLead: "Chào mừng bạn đến với",
+    titleEmphasis: "Tinh Hoa Việt!",
+    description: "Tiếp tục hành trình khám phá những làng nghề, nghệ nhân và giá trị văn hóa truyền thống Việt Nam.",
     action: "Khám phá nghệ nhân",
     to: "/tourist/artisans",
   },
@@ -116,7 +53,45 @@ const categories = [
   { label: "Câu chuyện văn hóa", icon: Heart, to: "/tourist/stories" },
 ];
 
-export default function TouristLanding({ query, onQuery, onSearch }) {
+function HomeFeatureSection({ title, eyebrow, items, kind, link }) {
+  const routeForItem = (item) => `/tourist/${kind === "artisans" ? "artisan" : kind === "crafts" ? "craft" : kind === "products" ? "product" : kind === "stories" ? "story" : "activity"}/${item.id}`;
+
+  return (
+    <section className={`tourist-section tourist-home-collection tourist-home-${kind}-section`}>
+      <div className="tourist-section-title">
+        <div>
+          <span className="tourist-eyebrow">{eyebrow}</span>
+          <h2>{title}</h2>
+        </div>
+        <Link className="tourist-more" to={link}>Xem tất cả <ArrowRight size={15} /></Link>
+      </div>
+      <div className="tourist-home-feature-grid">
+        {items.slice(0, 3).map((item) => {
+          const itemTitle = item.name || item.title;
+          const subtitle = item.craft || item.category;
+          return (
+            <Link className="tourist-home-feature-card" to={routeForItem(item)} key={item.id}>
+              <div className="tourist-home-feature-image">
+                <img src={item.image} alt={itemTitle} loading="lazy" />
+                {item.category && <span>{item.category}</span>}
+              </div>
+              <div className="tourist-home-feature-copy">
+                {subtitle && <small>{subtitle}</small>}
+                <h3>{itemTitle}</h3>
+                {item.place && <p><MapPin size={14} /> {item.place}</p>}
+                {item.schedule && <p>{item.schedule} · {item.duration}</p>}
+                {item.description && <p className="tourist-home-feature-description">{item.description}</p>}
+                <span className="tourist-home-feature-link">Khám phá <ArrowRight size={14} /></span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+export default function TouristLanding({ query, onQuery, onSearch, data }) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -155,7 +130,7 @@ export default function TouristLanding({ query, onQuery, onSearch }) {
             {index === activeSlide && (
               <div className="tourist-hero-content" key={slide.titleLead || slide.title}>
                 <span className="tourist-hero-tag"><span /> {slide.eyebrow}</span>
-                <h1>
+                      <h1>
                   {slide.titleLead
                     ? <span>{slide.titleLead}<br /><em>{slide.titleEmphasis}</em></span>
                     : slide.title}
@@ -163,7 +138,7 @@ export default function TouristLanding({ query, onQuery, onSearch }) {
                 <p>{slide.description}</p>
                 <form className="tourist-hero-search" onSubmit={onSearch}>
                   <Search size={19} aria-hidden="true" />
-                  <input value={query} onChange={(event) => onQuery(event.target.value)} placeholder="Tìm kiếm nghệ nhân, làng nghề, hoạt động..." aria-label="Tìm kiếm nghệ nhân, làng nghề, hoạt động" />
+                  <input value={query} onChange={(event) => onQuery(event.target.value)} placeholder="Tìm kiếm nghệ nhân, làng nghề, sản phẩm, hoạt động..." aria-label="Tìm kiếm nghệ nhân, làng nghề, sản phẩm, hoạt động" />
                   <button type="submit">Tìm kiếm</button>
                 </form>
               </div>
@@ -198,52 +173,11 @@ export default function TouristLanding({ query, onQuery, onSearch }) {
           ))}
         </section>
 
-        <section className="tourist-section tourist-discovery-section">
-          <div className="tourist-section-title">
-            <div>
-              <span className="tourist-discovery-leaf"><Leaf size={29} /></span>
-              <h2>Khám phá nét đẹp văn hóa Việt</h2>
-            </div>
-            <Link className="tourist-more tourist-pill-link" to="/tourist/crafts">Xem thêm <ArrowRight size={15} /></Link>
-          </div>
-          <div className="tourist-home-discovery-grid">
-            {discoveryCards.map((card) => {
-              const Icon = card.icon;
-              return (
-              <Link className="tourist-home-discovery-card" to={card.to} key={card.title}>
-                <img src={card.image} alt={card.title} loading="lazy" />
-                <span className="tourist-home-discovery-shade" />
-                <span className="tourist-home-discovery-copy">
-                  <small><Icon size={14} /> {card.title}</small>
-                  <span><MapPin size={12} /> {card.place}</span>
-                </span>
-                <span className="tourist-home-discovery-arrow"><ArrowRight size={17} /></span>
-              </Link>
-            );})}
-          </div>
-        </section>
-
-        <section className="tourist-section tourist-news-section">
-          <div className="tourist-section-title">
-            <div>
-              <span className="tourist-news-mark">✿</span>
-              <h2>Tin tức & Câu chuyện văn hóa</h2>
-            </div>
-            <Link className="tourist-more tourist-pill-link" to="/tourist/stories">Xem thêm <ArrowRight size={15} /></Link>
-          </div>
-          <div className="tourist-news-grid">
-            {featuredStories.map((story) => (
-              <Link className="tourist-news-card" to={story.to} key={story.title}>
-                <img src={story.image} alt={story.title} loading="lazy" />
-                <span className="tourist-news-card-copy">
-                  <small>{story.category}</small>
-                  <strong>{story.title}</strong>
-                </span>
-                <span className="tourist-news-card-arrow"><ArrowRight size={16} /></span>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <HomeFeatureSection title="Nghệ nhân nổi bật" eyebrow="Người gìn giữ tinh hoa" items={data.artisans} kind="artisans" link="/tourist/artisans" />
+        <HomeFeatureSection title="Làng nghề truyền thống" eyebrow="Miền di sản" items={data.crafts} kind="crafts" link="/tourist/crafts" />
+        <HomeFeatureSection title="Sản phẩm thủ công" eyebrow="Từ đôi tay đến đời sống" items={data.products} kind="products" link="/tourist/products" />
+        <HomeFeatureSection title="Câu chuyện văn hóa" eyebrow="Tri thức được trao truyền" items={data.stories} kind="stories" link="/tourist/stories" />
+        <HomeFeatureSection title="Hoạt động trải nghiệm" eyebrow="Sống cùng văn hóa" items={data.activities} kind="activities" link="/tourist/activities" />
       </div>
     </>
   );

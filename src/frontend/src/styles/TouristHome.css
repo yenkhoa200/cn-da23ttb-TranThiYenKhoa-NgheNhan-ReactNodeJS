@@ -1,11 +1,11 @@
 .tourist-page {
-  --tourist-ink: #342820;
-  --tourist-green: #354b3d;
-  --tourist-green-dark: #26392d;
-  --tourist-primary: #9b4b32;
-  --tourist-primary-dark: #7e3926;
-  --tourist-pale: #f0e8dc;
-  --tourist-cream: #faf7f0;
+  --tourist-ink: #302820;
+  --tourist-green: #354c3f;
+  --tourist-green-dark: #293a30;
+  --tourist-primary: #a34f32;
+  --tourist-primary-dark: #813d27;
+  --tourist-pale: #ede2d2;
+  --tourist-cream: #f8f3ea;
   --tourist-muted: #85796c;
   --tourist-line: #e8dfd3;
   font-family: "Be Vietnam Pro", "Segoe UI", Tahoma, Arial, sans-serif;
@@ -6220,5 +6220,4250 @@
 
   .tourist-artisan-activity-card {
     grid-column: auto;
+  }
+}
+
+  .tourist-home-shell {
+    background: #f8f3ea;
+    color: #302820;
+  }
+
+  .tourist-home-shell .tourist-header {
+    min-height: 74px;
+    background: rgba(255, 255, 255, 0.97);
+  }
+
+  .tourist-home-shell .tourist-brand strong {
+    color: #a34f32;
+  }
+
+  .tourist-home-shell .tourist-nav a {
+    color: #51463b;
+    font-size: 12px;
+  }
+
+  .tourist-home-shell .tourist-nav a:hover,
+  .tourist-home-shell .tourist-nav a.is-current {
+    border-color: #a34f32;
+    color: #a34f32;
+  }
+
+  .tourist-header-popover-wrap {
+    position: relative;
+  }
+
+  .tourist-account-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #51463b;
+  }
+
+  .tourist-home-shell .tourist-avatar {
+    width: 38px;
+    height: 38px;
+    border: 2px solid #fff;
+    background: #ede2d2;
+    color: #354c3f;
+    box-shadow: 0 0 0 1px #e4d7c6;
+  }
+
+  .tourist-header-popover {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 13px);
+    right: 0;
+    width: 280px;
+    padding: 16px;
+    border: 1px solid #e8dfd3;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 14px 36px rgba(48, 40, 32, 0.16);
+  }
+
+  .tourist-header-popover::before {
+    position: absolute;
+    top: -6px;
+    right: 14px;
+    width: 10px;
+    height: 10px;
+    border-top: 1px solid #e8dfd3;
+    border-left: 1px solid #e8dfd3;
+    background: #fff;
+    content: "";
+    transform: rotate(45deg);
+  }
+
+  .tourist-account-summary {
+    display: grid;
+    gap: 3px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee6dc;
+  }
+
+  .tourist-account-summary strong,
+  .tourist-notification-popover > strong {
+    color: #302820;
+    font-size: 13px;
+  }
+
+  .tourist-account-summary span {
+    overflow: hidden;
+    color: #85796c;
+    font-size: 11px;
+    text-overflow: ellipsis;
+  }
+
+  .tourist-account-popover > a,
+  .tourist-account-popover > button {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 9px;
+    margin-top: 5px;
+    padding: 10px 4px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #51463b;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .tourist-account-popover > a:hover,
+  .tourist-account-popover > button:hover {
+    background: #f8f3ea;
+    color: #a34f32;
+  }
+
+  .tourist-account-popover > button {
+    color: #a34f32;
+  }
+
+  .tourist-notification-popover p {
+    margin: 10px 0;
+    color: #85796c;
+    font-size: 12px;
+  }
+
+  .tourist-notification-popover > a {
+    color: #a34f32;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .tourist-home-shell .tourist-hero {
+    min-height: clamp(410px, 43vw, 550px);
+    background: #354c3f;
+  }
+
+  .tourist-home-shell .tourist-hero-shade {
+    background: linear-gradient(90deg, rgba(28, 38, 30, 0.83), rgba(28, 38, 30, 0.5) 55%, rgba(28, 38, 30, 0.12));
+  }
+
+  .tourist-home-shell .tourist-hero h1 {
+    max-width: 760px;
+    font-size: clamp(38px, 5vw, 62px);
+  }
+
+  .tourist-home-shell .tourist-hero h1 em {
+    color: #f1dfbf;
+  }
+
+  .tourist-home-shell .tourist-hero p {
+    max-width: 650px;
+    font-size: 16px;
+  }
+
+  .tourist-home-shell .tourist-hero-search {
+    max-width: 680px;
+    min-height: 58px;
+    border-radius: 9px;
+    background: #fff;
+    color: #a34f32;
+  }
+
+  .tourist-home-shell .tourist-hero-search input {
+    font-size: 13px;
+  }
+
+  .tourist-home-shell .tourist-hero-search > button {
+    min-width: 112px;
+    border-radius: 7px;
+    background: #a34f32;
+  }
+
+  .tourist-home-shell .tourist-hero-search > button:hover {
+    background: #813d27;
+  }
+
+  .tourist-home-shell .tourist-category {
+    border-color: #e7dccd;
+    background: #fff;
+  }
+
+  .tourist-home-shell .tourist-category-icon {
+    background: #ede2d2;
+    color: #354c3f;
+  }
+
+  .tourist-home-shell .tourist-category strong {
+    color: #302820;
+    font-size: 12px;
+  }
+
+  .tourist-home-shell .tourist-section-title h2 {
+    color: #354c3f;
+    font-size: clamp(24px, 2.6vw, 31px);
+  }
+
+  .tourist-home-shell .tourist-eyebrow {
+    color: #a34f32;
+  }
+
+  .tourist-home-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .tourist-home-feature-card {
+    overflow: hidden;
+    border: 1px solid #e8dfd3;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 5px 18px rgba(48, 40, 32, 0.045);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .tourist-home-feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(48, 40, 32, 0.11);
+  }
+
+  .tourist-home-feature-image {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    background: #ede2d2;
+  }
+
+  .tourist-home-feature-image img {
+    height: 100%;
+    transition: transform 0.35s ease;
+  }
+
+  .tourist-home-feature-card:hover img {
+    transform: scale(1.035);
+  }
+
+  .tourist-home-feature-image > span {
+    position: absolute;
+    bottom: 13px;
+    left: 13px;
+    padding: 6px 10px;
+    border-radius: 30px;
+    background: rgba(53, 76, 63, 0.9);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .tourist-home-feature-copy {
+    padding: 17px 18px 18px;
+  }
+
+  .tourist-home-feature-copy > small {
+    color: #a34f32;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .tourist-home-feature-copy h3 {
+    margin: 6px 0 8px;
+    color: #302820;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .tourist-home-feature-copy > p {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0;
+    color: #766b5f;
+    font-size: 11px;
+  }
+
+  .tourist-home-feature-copy > p svg {
+    flex: 0 0 auto;
+    color: #a34f32;
+  }
+
+  .tourist-home-feature-copy > .tourist-home-feature-description {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 9px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .tourist-home-feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    color: #a34f32;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .tourist-home-activities-section {
+    padding: 30px;
+    border-radius: 14px;
+    background: #ede2d2;
+  }
+
+  .tourist-home-activities-section .tourist-home-feature-image {
+    height: 190px;
+  }
+
+  .tourist-footer {
+    display: block;
+    padding: 0 max(calc((100vw - 1200px) / 2), 5%);
+    border-top: 1px solid #e8dfd3;
+    background: #fff;
+  }
+
+  .tourist-footer-main {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.5fr) repeat(3, minmax(130px, 1fr));
+    gap: 40px;
+    padding: 42px 0 34px;
+  }
+
+  .tourist-footer-brand .tourist-brand-logo {
+    width: 58px !important;
+    height: 44px;
+  }
+
+  .tourist-footer-brand > p {
+    max-width: 330px;
+    margin: 12px 0 0;
+    color: #766b5f;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .tourist-footer-column {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+  }
+
+  .tourist-footer-column > strong {
+    margin-bottom: 3px;
+    color: #354c3f;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 14px;
+  }
+
+  .tourist-footer-column > a {
+    color: #766b5f;
+    font-size: 11px;
+  }
+
+  .tourist-footer-column > a:hover {
+    color: #a34f32;
+  }
+
+  .tourist-footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid #eee6dc;
+    color: #85796c;
+    font-size: 10px;
+  }
+
+  @media (max-width: 1100px) {
+    .tourist-home-shell .tourist-nav {
+      gap: 13px;
+      margin: 0 14px;
+    }
+
+    .tourist-home-shell .tourist-nav a {
+      font-size: 10px;
+    }
+
+    .tourist-home-feature-image {
+      height: 185px;
+    }
+
+    .tourist-footer-main {
+      gap: 24px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .tourist-home-shell .tourist-header {
+      min-height: 66px;
+    }
+
+    .tourist-home-shell .tourist-nav {
+      top: 65px;
+    }
+
+    .tourist-home-shell .tourist-hero {
+      min-height: 430px;
+    }
+
+    .tourist-home-shell .tourist-hero-content {
+      padding: 54px 25px 62px;
+    }
+
+    .tourist-home-shell .tourist-hero h1 {
+      font-size: clamp(34px, 8vw, 48px);
+    }
+
+    .tourist-home-feature-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .tourist-home-feature-image {
+      height: 160px;
+    }
+
+    .tourist-home-feature-copy {
+      padding: 13px;
+    }
+
+    .tourist-home-feature-copy h3 {
+      font-size: 16px;
+    }
+
+    .tourist-home-activities-section {
+      padding: 20px 14px;
+    }
+
+    .tourist-footer-main {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px 20px;
+    }
+
+    .tourist-footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tourist-home-feature-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tourist-home-feature-image,
+    .tourist-home-activities-section .tourist-home-feature-image {
+      height: 205px;
+    }
+
+    .tourist-header-popover {
+      right: -42px;
+      width: min(280px, calc(100vw - 24px));
+    }
+
+    .tourist-footer-bottom {
+      flex-direction: column;
+      gap: 5px;
+    }
+  }
+
+  .tourist-artisan-detail-content {
+    width: min(1320px, calc(100% - 64px));
+    padding-top: 10px;
+  }
+
+  .tourist-artisan-detail-page .tourist-breadcrumb {
+    margin-bottom: 14px;
+    color: #766b5f;
+    font-size: 11px;
+  }
+
+  .tourist-artisan-detail-page .tourist-breadcrumb a {
+    color: #354c3f;
+  }
+
+  .tourist-artisan-detail-top {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr) minmax(250px, 0.68fr);
+    align-items: start;
+    gap: 24px;
+  }
+
+  .tourist-artisan-gallery {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 106px;
+    gap: 9px;
+  }
+
+  .tourist-artisan-main-photo {
+    height: 306px;
+    border-radius: 13px;
+  }
+
+  .tourist-artisan-main-photo::after {
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(transparent, rgba(28, 38, 30, 0.16));
+    content: "";
+    pointer-events: none;
+  }
+
+  .tourist-artisan-photo-next {
+    z-index: 1;
+    right: auto;
+    left: 50%;
+    width: 48px;
+    height: 48px;
+    background: rgba(26, 34, 28, 0.58);
+    transform: translate(-50%, -50%);
+  }
+
+  .tourist-artisan-thumbnails {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  .tourist-artisan-thumbnails button {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    border-radius: 9px;
+  }
+
+  .tourist-artisan-thumbnails button.active {
+    border: 2px solid #354c3f;
+  }
+
+  .tourist-artisan-thumbnails img {
+    border-radius: 8px;
+  }
+
+  .tourist-artisan-thumbnails button > span {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(24, 31, 25, 0.56);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .tourist-artisan-profile {
+    padding-top: 1px;
+  }
+
+  .tourist-artisan-profile h1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #183f31;
+    font-size: clamp(26px, 2.4vw, 35px);
+  }
+
+  .tourist-artisan-profile h1 svg {
+    flex: 0 0 auto;
+    color: #168354;
+    stroke: #fff;
+  }
+
+  .tourist-artisan-craft-title {
+    margin: 4px 0 8px !important;
+    color: #51463b !important;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 17px !important;
+    font-style: italic;
+  }
+
+  .tourist-artisan-rating {
+    gap: 8px;
+  }
+
+  .tourist-artisan-rating > span {
+    color: #e99b17;
+    font-size: 20px;
+  }
+
+  .tourist-artisan-rating > b {
+    color: #302820;
+    font-size: 13px;
+  }
+
+  .tourist-artisan-rating small {
+    font-size: 11px;
+  }
+
+  .tourist-artisan-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 14px 0 12px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid #e8dfd3;
+  }
+
+  .tourist-artisan-facts > span {
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .tourist-artisan-facts svg {
+    color: #176444;
+    fill: none;
+  }
+
+  .tourist-artisan-profile > p:not(.tourist-artisan-craft-title) {
+    color: #403a33;
+    font-size: 12px;
+    line-height: 1.75;
+  }
+
+  .tourist-artisan-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 7px;
+    padding: 6px 12px;
+    border: 1px solid #8eaf9a;
+    border-radius: 18px;
+    color: #24583c;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .tourist-artisan-contact {
+    display: grid;
+    grid-column: auto;
+    gap: 10px;
+    padding: 18px;
+    border: 1px solid #e4e6d5;
+    border-radius: 16px;
+    background: #f0f3e5;
+    box-shadow: none;
+  }
+
+  .tourist-artisan-save-button,
+  .tourist-artisan-review-button {
+    display: flex;
+    min-height: 43px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid #a34f32;
+    border-radius: 8px;
+    background: #fff;
+    color: #a34f32;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .tourist-artisan-save-button {
+    border-color: transparent;
+    border-radius: 25px;
+    background: #e7edd8;
+    color: #24583c;
+  }
+
+  .tourist-artisan-save-button.is-saved {
+    background: #e1ead7;
+  }
+
+  .tourist-artisan-contact > .tourist-artisan-contact-submit {
+    width: 100%;
+    min-height: 43px;
+    margin: 0;
+    border: 0;
+    border-radius: 8px;
+    background: #176444;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .tourist-artisan-contact > .tourist-artisan-contact-submit:hover {
+    background: #104c34;
+  }
+
+  .tourist-artisan-review-button {
+    border-color: #749782;
+    background: #fff;
+    color: #354c3f;
+  }
+
+  .tourist-artisan-booking-form {
+    display: grid;
+    gap: 8px;
+    padding: 13px;
+    border: 1px solid #e1e3d6;
+    border-radius: 9px;
+    background: #fffefa;
+  }
+
+  .tourist-artisan-booking-form > label,
+  .tourist-artisan-booking-form > strong {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #373c35;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .tourist-artisan-booking-form input[type="date"] {
+    width: 100%;
+    height: 36px;
+    padding: 0 9px;
+    border: 1px solid #e7e4dc;
+    border-radius: 7px;
+    background: #fff;
+    color: #302820;
+    font: inherit;
+    font-size: 11px;
+  }
+
+  .tourist-artisan-booking-form .tourist-artisan-contact-submit {
+    min-height: 38px;
+    margin-top: 2px;
+    font-size: 11px;
+  }
+
+  .tourist-artisan-share {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7px;
+    padding-top: 9px;
+    border-top: 1px solid #dfe3d3;
+  }
+
+  .tourist-artisan-share > strong {
+    margin-right: auto;
+    color: #302820;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .tourist-artisan-share > a,
+  .tourist-artisan-share > button {
+    display: grid;
+    width: 31px;
+    height: 31px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid #e9e9df;
+    border-radius: 50%;
+    background: #fff;
+    color: #354c3f;
+  }
+
+  .tourist-artisan-share > a:hover,
+  .tourist-artisan-share > button:hover {
+    border-color: #a34f32;
+    color: #a34f32;
+  }
+
+  .tourist-artisan-facebook-mark {
+    font-family: Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+  }
+
+  .tourist-artisan-detail-lower {
+    grid-template-columns: minmax(0, 1.7fr) minmax(290px, 0.85fr);
+    gap: 18px;
+    margin-top: 20px;
+  }
+
+  .tourist-artisan-detail-primary {
+    display: grid;
+    min-width: 0;
+    gap: 14px;
+  }
+
+  .tourist-artisan-tabs-card,
+  .tourist-artisan-reviews-card,
+  .tourist-artisan-location-card {
+    border-color: #e8dfd3;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(48, 40, 32, 0.045);
+  }
+
+  .tourist-artisan-tabs {
+    min-height: 52px;
+  }
+
+  .tourist-artisan-tabs button {
+    gap: 7px;
+    font-size: 11px;
+  }
+
+  .tourist-artisan-tabs button.active {
+    border-bottom-color: #176444;
+    color: #176444;
+  }
+
+  .tourist-artisan-tab-content {
+    min-height: 280px;
+    padding: 18px;
+    font-size: 12px;
+  }
+
+  .tourist-artisan-introduction {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 1.05fr);
+    align-items: center;
+    gap: 18px;
+  }
+
+  .tourist-artisan-introduction h2,
+  .tourist-artisan-story h2 {
+    margin: 0 0 9px;
+    color: #263d30;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 19px;
+  }
+
+  .tourist-artisan-introduction h2 span {
+    margin-right: 5px;
+    color: #176444;
+  }
+
+  .tourist-artisan-introduction p,
+  .tourist-artisan-story p {
+    margin: 0;
+    color: #403a33;
+    font-size: 11px;
+    line-height: 1.75;
+  }
+
+  .tourist-artisan-introduction blockquote {
+    display: flex;
+    gap: 8px;
+    margin: 13px 0 0;
+    padding: 12px;
+    border-radius: 10px;
+    background: #f0f3e5;
+    color: #354c3f;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .tourist-artisan-introduction blockquote svg {
+    flex: 0 0 auto;
+    color: #176444;
+  }
+
+  .tourist-artisan-introduction blockquote small {
+    display: block;
+    margin-top: 4px;
+    color: #51463b;
+    font-family: "Be Vietnam Pro", "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 9px;
+    font-style: normal;
+    text-align: right;
+  }
+
+  .tourist-artisan-intro-gallery {
+    display: grid;
+    height: 220px;
+    grid-template-columns: minmax(0, 1.5fr) minmax(85px, 0.7fr);
+    gap: 8px;
+  }
+
+  .tourist-artisan-intro-gallery > img,
+  .tourist-artisan-intro-gallery > div > img {
+    width: 100%;
+    height: 100%;
+    border-radius: 9px;
+    object-fit: cover;
+  }
+
+  .tourist-artisan-intro-gallery > div {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .tourist-artisan-products {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 11px;
+  }
+
+  .tourist-artisan-products a {
+    background: #fff;
+  }
+
+  .tourist-artisan-products img {
+    height: 112px;
+  }
+
+  .tourist-artisan-products span {
+    padding: 8px 9px 0;
+    color: #a34f32;
+    font-size: 9px;
+  }
+
+  .tourist-artisan-products strong {
+    display: block;
+    padding: 3px 9px 10px;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 12px;
+  }
+
+  .tourist-artisan-featured-products {
+    min-width: 0;
+    overflow: hidden;
+    padding: 14px;
+    border: 1px solid #e8dfd3;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(48, 40, 32, 0.045);
+  }
+
+  .tourist-artisan-featured-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 11px;
+  }
+
+  .tourist-artisan-featured-heading h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #302820;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 16px;
+  }
+
+  .tourist-artisan-featured-heading h2 svg {
+    color: #176444;
+  }
+
+  .tourist-artisan-featured-heading > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #176444;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .tourist-artisan-featured-grid {
+    display: grid;
+    grid-auto-columns: minmax(130px, 160px);
+    grid-auto-flow: column;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-color: #c9d4c6 transparent;
+    scrollbar-width: thin;
+  }
+
+  .tourist-artisan-featured-grid > a {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #eee6dc;
+    border-radius: 9px;
+    background: #fff;
+    color: #302820;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .tourist-artisan-featured-grid > a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(48, 40, 32, 0.1);
+  }
+
+  .tourist-artisan-featured-grid img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+  }
+
+  .tourist-artisan-featured-grid > a > span {
+    display: block;
+    overflow: hidden;
+    padding: 7px 8px 0;
+    color: #a34f32;
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tourist-artisan-featured-grid > a > strong {
+    display: -webkit-box;
+    min-height: 34px;
+    overflow: hidden;
+    padding: 3px 8px 8px;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 11px;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .tourist-artisan-story {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px;
+  }
+
+  .tourist-artisan-story > svg {
+    flex: 0 0 auto;
+    color: #176444;
+  }
+
+  .tourist-artisan-story p + p {
+    margin-top: 10px;
+  }
+
+  .tourist-artisan-related-activities {
+    display: grid;
+    gap: 10px;
+  }
+
+  .tourist-artisan-related-activities > a {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 11px;
+    padding: 8px;
+    border: 1px solid #eee6dc;
+    border-radius: 9px;
+    color: #302820;
+  }
+
+  .tourist-artisan-related-activities img {
+    width: 90px;
+    height: 72px;
+    border-radius: 7px;
+  }
+
+  .tourist-artisan-related-activities strong,
+  .tourist-artisan-related-activities small {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .tourist-artisan-related-activities strong {
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 12px;
+  }
+
+  .tourist-artisan-related-activities small {
+    margin-top: 5px;
+    color: #766b5f;
+    font-size: 9px;
+  }
+
+  .tourist-artisan-related-activities > a > svg {
+    color: #a34f32;
+  }
+
+  .tourist-artisan-media-gallery {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .tourist-artisan-media-gallery > div {
+    position: relative;
+    height: 170px;
+    overflow: hidden;
+    border-radius: 9px;
+  }
+
+  .tourist-artisan-media-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tourist-artisan-media-gallery > div > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(24, 43, 31, 0.7);
+    color: #fff;
+    transform: translate(-50%, -50%);
+  }
+
+  .tourist-artisan-detail-aside {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .tourist-artisan-location-card {
+    display: grid;
+    gap: 9px;
+    padding: 15px;
+  }
+
+  .tourist-artisan-aside-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .tourist-artisan-aside-title h2 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    color: #302820;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 15px;
+  }
+
+  .tourist-artisan-aside-title h2 svg {
+    color: #176444;
+  }
+
+  .tourist-artisan-aside-title > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #354c3f;
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .tourist-artisan-detail-aside > .tourist-artisan-map-card {
+    min-height: 145px;
+    border-color: #e5dfd1;
+    background-color: #eee8d8;
+    background-image:
+      linear-gradient(32deg, transparent 39%, rgba(255,255,255,.92) 40%, rgba(255,255,255,.92) 43%, transparent 44%),
+      linear-gradient(145deg, transparent 54%, rgba(255,255,255,.88) 55%, rgba(255,255,255,.88) 58%, transparent 59%),
+      linear-gradient(90deg, transparent 26%, rgba(214,198,168,.8) 27%, rgba(214,198,168,.8) 28%, transparent 29%),
+      linear-gradient(0deg, transparent 72%, rgba(214,198,168,.85) 73%, rgba(214,198,168,.85) 74%, transparent 75%);
+    text-decoration: none;
+  }
+
+  .tourist-artisan-detail-aside > .tourist-artisan-map-card > span {
+    color: #d8342a;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.18));
+  }
+
+  .tourist-artisan-detail-aside > .tourist-artisan-map-card > b {
+    margin-top: -26px;
+    color: #302820;
+    font-size: 11px;
+  }
+
+  .tourist-artisan-location-card > p,
+  .tourist-artisan-location-card > a:not(.tourist-artisan-map-card) {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin: 0;
+    color: #403a33;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .tourist-artisan-location-card > strong {
+    margin-top: 2px;
+    color: #302820;
+    font-size: 11px;
+  }
+
+  .tourist-artisan-location-card > p svg,
+  .tourist-artisan-location-card > a svg {
+    flex: 0 0 auto;
+    color: #176444;
+  }
+
+  .tourist-artisan-reviews-card {
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .tourist-artisan-reviews-card h2 {
+    color: #302820;
+    font-size: 16px;
+  }
+
+  .tourist-artisan-review-average {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+  }
+
+  .tourist-artisan-review-average > strong {
+    color: #302820;
+    font-family: "Lora", Georgia, "Times New Roman", serif;
+    font-size: 20px;
+  }
+
+  .tourist-artisan-review-average > span {
+    color: #766b5f;
+    font-size: 10px;
+  }
+
+  .tourist-artisan-rating-bar {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) 31px;
+    align-items: center;
+    gap: 7px;
+    color: #51463b;
+    font-size: 9px;
+  }
+
+  .tourist-artisan-rating-bar > i {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 9px;
+    background: #ece9e1;
+  }
+
+  .tourist-artisan-rating-bar > i > b {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #e9a92e;
+  }
+
+  .tourist-artisan-rating-bar > small {
+    color: #766b5f;
+    text-align: right;
+  }
+
+  .tourist-artisan-reviews-card article {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 9px;
+    padding-top: 8px;
+    border-top: 1px solid #f0ebe3;
+  }
+
+  .tourist-artisan-review-avatar {
+    width: 34px;
+    height: 34px;
+    background: #ede2d2;
+    color: #354c3f;
+  }
+
+  .tourist-artisan-reviews-card article > div > b {
+    color: #302820;
+    font-size: 10px;
+  }
+
+  .tourist-artisan-reviews-card article > div > small {
+    display: block;
+    font-size: 10px;
+  }
+
+  .tourist-artisan-reviews-card article p {
+    color: #51463b;
+    font-size: 9px;
+  }
+
+  .tourist-artisan-reviews-card > a {
+    color: #a34f32;
+    font-size: 10px;
+  }
+
+  .tourist-artisan-detail-aside > .tourist-artisan-activity-card {
+    grid-column: auto;
+    min-height: 105px;
+    padding: 13px;
+    border-color: #e8dfd3;
+    background: #f0f3e5;
+  }
+
+  .tourist-artisan-activity-card > small {
+    color: #a34f32;
+    font-size: 9px;
+  }
+
+  .tourist-artisan-activity-card > b {
+    color: #302820;
+    font-size: 13px;
+  }
+
+  .tourist-artisan-activity-card > span {
+    color: #354c3f;
+    font-size: 10px;
+  }
+
+  .tourist-artisan-activity-card > img {
+    width: 52px;
+    height: 52px;
+  }
+
+  @media (max-width: 900px) {
+    .tourist-artisan-detail-top {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .tourist-artisan-gallery {
+      grid-row: span 2;
+    }
+
+    .tourist-artisan-contact {
+      grid-column: 2;
+    }
+
+    .tourist-artisan-detail-lower {
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .tourist-artisan-detail-content {
+      width: calc(100% - 30px);
+    }
+
+    .tourist-artisan-detail-top,
+    .tourist-artisan-detail-lower {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tourist-artisan-gallery {
+      grid-row: auto;
+    }
+
+    .tourist-artisan-main-photo {
+      height: 300px;
+    }
+
+    .tourist-artisan-contact {
+      grid-column: auto;
+    }
+
+    .tourist-artisan-introduction {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tourist-artisan-intro-gallery {
+      height: 200px;
+    }
+
+    .tourist-artisan-tabs button {
+      padding: 0 12px;
+    }
+
+    .tourist-artisan-tab-content {
+      min-height: 220px;
+    }
+
+    .tourist-artisan-detail-aside {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    .tourist-artisan-reviews-card {
+      grid-row: span 2;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .tourist-artisan-gallery {
+      grid-template-columns: minmax(0, 1fr) 76px;
+      gap: 6px;
+    }
+
+    .tourist-artisan-main-photo {
+      height: 255px;
+    }
+
+    .tourist-artisan-facts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tourist-artisan-detail-aside {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tourist-artisan-reviews-card {
+      grid-row: auto;
+    }
+
+    .tourist-artisan-products,
+    .tourist-artisan-media-gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tourist-artisan-products img {
+      height: 95px;
+    }
+
+    .tourist-artisan-featured-products {
+      padding: 11px;
+    }
+
+    .tourist-artisan-featured-grid {
+      grid-auto-columns: minmax(130px, 42%);
+    }
+
+    .tourist-artisan-featured-grid img {
+      height: 105px;
+    }
+
+    .tourist-artisan-media-gallery > div {
+      height: 130px;
+    }
+
+    .tourist-artisan-related-activities > a {
+      grid-template-columns: 68px minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    .tourist-artisan-related-activities img {
+      width: 68px;
+      height: 65px;
+    }
+
+    .tourist-artisan-related-activities strong {
+      font-size: 10px;
+    }
+  }
+
+.tourist-villages-page,
+.tourist-village-detail-page {
+  width: min(1380px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 18px 0 42px;
+  color: #302820;
+}
+
+.tourist-villages-page {
+  animation: tourist-view-enter 0.24s ease both;
+}
+
+.tourist-villages-hero {
+  position: relative;
+  display: flex;
+  min-height: 158px;
+  align-items: center;
+  overflow: hidden;
+  margin: -18px calc((min(1380px, 100vw - 64px) - 100vw) / 2) 16px;
+  background:
+    linear-gradient(90deg, rgba(28, 48, 34, 0.88), rgba(28, 48, 34, 0.65) 44%, rgba(28, 48, 34, 0.09)),
+    url("https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=2000&q=88") center 48% / cover;
+  color: #fff;
+}
+
+.tourist-villages-hero-inner {
+  display: flex;
+  width: min(1240px, calc(100% - 64px));
+  align-items: center;
+  gap: 20px;
+  margin: 0 auto;
+}
+
+.tourist-villages-hero-symbol {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 50%;
+  color: #fff8e9;
+  font-family: Georgia, serif;
+  font-size: 62px;
+  line-height: 1;
+}
+
+.tourist-villages-hero h1 {
+  margin: 0 0 6px;
+  color: #fffdf6;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 600;
+}
+
+.tourist-villages-hero p {
+  margin: 0;
+  color: rgba(255, 253, 246, 0.94);
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.65;
+}
+
+.tourist-villages-hero-ornament {
+  margin-left: auto;
+  color: rgba(255, 248, 231, 0.82);
+  font-family: Georgia, serif;
+  font-size: 90px;
+  transform: rotate(-12deg);
+}
+
+.tourist-villages-main {
+  width: min(1308px, calc(100% - 56px));
+  margin: 0 auto;
+}
+
+.tourist-villages-toolbar {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  margin: 13px 0 15px;
+}
+
+.tourist-villages-search,
+.tourist-villages-filters > label {
+  display: flex;
+  min-width: 0;
+  height: 42px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 13px;
+  border: 1px solid #e8dfd3;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 3px 11px rgba(48, 40, 32, 0.06);
+  color: #354c3f;
+}
+
+.tourist-villages-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #302820;
+  font-size: 11px;
+}
+
+.tourist-villages-search input::placeholder {
+  color: #8d877d;
+}
+
+.tourist-villages-search > button {
+  border: 0;
+  background: transparent;
+  color: #766b5f;
+  font-size: 20px;
+}
+
+.tourist-villages-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.tourist-villages-filters > label {
+  min-width: 135px;
+  height: 40px;
+  gap: 6px;
+  padding: 0 10px;
+}
+
+.tourist-villages-filters select {
+  width: 100%;
+  min-width: 0;
+  appearance: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #302820;
+  font-size: 10px;
+}
+
+.tourist-villages-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  align-items: start;
+  gap: 18px;
+}
+
+.tourist-villages-count {
+  margin-bottom: 7px;
+  color: #766b5f;
+  font-size: 10px;
+}
+
+.tourist-villages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.tourist-village-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e8dfd3;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 9px rgba(48, 40, 32, 0.055);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tourist-village-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 20px rgba(48, 40, 32, 0.12);
+}
+
+.tourist-village-card-image {
+  position: relative;
+  display: block;
+  height: 132px;
+  overflow: hidden;
+  background: #ede2d2;
+}
+
+.tourist-village-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.tourist-village-card:hover .tourist-village-card-image img {
+  transform: scale(1.04);
+}
+
+.tourist-village-card-image > span {
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 9px;
+  border-radius: 18px;
+  background: #f8f3ea;
+  color: #354c3f;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tourist-village-card-heart {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  background: rgba(32, 35, 29, 0.35);
+  color: #fff;
+  cursor: pointer;
+}
+
+.tourist-village-card-heart.is-saved {
+  color: #e85f4f;
+}
+
+.tourist-village-card-body {
+  display: grid;
+  min-height: 88px;
+  gap: 5px;
+  padding: 8px 10px 9px;
+}
+
+.tourist-village-card-title {
+  overflow: hidden;
+  color: #302820;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tourist-village-card-body > span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #766b5f;
+  font-size: 9px;
+}
+
+.tourist-village-card-body > span svg {
+  color: #176444;
+}
+
+.tourist-village-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  margin-top: auto;
+}
+
+.tourist-village-card-footer > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #e99b17;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tourist-village-card-footer small {
+  color: #766b5f;
+  font-size: 8px;
+  font-weight: 400;
+}
+
+.tourist-village-card-footer > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 9px;
+  border-radius: 17px;
+  background: #e8efdf;
+  color: #24583c;
+  font-size: 8px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tourist-village-card-footer > a:hover {
+  background: #dce8d1;
+}
+
+.tourist-villages-sidebar {
+  display: grid;
+  gap: 10px;
+}
+
+.tourist-village-featured,
+.tourist-villages-reasons {
+  display: grid;
+  gap: 8px;
+  padding: 13px;
+  border: 1px solid #e4e9d8;
+  border-radius: 13px;
+  background: #f0f3e5;
+}
+
+.tourist-village-featured h2,
+.tourist-villages-reasons h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #354c3f;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 16px;
+}
+
+.tourist-village-featured-image {
+  display: block;
+  height: 112px;
+  overflow: hidden;
+  border-radius: 9px;
+}
+
+.tourist-village-featured-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tourist-village-featured-title {
+  color: #302820;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tourist-village-featured-place {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #354c3f;
+  font-size: 10px;
+}
+
+.tourist-village-featured p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: #51463b;
+  font-size: 10px;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.tourist-village-featured-action {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  justify-self: center;
+  padding: 0 17px;
+  border-radius: 20px;
+  background: #176444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tourist-villages-reasons {
+  padding: 12px;
+}
+
+.tourist-villages-reasons h2 {
+  font-size: 13px;
+}
+
+.tourist-villages-reasons > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.tourist-villages-reasons > div > span {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 7px 4px 2px;
+  border-right: 1px solid #dfe5d4;
+  color: #51463b;
+  font-size: 8px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.tourist-villages-reasons > div > span:last-child {
+  border-right: 0;
+}
+
+.tourist-villages-reasons i {
+  display: grid;
+  width: 33px;
+  height: 33px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #176444;
+  font-size: 19px;
+  font-style: normal;
+}
+
+.tourist-villages-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px 0 0;
+}
+
+.tourist-villages-pagination button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid #e8dfd3;
+  border-radius: 50%;
+  background: #fff;
+  color: #302820;
+  font-size: 11px;
+}
+
+.tourist-villages-pagination button.active {
+  border-color: #176444;
+  background: #176444;
+  color: #fff;
+}
+
+.tourist-villages-pagination button:disabled {
+  opacity: 0.5;
+}
+
+.tourist-villages-empty {
+  padding: 30px;
+  border: 1px dashed #d9d4c8;
+  border-radius: 10px;
+  color: #766b5f;
+  text-align: center;
+}
+
+.tourist-village-detail-page {
+  padding-top: 10px;
+  animation: tourist-view-enter 0.24s ease both;
+}
+
+.tourist-village-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #766b5f;
+  font-size: 11px;
+}
+
+.tourist-village-breadcrumb a {
+  color: #354c3f;
+}
+
+.tourist-village-detail-hero {
+  position: relative;
+  display: flex;
+  min-height: 215px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  overflow: hidden;
+  padding: 25px 26px 25px 29%;
+  border-radius: 13px;
+  background:
+    linear-gradient(90deg, rgba(36, 34, 26, 0.18) 0%, rgba(35, 34, 28, 0.83) 35%, rgba(35, 34, 28, 0.57) 72%, rgba(35, 34, 28, 0.28)),
+    var(--village-hero-image) center / cover;
+  color: #fff;
+}
+
+.tourist-village-detail-hero-copy {
+  min-width: 0;
+}
+
+.tourist-village-detail-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #f2ad22;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tourist-village-detail-rating small {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.tourist-village-detail-hero h1 {
+  margin: 7px 0 2px;
+  color: #fffdf6;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: clamp(27px, 3vw, 39px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.tourist-village-detail-hero-copy > p {
+  margin: 0 0 13px;
+  color: rgba(255, 253, 246, 0.92);
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.tourist-village-detail-hero-copy > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.tourist-village-detail-hero-copy > div > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fffdf6;
+  font-size: 10px;
+}
+
+.tourist-village-detail-actions {
+  display: grid;
+  width: 205px;
+  flex: 0 0 auto;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
+  background: rgba(248, 243, 234, 0.94);
+}
+
+.tourist-village-detail-actions > button,
+.tourist-village-detail-actions > a {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #8eaf9a;
+  border-radius: 20px;
+  background: #fff;
+  color: #24583c;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tourist-village-detail-actions > button.is-saved {
+  border-color: transparent;
+  background: #e8efdf;
+}
+
+.tourist-village-detail-actions > button:hover,
+.tourist-village-detail-actions > a:hover {
+  border-color: #176444;
+  background: #176444;
+  color: #fff;
+}
+
+.tourist-village-tabs {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  margin: 13px 0;
+  padding: 2px;
+  scrollbar-width: thin;
+}
+
+.tourist-village-tabs button {
+  display: inline-flex;
+  min-height: 40px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  border: 1px solid #e8dfd3;
+  border-radius: 22px;
+  background: #fff;
+  color: #51463b;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.tourist-village-tabs button.active {
+  border-color: #176444;
+  background: #176444;
+  color: #fff;
+}
+
+.tourist-village-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 305px;
+  align-items: start;
+  gap: 18px;
+}
+
+.tourist-village-detail-main {
+  display: grid;
+  min-width: 0;
+  gap: 13px;
+}
+
+.tourist-village-tab-panel,
+.tourist-village-info-card,
+.tourist-village-sidebar-activities,
+.tourist-village-sidebar-artisans,
+.tourist-village-featured-products {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #e8dfd3;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 3px 11px rgba(48, 40, 32, 0.045);
+}
+
+.tourist-village-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 0.9fr);
+  align-items: center;
+  gap: 20px;
+}
+
+.tourist-village-eyebrow {
+  color: #a34f32;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.tourist-village-intro h2,
+.tourist-village-history h2,
+.tourist-village-tradition h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 5px 0 8px;
+  color: #263d30;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 21px;
+}
+
+.tourist-village-intro h2 > span {
+  color: #176444;
+}
+
+.tourist-village-intro p,
+.tourist-village-history > p,
+.tourist-village-tradition > p {
+  margin: 0 0 8px;
+  color: #403a33;
+  font-size: 11px;
+  line-height: 1.75;
+}
+
+.tourist-village-intro > img {
+  width: 100%;
+  height: 205px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.tourist-village-primary-link {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+  padding: 0 13px;
+  border-radius: 18px;
+  background: #176444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tourist-village-highlights {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.72fr) minmax(0, 1.5fr);
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  border: 1px solid #eee8dd;
+  border-radius: 11px;
+  background: #fffdfa;
+}
+
+.tourist-village-highlights h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 8px;
+  color: #302820;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 14px;
+}
+
+.tourist-village-highlights h3 svg {
+  color: #e99b17;
+}
+
+.tourist-village-highlights p {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 6px 0;
+  color: #51463b;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.tourist-village-highlights p svg {
+  flex: 0 0 auto;
+  color: #21845b;
+}
+
+.tourist-village-highlight-images {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tourist-village-highlight-images button {
+  height: 128px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: #ede2d2;
+}
+
+.tourist-village-highlight-images img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+
+.tourist-village-highlight-images button:hover img {
+  transform: scale(1.04);
+}
+
+.tourist-village-featured-products {
+  padding: 14px;
+}
+
+.tourist-village-featured-heading,
+.tourist-village-sidebar-activities > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 11px;
+}
+
+.tourist-village-featured-heading h2,
+.tourist-village-sidebar-activities h2,
+.tourist-village-info-card h2,
+.tourist-village-sidebar-artisans h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #302820;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 15px;
+}
+
+.tourist-village-featured-heading h2 svg,
+.tourist-village-sidebar-activities h2 svg,
+.tourist-village-info-card h2 svg,
+.tourist-village-sidebar-artisans h2 svg {
+  color: #176444;
+}
+
+.tourist-village-featured-heading > a,
+.tourist-village-sidebar-activities > div > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #176444;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tourist-village-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tourist-village-products-grid > a {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #eee6dc;
+  border-radius: 9px;
+  color: #302820;
+}
+
+.tourist-village-products-grid img {
+  width: 100%;
+  height: 115px;
+  object-fit: cover;
+}
+
+.tourist-village-products-grid span,
+.tourist-village-products-grid strong {
+  display: block;
+  overflow: hidden;
+  padding: 6px 8px 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tourist-village-products-grid span {
+  color: #a34f32;
+  font-size: 9px;
+}
+
+.tourist-village-products-grid strong {
+  padding-top: 3px;
+  padding-bottom: 9px;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 11px;
+}
+
+.tourist-village-info-card {
+  display: grid;
+  gap: 10px;
+  background: #f0f3e5;
+}
+
+.tourist-village-info-card h2 {
+  margin-bottom: 2px;
+}
+
+.tourist-village-info-card > p {
+  display: grid;
+  grid-template-columns: 19px minmax(0, 1fr);
+  gap: 7px;
+  margin: 0;
+  color: #51463b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.tourist-village-info-card > p > svg {
+  color: #176444;
+}
+
+.tourist-village-info-card > p strong {
+  display: block;
+  color: #302820;
+  font-size: 10px;
+}
+
+.tourist-village-map {
+  position: relative;
+  display: grid;
+  min-height: 142px;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  overflow: hidden;
+  border: 1px solid #e4ddce;
+  border-radius: 9px;
+  background-color: #ede8d9;
+  background-image:
+    linear-gradient(35deg, transparent 40%, rgba(255,255,255,.92) 41%, rgba(255,255,255,.92) 44%, transparent 45%),
+    linear-gradient(125deg, transparent 58%, rgba(255,255,255,.9) 59%, rgba(255,255,255,.9) 62%, transparent 63%),
+    linear-gradient(90deg, transparent 29%, rgba(211,197,170,.82) 30%, rgba(211,197,170,.82) 31%, transparent 32%),
+    linear-gradient(0deg, transparent 72%, rgba(211,197,170,.82) 73%, rgba(211,197,170,.82) 74%, transparent 75%);
+  color: #302820;
+  text-align: center;
+}
+
+.tourist-village-map > span {
+  color: #d8342a;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.2));
+}
+
+.tourist-village-map > strong {
+  padding: 2px 7px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .86);
+  font-size: 10px;
+}
+
+.tourist-village-map > small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 16px;
+  background: #176444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tourist-village-sidebar-activities,
+.tourist-village-sidebar-artisans {
+  display: grid;
+  gap: 9px;
+  padding: 13px;
+  background: #f0f3e5;
+}
+
+.tourist-village-sidebar-activities > div {
+  margin-bottom: 0;
+}
+
+.tourist-village-sidebar-activities h2,
+.tourist-village-sidebar-artisans h2 {
+  font-size: 13px;
+}
+
+.tourist-village-sidebar-activities > a:not(:first-child) {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: #302820;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 10px;
+}
+
+.tourist-village-sidebar-activities img {
+  width: 74px;
+  height: 55px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.tourist-village-sidebar-activities > p {
+  margin: 0;
+  color: #766b5f;
+  font-size: 10px;
+}
+
+.tourist-village-sidebar-artisans {
+  background: #fff;
+}
+
+.tourist-village-sidebar-artisans > a {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: #302820;
+}
+
+.tourist-village-sidebar-artisans img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.tourist-village-sidebar-artisans strong,
+.tourist-village-sidebar-artisans small {
+  display: block;
+}
+
+.tourist-village-sidebar-artisans strong {
+  font-size: 10px;
+}
+
+.tourist-village-sidebar-artisans small {
+  margin-top: 3px;
+  color: #766b5f;
+  font-size: 9px;
+}
+
+.tourist-village-sidebar-artisans > a > svg {
+  color: #a34f32;
+}
+
+.tourist-village-history,
+.tourist-village-tradition {
+  min-height: 300px;
+}
+
+.tourist-village-history h2,
+.tourist-village-tradition h2 {
+  margin: 7px 0 12px;
+}
+
+.tourist-village-history-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 9px;
+  background: #f0f3e5;
+  color: #176444;
+}
+
+.tourist-village-history-note strong,
+.tourist-village-history-note small {
+  display: block;
+}
+
+.tourist-village-history-note strong {
+  color: #302820;
+  font-size: 11px;
+}
+
+.tourist-village-history-note small {
+  margin-top: 3px;
+  color: #766b5f;
+  font-size: 10px;
+}
+
+.tourist-village-artisan-grid,
+.tourist-village-activities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.tourist-village-artisan-grid > a {
+  display: grid;
+  grid-template-columns: 55px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 8px;
+  border: 1px solid #eee6dc;
+  border-radius: 9px;
+  color: #302820;
+}
+
+.tourist-village-artisan-grid img {
+  width: 55px;
+  height: 55px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.tourist-village-artisan-grid strong,
+.tourist-village-artisan-grid small {
+  display: block;
+}
+
+.tourist-village-artisan-grid strong {
+  font-size: 10px;
+}
+
+.tourist-village-artisan-grid small {
+  margin-top: 3px;
+  color: #766b5f;
+  font-size: 8px;
+}
+
+.tourist-village-artisan-grid svg {
+  color: #a34f32;
+}
+
+.tourist-village-activities-grid > a {
+  display: grid;
+  gap: 6px;
+  overflow: hidden;
+  padding-bottom: 10px;
+  border: 1px solid #eee6dc;
+  border-radius: 9px;
+  color: #302820;
+}
+
+.tourist-village-activities-grid img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+
+.tourist-village-activities-grid strong,
+.tourist-village-activities-grid span,
+.tourist-village-activities-grid small {
+  margin: 0 9px;
+}
+
+.tourist-village-activities-grid strong {
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 12px;
+}
+
+.tourist-village-activities-grid span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #766b5f;
+  font-size: 9px;
+}
+
+.tourist-village-activities-grid small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #a34f32;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tourist-village-gallery-feature {
+  position: relative;
+  height: 310px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.tourist-village-gallery-feature img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tourist-village-gallery-feature > span {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border-radius: 18px;
+  background: rgba(32, 45, 34, .82);
+  color: #fff;
+  font-size: 10px;
+}
+
+.tourist-village-gallery-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.tourist-village-gallery-thumbnails button {
+  height: 76px;
+  overflow: hidden;
+  padding: 2px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.tourist-village-gallery-thumbnails button.active {
+  border-color: #176444;
+}
+
+.tourist-village-gallery-thumbnails img {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.tourist-village-tab-empty {
+  grid-column: 1 / -1;
+  padding: 25px;
+  color: #766b5f;
+  font-size: 11px;
+  text-align: center;
+}
+
+.tourist-village-detail-footnote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 22px 0 0;
+  color: #766b5f;
+  font-size: 10px;
+}
+
+.tourist-village-detail-footnote svg {
+  color: #a34f32;
+}
+
+.tourist-village-not-found {
+  width: min(700px, calc(100% - 36px));
+  margin: 60px auto;
+  padding: 32px;
+  border: 1px solid #e8dfd3;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+}
+
+.tourist-village-not-found h1 {
+  color: #354c3f;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+}
+
+.tourist-village-not-found > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #a34f32;
+}
+
+@media (max-width: 1080px) {
+  .tourist-villages-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-villages-layout {
+    grid-template-columns: minmax(0, 1fr) 235px;
+    gap: 12px;
+  }
+
+  .tourist-villages-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tourist-village-detail-layout {
+    grid-template-columns: minmax(0, 1fr) 270px;
+  }
+
+  .tourist-village-detail-hero {
+    padding-left: 22%;
+  }
+}
+
+@media (max-width: 760px) {
+  .tourist-villages-page,
+  .tourist-village-detail-page {
+    width: calc(100% - 30px);
+  }
+
+  .tourist-villages-hero {
+    min-height: 150px;
+    margin: -18px -15px 14px;
+  }
+
+  .tourist-villages-hero-inner,
+  .tourist-villages-main {
+    width: calc(100% - 30px);
+  }
+
+  .tourist-villages-hero-symbol {
+    width: 54px;
+    height: 54px;
+    font-size: 43px;
+  }
+
+  .tourist-villages-hero-ornament {
+    display: none;
+  }
+
+  .tourist-villages-filters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .tourist-villages-filters > label {
+    min-width: 0;
+  }
+
+  .tourist-villages-filters select {
+    font-size: 9px;
+  }
+
+  .tourist-villages-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-villages-sidebar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tourist-village-detail-hero {
+    min-height: 260px;
+    align-items: flex-end;
+    padding: 22px;
+    background:
+      linear-gradient(90deg, rgba(35, 34, 28, 0.7), rgba(35, 34, 28, 0.7)),
+      var(--village-hero-image) center / cover;
+  }
+
+  .tourist-village-detail-hero-copy {
+    align-self: center;
+  }
+
+  .tourist-village-detail-actions {
+    width: 168px;
+  }
+
+  .tourist-village-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-village-detail-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 540px) {
+  .tourist-villages-page,
+  .tourist-village-detail-page {
+    width: calc(100% - 24px);
+  }
+
+  .tourist-villages-hero {
+    margin-right: -12px;
+    margin-left: -12px;
+  }
+
+  .tourist-villages-hero-inner,
+  .tourist-villages-main {
+    width: calc(100% - 24px);
+  }
+
+  .tourist-villages-hero-inner {
+    gap: 12px;
+  }
+
+  .tourist-villages-hero-symbol {
+    width: 42px;
+    height: 42px;
+    font-size: 34px;
+  }
+
+  .tourist-villages-hero h1 {
+    font-size: 27px;
+  }
+
+  .tourist-villages-hero p {
+    font-size: 11px;
+  }
+
+  .tourist-villages-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-villages-filters > label {
+    height: 38px;
+  }
+
+  .tourist-villages-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-village-card {
+    display: grid;
+    grid-template-columns: 38% minmax(0, 1fr);
+  }
+
+  .tourist-village-card-image {
+    grid-row: span 2;
+    height: 100%;
+    min-height: 138px;
+  }
+
+  .tourist-village-card-body {
+    min-height: 138px;
+  }
+
+  .tourist-village-card-heart {
+    top: 7px;
+    right: auto;
+    left: calc(38% - 39px);
+  }
+
+  .tourist-villages-sidebar,
+  .tourist-village-detail-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-village-detail-hero {
+    display: grid;
+    gap: 14px;
+    padding: 19px;
+  }
+
+  .tourist-village-detail-hero h1 {
+    font-size: 25px;
+  }
+
+  .tourist-village-detail-hero-copy > p {
+    font-size: 12px;
+  }
+
+  .tourist-village-detail-actions {
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tourist-village-detail-actions > button:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .tourist-village-tabs button {
+    min-height: 37px;
+    padding: 0 11px;
+    font-size: 9px;
+  }
+
+  .tourist-village-tab-panel,
+  .tourist-village-featured-products {
+    padding: 12px;
+  }
+
+  .tourist-village-intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-village-intro > img {
+    height: 185px;
+  }
+
+  .tourist-village-highlights {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-village-highlight-images button {
+    height: 95px;
+  }
+
+  .tourist-village-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tourist-village-products-grid img {
+    height: 100px;
+  }
+
+  .tourist-village-artisan-grid,
+  .tourist-village-activities-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tourist-village-gallery-feature {
+    height: 230px;
+  }
+
+  .tourist-village-gallery-thumbnails {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .tourist-village-gallery-thumbnails button {
+    height: 60px;
+  }
+}
+
+.tourist-product-content {
+  width: 100%;
+  min-height: calc(100vh - 74px);
+  padding: 0 0 38px;
+}
+
+.tourist-products-page,
+.tourist-product-detail-page {
+  color: #302820;
+  animation: tourist-view-enter 0.24s ease both;
+}
+
+.tourist-products-hero {
+  display: flex;
+  min-height: 172px;
+  align-items: center;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(26, 39, 28, 0.82), rgba(32, 43, 30, 0.5) 45%, rgba(32, 43, 30, 0.08) 82%),
+    url("https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=2000&q=88") center 48% / cover,
+    #354c3f;
+}
+
+.tourist-products-hero-inner {
+  display: flex;
+  width: min(1320px, calc(100% - 56px));
+  align-items: center;
+  gap: 25px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.tourist-products-ornament { color: #e7c992; font: 58px/1 Georgia, serif; }
+.tourist-products-eyebrow { color: #e8d2a8; font-size: 10px; font-weight: 700; letter-spacing: .16em; }
+.tourist-products-hero h1 {
+  margin: 7px 0 5px;
+  color: #fffdf6;
+  font: 600 clamp(30px, 3.2vw, 42px)/1.15 "Lora", Georgia, serif;
+}
+.tourist-products-hero p { margin: 0; color: rgba(255,253,246,.88); font-size: 15px; }
+.tourist-products-main { width: min(1320px, calc(100% - 48px)); margin: 0 auto; }
+.tourist-products-toolbar { display: flex; align-items: center; gap: 18px; padding: 18px 0; }
+.tourist-products-search,
+.tourist-products-filters label {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e8dfd1;
+  border-radius: 12px;
+  background: #fffefa;
+  color: #506a56;
+}
+.tourist-products-search { flex: 1 1 420px; padding: 0 14px; box-shadow: 0 3px 12px rgba(67,54,35,.035); }
+.tourist-products-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #302820;
+  font: inherit;
+  font-size: 13px;
+}
+.tourist-products-search input::placeholder { color: #988e81; }
+.tourist-products-search button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #f1e9dd;
+  color: #615446;
+  font-size: 18px;
+  cursor: pointer;
+}
+.tourist-products-filters { display: flex; gap: 9px; }
+.tourist-products-filters label { min-width: 125px; justify-content: space-between; padding: 0 11px; }
+.tourist-products-filters label:nth-child(2) { min-width: 175px; }
+.tourist-products-filters select {
+  width: 100%;
+  min-width: 0;
+  appearance: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #40382f;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.tourist-products-price-mark { color: #a34f32; font-size: 13px; font-weight: 700; }
+.tourist-products-layout { display: grid; grid-template-columns: 242px minmax(0,1fr); align-items: start; gap: 22px; padding-bottom: 30px; }
+.tourist-products-sidebar { display: grid; gap: 14px; }
+.tourist-products-category-panel,
+.tourist-products-villages-panel {
+  padding: 17px;
+  border: 1px solid #e8e4d7;
+  border-radius: 15px;
+  background: #f2f4e9;
+  box-shadow: 0 5px 16px rgba(61,69,45,.045);
+}
+.tourist-products-category-panel h2,
+.tourist-products-villages-panel h2 {
+  margin: 0 0 13px;
+  color: #302820;
+  font: 700 16px "Lora", Georgia, serif;
+}
+.tourist-products-category-panel button {
+  display: flex;
+  width: 100%;
+  min-height: 36px;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #79634e;
+  text-align: left;
+  cursor: pointer;
+}
+.tourist-products-category-panel button span { overflow: hidden; color: #41382e; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.tourist-products-category-panel button:hover,
+.tourist-products-category-panel button.active { background: #e1e9d4; color: #354c3f; }
+.tourist-products-category-panel button.active span { color: #354c3f; font-weight: 700; }
+.tourist-products-villages-panel { background: #f0f3e7; }
+.tourist-products-villages-panel > a:not(.tourist-products-all-villages) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 9px 0;
+  color: #41382e;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.tourist-products-villages-panel img { width: 48px; height: 42px; flex: 0 0 auto; border-radius: 8px; object-fit: cover; }
+.tourist-products-all-villages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid #dfe5d6;
+  color: #354c3f;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.tourist-products-results-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 0 13px; }
+.tourist-products-results-heading p { margin: 0; color: #6f6253; font-size: 13px; }
+.tourist-products-results-heading strong { color: #354c3f; font-size: 17px; }
+.tourist-products-results-heading > span { color: #91877a; font-size: 11px; text-align: right; }
+.tourist-products-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; }
+.tourist-product-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #ece6dc;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 5px 16px rgba(64,50,33,.055);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.tourist-product-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(64,50,33,.11); }
+.tourist-product-card-image { display: block; height: 186px; overflow: hidden; background: #eee5d7; }
+.tourist-product-card-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.tourist-product-card:hover .tourist-product-card-image img { transform: scale(1.04); }
+.tourist-product-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.72);
+  border-radius: 50%;
+  background: rgba(39,37,28,.25);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+}
+.tourist-product-heart.is-saved { background: #a34f32; color: #fff; }
+.tourist-product-card-body { display: flex; flex-direction: column; align-items: flex-start; padding: 12px 13px 13px; }
+.tourist-product-category { margin-bottom: 4px; color: #9a7a5a; font-size: 10px; }
+.tourist-product-name {
+  display: -webkit-box;
+  min-height: 22px;
+  overflow: hidden;
+  color: #302820;
+  font: 700 15px/1.4 "Lora", Georgia, serif;
+  text-decoration: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+.tourist-product-place { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; color: #5b7c63; font-size: 11px; text-decoration: none; }
+.tourist-product-card-meta { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.tourist-product-card-meta > span { display: inline-flex; align-items: center; gap: 4px; color: #bc8328; font-size: 11px; font-weight: 700; }
+.tourist-product-card-meta small { color: #958a7d; font-size: 9px; font-weight: 400; }
+.tourist-product-card-meta strong { color: #302820; font-size: 14px; }
+.tourist-product-detail-link {
+  display: inline-flex;
+  min-height: 31px;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-end;
+  margin-top: 8px;
+  padding: 0 11px;
+  border-radius: 8px;
+  background: #e5eddc;
+  color: #354c3f;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.tourist-product-detail-link:hover { background: #354c3f; color: #fff; }
+.tourist-products-empty { display: flex; min-height: 260px; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 1px dashed #d9cdbb; border-radius: 15px; color: #887a68; text-align: center; }
+.tourist-products-empty strong { color: #41382e; font: 700 17px "Lora", Georgia, serif; }
+.tourist-products-empty span { font-size: 13px; }
+.tourist-products-empty button { padding: 8px 13px; border: 0; border-radius: 8px; background: #354c3f; color: #fff; font: inherit; font-size: 12px; cursor: pointer; }
+.tourist-product-breadcrumb { display: flex; min-height: 43px; align-items: center; gap: 9px; padding: 0 max(calc((100vw - 1320px)/2),24px); color: #988b7b; font-size: 11px; }
+.tourist-product-breadcrumb a { color: #354c3f; text-decoration: none; }
+.tourist-product-breadcrumb strong { overflow: hidden; color: #51463b; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.tourist-product-overview { display: grid; width: min(1320px,calc(100% - 48px)); grid-template-columns: minmax(0,1.02fr) minmax(0,1fr); align-items: center; gap: clamp(25px,4vw,58px); margin: 0 auto; padding: 14px 0 29px; }
+.tourist-product-gallery { display: grid; min-width: 0; grid-template-columns: 66px minmax(0,1fr); gap: 10px; }
+.tourist-product-thumbnails { display: flex; flex-direction: column; gap: 9px; }
+.tourist-product-thumbnails button { height: 71px; padding: 3px; overflow: hidden; border: 1px solid #e7ddcf; border-radius: 10px; background: #fff; cursor: pointer; }
+.tourist-product-thumbnails button.active { border: 2px solid #49634e; }
+.tourist-product-thumbnails img { width: 100%; height: 100%; border-radius: 7px; object-fit: cover; }
+.tourist-product-main-image { position: relative; height: clamp(325px,34vw,420px); min-height: 325px; overflow: hidden; border-radius: 13px; background: #efe7da; }
+.tourist-product-main-image > img { width: 100%; height: 100%; object-fit: cover; }
+.tourist-product-photo-prev,
+.tourist-product-photo-next { position: absolute; top: 50%; display: grid; width: 34px; height: 34px; place-items: center; transform: translateY(-50%); border: 0; border-radius: 50%; background: rgba(255,253,246,.9); color: #354c3f; cursor: pointer; }
+.tourist-product-photo-prev { left: 10px; }
+.tourist-product-photo-next { right: 10px; }
+.tourist-product-detail-copy { min-width: 0; }
+.tourist-product-detail-category { color: #9a7a5a; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.tourist-product-detail-copy h1 { margin: 7px 0 9px; color: #29251f; font: 700 clamp(27px,3vw,36px)/1.2 "Lora", Georgia, serif; }
+.tourist-product-detail-location { display: inline-flex; align-items: center; gap: 6px; color: #4a7455; font-size: 13px; font-weight: 600; text-decoration: none; }
+.tourist-product-detail-rating { display: flex; align-items: center; gap: 7px; margin: 11px 0 9px; }
+.tourist-product-detail-rating > span,
+.tourist-product-review-score > span { color: #d99a2b; letter-spacing: 1px; }
+.tourist-product-detail-rating strong { color: #4a463d; font-size: 12px; }
+.tourist-product-detail-rating small { color: #8d8376; font-size: 11px; }
+.tourist-product-detail-price { display: block; margin-bottom: 8px; color: #3c6749; font-size: 25px; }
+.tourist-product-detail-description { max-width: 630px; margin: 0 0 16px; color: #51483d; font-size: 13px; line-height: 1.8; }
+.tourist-product-quantity { display: flex; align-items: center; gap: 13px; margin-bottom: 14px; color: #40382f; font-size: 13px; }
+.tourist-product-quantity > div { display: inline-flex; height: 36px; align-items: center; overflow: hidden; border: 1px solid #d9d4c7; border-radius: 20px; background: #fffefa; }
+.tourist-product-quantity button { width: 35px; height: 100%; border: 0; background: transparent; color: #354c3f; font-size: 19px; cursor: pointer; }
+.tourist-product-quantity button:disabled { color: #c8c0b5; cursor: not-allowed; }
+.tourist-product-quantity output { min-width: 22px; color: #302820; font-weight: 700; text-align: center; }
+.tourist-product-detail-actions { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; }
+.tourist-product-detail-actions button { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tourist-product-cart-button { border: 1px solid #354c3f; background: #285d43; color: #fff; }
+.tourist-product-cart-button:hover { background: #1f4d36; }
+.tourist-product-save-button { border: 1px solid #aebda8; background: #fffefa; color: #354c3f; }
+.tourist-product-save-button.is-saved { border-color: #a34f32; color: #a34f32; }
+.tourist-product-promises { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; margin-top: 14px; padding: 12px 8px; border-radius: 11px; background: #eff2e5; }
+.tourist-product-promises span { display: flex; align-items: center; justify-content: center; gap: 7px; color: #46634b; font-size: 10px; font-weight: 600; line-height: 1.45; }
+.tourist-product-detail-content { display: grid; width: min(1320px,calc(100% - 48px)); grid-template-columns: minmax(0,1fr) 310px; align-items: start; gap: 20px; margin: 0 auto 30px; padding-top: 4px; }
+.tourist-product-information,
+.tourist-product-village-card,
+.tourist-product-map-card { overflow: hidden; border: 1px solid #e9e2d5; border-radius: 14px; background: #fffefa; box-shadow: 0 5px 18px rgba(64,50,33,.045); }
+.tourist-product-tabs { display: flex; min-height: 47px; align-items: stretch; justify-content: space-around; gap: 8px; padding: 0 10px; border-bottom: 1px solid #e9e2d5; background: #fcfaf4; }
+.tourist-product-tabs button { position: relative; padding: 0 10px; border: 0; background: transparent; color: #655b4f; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.tourist-product-tabs button.active { color: #355a40; }
+.tourist-product-tabs button.active::after { position: absolute; right: 8px; bottom: -1px; left: 8px; height: 2px; background: #4c7757; content: ""; }
+.tourist-product-information-panel { padding: 22px 24px 25px; }
+.tourist-product-information-panel h2 { margin: 0 0 12px; color: #302820; font: 700 17px "Lora", Georgia, serif; }
+.tourist-product-information-panel h2:not(:first-child) { margin-top: 22px; }
+.tourist-product-information-panel h2 span { margin-right: 6px; color: #4d7453; }
+.tourist-product-information-panel ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+.tourist-product-information-panel li { display: flex; align-items: flex-start; gap: 9px; color: #554b3f; font-size: 13px; line-height: 1.55; }
+.tourist-product-information-panel li svg { flex: 0 0 auto; margin-top: 2px; color: #4b7653; }
+.tourist-product-information-panel > p,
+.tourist-product-story-panel > p { margin: 0; color: #554b3f; font-size: 13px; line-height: 1.8; }
+.tourist-product-story-panel { min-height: 235px; padding: 27px 25px; }
+.tourist-product-story-eyebrow { color: #9a7a5a; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+.tourist-product-story-panel h2 { margin: 10px 0; color: #302820; font: 700 21px "Lora", Georgia, serif; }
+.tourist-product-story-panel > a,
+.tourist-product-reviews-panel > a { display: inline-flex; align-items: center; gap: 6px; margin-top: 17px; color: #416347; font-size: 12px; font-weight: 700; text-decoration: none; }
+.tourist-product-reviews-panel { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: 12px 18px; padding: 22px; }
+.tourist-product-review-score { display: flex; grid-row: span 2; flex-direction: column; gap: 5px; }
+.tourist-product-review-score > strong { color: #355f43; font: 34px "Lora", Georgia, serif; }
+.tourist-product-review-score > small { color: #84796c; font-size: 10px; }
+.tourist-product-reviews-panel article { padding: 0 0 10px; border-bottom: 1px solid #eee8df; }
+.tourist-product-reviews-panel article strong { color: #3c352d; font-size: 12px; }
+.tourist-product-reviews-panel article span { margin-left: 9px; color: #d99a2b; font-size: 11px; }
+.tourist-product-reviews-panel article p { margin: 5px 0 0; color: #645a4f; font-size: 11px; line-height: 1.6; }
+.tourist-product-reviews-panel > a { grid-column: 2; margin-top: 0; }
+.tourist-product-related-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 13px; padding: 18px; }
+.tourist-product-related-grid > a { display: flex; min-width: 0; flex-direction: column; gap: 5px; color: #302820; text-decoration: none; }
+.tourist-product-related-grid img { width: 100%; height: 110px; border-radius: 9px; object-fit: cover; }
+.tourist-product-related-grid span { color: #9a7a5a; font-size: 9px; }
+.tourist-product-related-grid strong { font: 12px "Lora", Georgia, serif; }
+.tourist-product-related-grid small { color: #3c6749; font-size: 11px; font-weight: 700; }
+.tourist-product-detail-aside { display: grid; gap: 13px; }
+.tourist-product-village-card,
+.tourist-product-map-card { padding: 16px; background: #f0f3e7; }
+.tourist-product-village-card h2,
+.tourist-product-map-card h2 { margin: 0 0 12px; color: #302820; font: 700 15px "Lora", Georgia, serif; }
+.tourist-product-village-card > div { display: flex; align-items: center; gap: 11px; }
+.tourist-product-village-card img { width: 76px; height: 73px; flex: 0 0 auto; border-radius: 9px; object-fit: cover; }
+.tourist-product-village-card > div span { display: grid; gap: 5px; }
+.tourist-product-village-card strong { color: #39342c; font: 13px "Lora", Georgia, serif; }
+.tourist-product-village-card small { color: #71675b; font-size: 10px; }
+.tourist-product-village-card > a { display: flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; border: 1px solid #aabb9f; border-radius: 8px; color: #355a40; font-size: 11px; font-weight: 700; text-decoration: none; }
+.tourist-product-map-card > a { position: relative; display: flex; min-height: 122px; align-items: center; justify-content: center; overflow: hidden; border-radius: 9px; background: linear-gradient(32deg,transparent 46%,rgba(235,213,159,.9) 47%,rgba(235,213,159,.9) 49%,transparent 50%),linear-gradient(118deg,transparent 35%,rgba(207,220,189,.9) 36%,rgba(207,220,189,.9) 40%,transparent 41%),#e8eddc; color: #416347; text-decoration: none; }
+.tourist-product-map-card > a > span { display: flex; align-items: center; gap: 4px; color: #3a5540; font-size: 11px; font-weight: 700; }
+.tourist-product-map-card > a > span svg { color: #bd4d3e; }
+.tourist-product-map-card > a > strong { position: absolute; right: 7px; bottom: 7px; display: flex; align-items: center; gap: 4px; padding: 6px 8px; border-radius: 7px; background: #f8f7ed; font-size: 9px; }
+.tourist-product-not-found { min-height: 360px; padding: 60px 24px; text-align: center; }
+.tourist-product-not-found h1 { font-family: "Lora", Georgia, serif; }
+.tourist-product-not-found > a { display: inline-flex; align-items: center; gap: 7px; color: #354c3f; font-weight: 700; text-decoration: none; }
+
+@media (max-width: 1080px) {
+  .tourist-products-layout { grid-template-columns: 210px minmax(0,1fr); gap: 16px; }
+  .tourist-products-grid { gap: 11px; }
+  .tourist-product-card-image { height: 160px; }
+  .tourist-product-overview { gap: 27px; }
+  .tourist-product-detail-content { grid-template-columns: minmax(0,1fr) 270px; }
+}
+
+@media (max-width: 800px) {
+  .tourist-products-main,
+  .tourist-product-overview,
+  .tourist-product-detail-content { width: min(100% - 32px,680px); }
+  .tourist-products-toolbar { align-items: stretch; flex-direction: column; gap: 10px; }
+  .tourist-products-search { flex-basis: auto; }
+  .tourist-products-layout { grid-template-columns: 1fr; }
+  .tourist-products-sidebar { grid-template-columns: 1fr 1fr; }
+  .tourist-products-category-panel button:not(:first-of-type) { display: none; }
+  .tourist-products-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .tourist-product-overview { grid-template-columns: 1fr; gap: 22px; }
+  .tourist-product-gallery { grid-template-columns: 58px minmax(0,1fr); }
+  .tourist-product-thumbnails button { height: 62px; }
+  .tourist-product-main-image { height: min(70vw,420px); min-height: 260px; }
+  .tourist-product-detail-content { grid-template-columns: 1fr; }
+  .tourist-product-detail-aside { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 540px) {
+  .tourist-products-hero { min-height: 148px; }
+  .tourist-products-hero-inner { width: calc(100% - 32px); gap: 12px; }
+  .tourist-products-ornament { font-size: 43px; }
+  .tourist-products-hero h1 { font-size: 28px; }
+  .tourist-products-hero p { font-size: 12px; }
+  .tourist-products-main,
+  .tourist-product-overview,
+  .tourist-product-detail-content { width: calc(100% - 24px); }
+  .tourist-products-filters { display: grid; grid-template-columns: 1fr 1fr; }
+  .tourist-products-filters label,
+  .tourist-products-filters label:nth-child(2) { min-width: 0; }
+  .tourist-products-filters label:last-child { grid-column: 1 / -1; }
+  .tourist-products-sidebar { grid-template-columns: 1fr; }
+  .tourist-products-category-panel { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 2px 6px; }
+  .tourist-products-category-panel h2 { grid-column: 1 / -1; }
+  .tourist-products-category-panel button:not(:first-of-type) { display: flex; }
+  .tourist-products-category-panel button span { font-size: 10px; }
+  .tourist-products-villages-panel { display: none; }
+  .tourist-products-results-heading { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .tourist-products-results-heading > span { text-align: left; }
+  .tourist-products-grid { gap: 9px; }
+  .tourist-product-card-image { height: 128px; }
+  .tourist-product-card-body { padding: 9px; }
+  .tourist-product-name { font-size: 12px; }
+  .tourist-product-place { align-items: flex-start; font-size: 9px; }
+  .tourist-product-card-meta { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .tourist-product-card-meta strong { font-size: 12px; }
+  .tourist-product-detail-link { min-height: 28px; margin-top: 6px; padding: 0 8px; font-size: 10px; }
+  .tourist-product-breadcrumb { gap: 5px; padding: 0 12px; font-size: 9px; }
+  .tourist-product-gallery { grid-template-columns: 48px minmax(0,1fr); gap: 7px; }
+  .tourist-product-thumbnails { gap: 6px; }
+  .tourist-product-thumbnails button { height: 54px; border-radius: 7px; }
+  .tourist-product-main-image { height: 74vw; min-height: 235px; border-radius: 10px; }
+  .tourist-product-detail-copy h1 { font-size: 27px; }
+  .tourist-product-detail-description { font-size: 12px; }
+  .tourist-product-detail-actions { grid-template-columns: 1fr; }
+  .tourist-product-detail-actions button { min-height: 43px; }
+  .tourist-product-promises span { flex-direction: column; gap: 4px; font-size: 9px; text-align: center; }
+  .tourist-product-tabs { min-height: 43px; justify-content: flex-start; overflow-x: auto; }
+  .tourist-product-tabs button { flex: 0 0 auto; padding: 0 7px; font-size: 10px; }
+  .tourist-product-information-panel { padding: 17px; }
+  .tourist-product-information-panel li,
+  .tourist-product-information-panel > p,
+  .tourist-product-story-panel > p { font-size: 11px; }
+  .tourist-product-reviews-panel { grid-template-columns: 1fr; padding: 17px; }
+  .tourist-product-review-score { grid-row: auto; }
+  .tourist-product-reviews-panel > a { grid-column: 1; }
+  .tourist-product-related-grid { grid-template-columns: repeat(2,minmax(0,1fr)); padding: 12px; }
+  .tourist-product-detail-aside { grid-template-columns: 1fr; }
+}
+
+
+
+
+.tourist-culture-page {
+  color: #302820;
+  animation: tourist-view-enter 0.24s ease both;
+}
+
+.tourist-culture-hero {
+  position: relative;
+  display: flex;
+  min-height: 340px;
+  align-items: center;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(22, 42, 30, 0.86) 0%, rgba(32, 54, 38, 0.66) 46%, rgba(31, 45, 31, 0.12) 100%),
+    url("https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=2000&q=88") center 48% / cover,
+    #354c3f;
+}
+
+.tourist-culture-hero-inner {
+  position: relative;
+  width: min(1280px, calc(100% - 56px));
+  margin: 0 auto;
+  color: #fffdf6;
+}
+
+.tourist-culture-hero-flower {
+  position: absolute;
+  top: -38px;
+  left: -3px;
+  color: rgba(232, 210, 168, 0.72);
+  font: 50px/1 Georgia, serif;
+}
+
+.tourist-culture-hero-eyebrow,
+.tourist-culture-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #e7d3a6;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.tourist-culture-hero h1 {
+  margin: 13px 0 11px;
+  color: #fffdf6;
+  font: 600 clamp(34px, 4vw, 50px)/1.15 "Lora", Georgia, serif;
+}
+
+.tourist-culture-hero p {
+  margin: 0 0 21px;
+  color: rgba(255, 253, 246, 0.88);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.tourist-culture-search {
+  display: flex;
+  width: min(590px, 100%);
+  min-height: 50px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 15px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: 10px;
+  background: rgba(255, 254, 250, 0.97);
+  color: #52705a;
+  box-shadow: 0 8px 26px rgba(13, 30, 19, 0.18);
+}
+
+.tourist-culture-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #302820;
+  font: inherit;
+  font-size: 12px;
+}
+
+.tourist-culture-search input::placeholder {
+  color: #928779;
+}
+
+.tourist-culture-search button {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #ede6d9;
+  color: #5e5549;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.tourist-culture-main {
+  width: min(1280px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 34px 0 44px;
+}
+
+.tourist-culture-section-heading {
+  margin-bottom: 18px;
+}
+
+.tourist-culture-section-heading .tourist-culture-eyebrow {
+  color: #67816a;
+}
+
+.tourist-culture-section-heading h2 {
+  margin: 7px 0 5px;
+  color: #302820;
+  font: 600 clamp(22px, 2.5vw, 29px)/1.25 "Lora", Georgia, serif;
+}
+
+.tourist-culture-section-heading p {
+  max-width: 750px;
+  margin: 0;
+  color: #81766a;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.tourist-culture-featured-section,
+.tourist-culture-categories-section,
+.tourist-culture-timeline-section,
+.tourist-culture-list-section,
+.tourist-culture-related-section {
+  margin-bottom: 45px;
+}
+
+.tourist-culture-featured-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+  gap: 16px;
+}
+
+.tourist-culture-featured-side {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tourist-culture-story-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 41% minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid #e9e2d7;
+  border-radius: 13px;
+  background: #fffefa;
+  box-shadow: 0 6px 20px rgba(61, 52, 39, 0.055);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tourist-culture-story-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 26px rgba(61, 52, 39, 0.1);
+}
+
+.tourist-culture-story-card.is-featured {
+  min-height: 330px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(190px, 1fr) auto;
+}
+
+.tourist-culture-story-image {
+  display: block;
+  min-height: 100%;
+  overflow: hidden;
+  background: #e9e1d3;
+}
+
+.tourist-culture-story-card.is-featured .tourist-culture-story-image {
+  min-height: 190px;
+}
+
+.tourist-culture-story-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 145px;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.tourist-culture-story-card:hover .tourist-culture-story-image img {
+  transform: scale(1.035);
+}
+
+.tourist-culture-story-card.is-featured .tourist-culture-story-image img {
+  min-height: 190px;
+  max-height: 260px;
+}
+
+.tourist-culture-story-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  width: 33px;
+  height: 33px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 50%;
+  background: rgba(35, 44, 32, 0.34);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+}
+
+.tourist-culture-story-heart.is-saved {
+  background: #a34f32;
+}
+
+.tourist-culture-story-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 17px;
+}
+
+.tourist-culture-story-card.is-featured .tourist-culture-story-copy {
+  padding: 19px 21px 20px;
+}
+
+.tourist-culture-story-category {
+  display: inline-flex;
+  margin-bottom: 7px;
+  color: #618064;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+}
+
+.tourist-culture-story-title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #302820;
+  font: 600 16px/1.4 "Lora", Georgia, serif;
+  text-decoration: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tourist-culture-story-card.is-featured .tourist-culture-story-title {
+  font-size: 21px;
+}
+
+.tourist-culture-story-copy p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 8px 0 12px;
+  color: #74695d;
+  font-size: 11px;
+  line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.tourist-culture-story-card.is-featured .tourist-culture-story-copy p {
+  -webkit-line-clamp: 2;
+}
+
+.tourist-culture-read-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  color: #42644a;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tourist-culture-read-link:hover {
+  color: #a34f32;
+}
+
+.tourist-culture-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tourist-culture-categories button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #e4dfd3;
+  border-radius: 20px;
+  background: #fffefa;
+  color: #5f5549;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.tourist-culture-categories button > span {
+  color: #9c8052;
+}
+
+.tourist-culture-categories button small {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e7eddf;
+  color: #49664e;
+  font-size: 9px;
+}
+
+.tourist-culture-categories button:hover,
+.tourist-culture-categories button.active {
+  border-color: #47664d;
+  background: #354c3f;
+  color: #fffefa;
+}
+
+.tourist-culture-timeline-section {
+  padding: 26px 26px 29px;
+  border: 1px solid #e4e6d9;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f1f3e8, #faf8f0 70%);
+}
+
+.tourist-culture-timeline-section .tourist-culture-section-heading {
+  margin-bottom: 25px;
+}
+
+.tourist-culture-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.tourist-culture-timeline::before {
+  position: absolute;
+  top: 15px;
+  right: 7%;
+  left: 7%;
+  height: 2px;
+  background: #c4d2bc;
+  content: "";
+}
+
+.tourist-culture-timeline-item {
+  position: relative;
+  min-width: 0;
+  padding-top: 37px;
+}
+
+.tourist-culture-timeline-marker {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 16px;
+  display: grid;
+  width: 31px;
+  height: 31px;
+  place-items: center;
+  border: 4px solid #eff2e7;
+  border-radius: 50%;
+  background: #41684a;
+  box-shadow: 0 0 0 1px #b7c8b0;
+}
+
+.tourist-culture-timeline-marker span {
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.tourist-culture-timeline-card {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e4e2d6;
+  border-radius: 11px;
+  background: #fffefa;
+  box-shadow: 0 5px 16px rgba(53, 69, 48, 0.045);
+}
+
+.tourist-culture-timeline-card > img {
+  width: 100%;
+  height: 106px;
+  object-fit: cover;
+}
+
+.tourist-culture-timeline-card > div {
+  padding: 12px 13px 14px;
+}
+
+.tourist-culture-timeline-card > div > span {
+  color: #71866c;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tourist-culture-timeline-card h3 {
+  margin: 6px 0 5px;
+  color: #344a38;
+  font: 600 14px "Lora", Georgia, serif;
+}
+
+.tourist-culture-timeline-card p {
+  margin: 0;
+  color: #746b5f;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.tourist-culture-list-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.tourist-culture-list-heading > span {
+  color: #75816d;
+  font-size: 11px;
+}
+
+.tourist-culture-list-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 15px;
+}
+
+.tourist-culture-list-toolbar label,
+.tourist-culture-list-toolbar select {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid #e3ddd1;
+  border-radius: 9px;
+  background: #fffefa;
+  color: #61735e;
+}
+
+.tourist-culture-list-toolbar label {
+  flex: 1;
+}
+
+.tourist-culture-list-toolbar input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #302820;
+  font: inherit;
+  font-size: 11px;
+}
+
+.tourist-culture-list-toolbar select {
+  min-width: 220px;
+  color: #4c594a;
+  font: inherit;
+  font-size: 11px;
+}
+
+.tourist-culture-list-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.tourist-culture-list-grid .tourist-culture-story-card {
+  min-height: 274px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 150px minmax(0, 1fr);
+}
+
+.tourist-culture-list-grid .tourist-culture-story-image img {
+  min-height: 150px;
+}
+
+.tourist-culture-list-grid .tourist-culture-story-copy {
+  padding: 13px 15px 15px;
+}
+
+.tourist-culture-list-grid .tourist-culture-story-title {
+  font-size: 15px;
+}
+
+.tourist-culture-empty {
+  display: flex;
+  min-height: 190px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed #d9d4c7;
+  border-radius: 12px;
+  color: #71816d;
+  text-align: center;
+}
+
+.tourist-culture-empty strong {
+  color: #3d4739;
+  font: 600 16px "Lora", Georgia, serif;
+}
+
+.tourist-culture-empty span {
+  color: #81766a;
+  font-size: 11px;
+}
+
+.tourist-culture-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 20px;
+}
+
+.tourist-culture-pagination button {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid #ded9ce;
+  border-radius: 50%;
+  background: #fffefa;
+  color: #536850;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tourist-culture-pagination button.active,
+.tourist-culture-pagination button:not(:disabled):hover {
+  border-color: #354c3f;
+  background: #354c3f;
+  color: #fff;
+}
+
+.tourist-culture-pagination button:disabled {
+  color: #c8c0b5;
+  cursor: not-allowed;
+}
+
+.tourist-culture-reflection {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 17px;
+  margin: 0 0 45px;
+  padding: 21px 23px;
+  border: 1px solid #dfe6d9;
+  border-radius: 14px;
+  background: #edf2e8;
+  color: #44634a;
+}
+
+.tourist-culture-reflection > svg {
+  color: #9a7a3d;
+}
+
+.tourist-culture-reflection > div > span {
+  color: #71866c;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.tourist-culture-reflection h2 {
+  margin: 4px 0;
+  color: #344a38;
+  font: 600 17px "Lora", Georgia, serif;
+}
+
+.tourist-culture-reflection p {
+  margin: 0;
+  color: #687365;
+  font-size: 11px;
+}
+
+.tourist-culture-reflection > a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
+  border-radius: 8px;
+  background: #354c3f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tourist-culture-related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.tourist-culture-related-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: hidden;
+  padding: 0 0 13px;
+  border: 1px solid #e8e2d7;
+  border-radius: 12px;
+  background: #fffefa;
+  color: #302820;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(61, 52, 39, 0.05);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tourist-culture-related-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 9px 22px rgba(61, 52, 39, 0.1);
+}
+
+.tourist-culture-related-card > img {
+  width: 100%;
+  height: 135px;
+  margin-bottom: 11px;
+  object-fit: cover;
+}
+
+.tourist-culture-related-card > span,
+.tourist-culture-related-card > strong,
+.tourist-culture-related-card > small {
+  margin-right: 14px;
+  margin-left: 14px;
+}
+
+.tourist-culture-related-card > span {
+  color: #6b8267;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tourist-culture-related-card > strong {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 4px;
+  color: #373229;
+  font: 600 14px/1.4 "Lora", Georgia, serif;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.tourist-culture-related-card > small {
+  overflow: hidden;
+  margin-top: 5px;
+  color: #85796c;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tourist-culture-related-card > i {
+  position: absolute;
+  right: 11px;
+  bottom: 11px;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e9efe2;
+  color: #3d6145;
+}
+
+@media (max-width: 900px) {
+  .tourist-culture-featured-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tourist-culture-featured-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+
+  .tourist-culture-timeline-section {
+    padding: 21px;
+  }
+
+  .tourist-culture-timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 13px;
+  }
+
+  .tourist-culture-timeline::before {
+    display: none;
+  }
+
+  .tourist-culture-list-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tourist-culture-related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .tourist-culture-hero {
+    min-height: 310px;
+    background-position: 58% center;
+  }
+
+  .tourist-culture-hero-inner {
+    width: calc(100% - 32px);
+  }
+
+  .tourist-culture-hero h1 {
+    max-width: 350px;
+    font-size: 34px;
+  }
+
+  .tourist-culture-hero p {
+    font-size: 12px;
+  }
+
+  .tourist-culture-desktop-break {
+    display: none;
+  }
+
+  .tourist-culture-main {
+    width: calc(100% - 28px);
+    padding-top: 26px;
+  }
+
+  .tourist-culture-featured-section,
+  .tourist-culture-categories-section,
+  .tourist-culture-timeline-section,
+  .tourist-culture-list-section,
+  .tourist-culture-related-section {
+    margin-bottom: 33px;
+  }
+
+  .tourist-culture-featured-side {
+    grid-template-columns: 1fr;
+  }
+
+  .tourist-culture-story-card:not(.is-featured) {
+    min-height: 144px;
+    grid-template-columns: 37% minmax(0, 1fr);
+  }
+
+  .tourist-culture-featured-side .tourist-culture-story-card {
+    min-height: 160px;
+  }
+
+  .tourist-culture-story-card.is-featured {
+    min-height: 0;
+    grid-template-rows: 190px auto;
+  }
+
+  .tourist-culture-story-card.is-featured .tourist-culture-story-image img {
+    min-height: 190px;
+  }
+
+  .tourist-culture-story-copy {
+    padding: 11px;
+  }
+
+  .tourist-culture-story-title {
+    font-size: 13px;
+  }
+
+  .tourist-culture-story-copy p {
+    margin: 6px 0 8px;
+    font-size: 10px;
+    -webkit-line-clamp: 2;
+  }
+
+  .tourist-culture-story-card.is-featured .tourist-culture-story-title {
+    font-size: 18px;
+  }
+
+  .tourist-culture-categories {
+    gap: 6px;
+  }
+
+  .tourist-culture-categories button {
+    min-height: 33px;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .tourist-culture-timeline-section {
+    padding: 17px 13px;
+  }
+
+  .tourist-culture-timeline {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .tourist-culture-timeline-item {
+    padding: 0 0 0 38px;
+  }
+
+  .tourist-culture-timeline-item:not(:last-child)::before {
+    position: absolute;
+    top: 27px;
+    bottom: -16px;
+    left: 14px;
+    width: 2px;
+    background: #c4d2bc;
+    content: "";
+  }
+
+  .tourist-culture-timeline-marker {
+    top: 12px;
+    left: 0;
+  }
+
+  .tourist-culture-timeline-card {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .tourist-culture-timeline-card > img {
+    height: 100%;
+    min-height: 112px;
+  }
+
+  .tourist-culture-timeline-card > div {
+    padding: 10px;
+  }
+
+  .tourist-culture-timeline-card > div > span {
+    font-size: 8px;
+  }
+
+  .tourist-culture-timeline-card h3 {
+    font-size: 12px;
+  }
+
+  .tourist-culture-timeline-card p {
+    font-size: 9px;
+  }
+
+  .tourist-culture-list-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tourist-culture-list-toolbar select {
+    min-width: 0;
+  }
+
+  .tourist-culture-list-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .tourist-culture-list-grid .tourist-culture-story-card {
+    min-height: 140px;
+    grid-template-columns: 37% minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .tourist-culture-list-grid .tourist-culture-story-image img {
+    min-height: 140px;
+  }
+
+  .tourist-culture-list-grid .tourist-culture-story-copy {
+    padding: 10px;
+  }
+
+  .tourist-culture-list-grid .tourist-culture-story-title {
+    font-size: 13px;
+  }
+
+  .tourist-culture-reflection {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .tourist-culture-reflection h2 {
+    font-size: 14px;
+  }
+
+  .tourist-culture-reflection p {
+    font-size: 10px;
+  }
+
+  .tourist-culture-reflection > a {
+    grid-column: 1 / -1;
+  }
+
+  .tourist-culture-related-grid {
+    gap: 9px;
+  }
+
+  .tourist-culture-related-card > img {
+    height: 105px;
+  }
+
+  .tourist-culture-related-card > span,
+  .tourist-culture-related-card > strong,
+  .tourist-culture-related-card > small {
+    margin-right: 9px;
+    margin-left: 9px;
+  }
+
+  .tourist-culture-related-card > strong {
+    font-size: 11px;
+  }
+
+  .tourist-culture-related-card > i {
+    right: 7px;
+    bottom: 7px;
+    width: 22px;
+    height: 22px;
   }
 }

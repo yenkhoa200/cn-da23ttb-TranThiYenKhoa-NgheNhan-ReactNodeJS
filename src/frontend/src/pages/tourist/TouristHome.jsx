@@ -1,7 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Bell,
+  ChevronDown,
   Heart,
+  LogOut,
   Search,
+  UserRound,
   X,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -10,6 +14,8 @@ import { ROUTES } from "../../routes/path.js";
 import "../../styles/TouristHome.css";
 import TouristLanding from "./TouristLanding.jsx";
 import TouristViews from "./TouristViews.jsx";
+import TouristVillagePages from "./TouristVillagePages.jsx";
+import TouristVillageDetail from "./TouristVillageDetail.jsx";
 
 const artisans = [
   {
@@ -147,6 +153,23 @@ const crafts = [
     title: "Làng nghề gốm Bát Tràng",
     category: "Gốm sứ",
     place: "Gia Lâm, Hà Nội",
+    location: "Gia Lâm, Hà Nội",
+    rating: "4.8",
+    reviews: "1.2k",
+    history: "Hơn 700 năm lịch sử",
+    historyDescription: "Bát Tràng hình thành bên bờ sông Hồng, nơi nguồn đất sét quý và giao thương thuận lợi tạo điều kiện cho nghề gốm phát triển. Qua nhiều thế kỷ, các thế hệ nghệ nhân đã bồi đắp kỹ thuật tạo dáng, men và nung gốm đặc trưng.",
+    introduction: "Nơi đây không chỉ lưu giữ tinh hoa nghề gốm mà còn là điểm đến văn hóa hấp dẫn, thu hút du khách trong và ngoài nước.",
+    tradition: "Từ chọn đất, luyện đất, tạo hình trên bàn xoay đến tráng men và canh lửa lò, mỗi công đoạn đều đòi hỏi kinh nghiệm cùng sự tỉ mỉ của người thợ.",
+    visitingHours: "8:00 – 17:00 (hằng ngày)",
+    transport: "Khoảng 20 km từ trung tâm Hà Nội",
+    featuredImage: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=85",
+    gallery: [
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=900&q=85",
+    ],
+    tagline: "Tinh hoa gốm Việt, lưu giữ qua bao thế hệ",
     image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=85",
     description: "Hơn 700 năm, Bát Tràng vẫn đỏ lửa với những kỹ thuật làm gốm được lưu truyền qua nhiều thế hệ. Mỗi sản phẩm mang dấu ấn của đất, men và đôi tay người thợ.",
   },
@@ -155,6 +178,16 @@ const crafts = [
     title: "Làng lụa Vạn Phúc",
     category: "Dệt lụa",
     place: "Hà Đông, Hà Nội",
+    location: "Hà Đông, Hà Nội",
+    rating: "4.7",
+    reviews: "856",
+    history: "Hơn 1.000 năm lịch sử",
+    historyDescription: "Làng lụa Vạn Phúc lưu giữ nghề dệt tơ lâu đời. Tiếng thoi đưa và những hoa văn trên lụa phản ánh sự khéo léo, óc sáng tạo và nhịp sống của nhiều thế hệ người thợ.",
+    visitingHours: "8:00 – 18:00 (hằng ngày)",
+    transport: "Khoảng 10 km từ trung tâm Hà Nội",
+    featuredImage: "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=1200&q=85",
+    gallery: ["https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=1200&q=85", "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=85", "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=85"],
+    tagline: "Sợi tơ mềm kể chuyện một miền di sản",
     image: "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=1000&q=85",
     description: "Tiếng thoi đưa ở Vạn Phúc kể câu chuyện về nghề dệt lụa lâu đời, nơi những sợi tơ mềm được biến thành hoa văn tinh tế.",
   },
@@ -163,6 +196,15 @@ const crafts = [
     title: "Làng nón Chuông",
     category: "Nón lá",
     place: "Thanh Oai, Hà Nội",
+    location: "Thanh Oai, Hà Nội",
+    rating: "4.6",
+    reviews: "642",
+    history: "Nghề nón truyền thống",
+    visitingHours: "8:00 – 17:00 (hằng ngày)",
+    transport: "Khoảng 30 km từ trung tâm Hà Nội",
+    featuredImage: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=1200&q=85",
+    gallery: ["https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=1200&q=85", "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=900&q=85", "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=85"],
+    tagline: "Nét duyên mộc mạc của chiếc nón làng Chuông",
     image: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=1000&q=85",
     description: "Từ vành tre, lá cọ đến đường khâu đều đặn, chiếc nón Chuông là kết tinh của sự tỉ mỉ và vẻ đẹp bình dị của làng quê Bắc Bộ.",
   },
@@ -171,6 +213,15 @@ const crafts = [
     title: "Làng lụa Hội An",
     category: "Dệt lụa",
     place: "Hội An, Quảng Nam",
+    location: "Hội An, Quảng Nam",
+    rating: "4.8",
+    reviews: "979",
+    history: "Di sản nghề phố Hội",
+    visitingHours: "8:00 – 17:30 (hằng ngày)",
+    transport: "Trong khu vực thành phố Hội An",
+    featuredImage: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1200&q=85",
+    gallery: ["https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=1200&q=85", "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=85", "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=85"],
+    tagline: "Sắc lụa phố Hội, giao hòa cùng văn hóa",
     image: "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=1000&q=85",
     description: "Tìm hiểu nghề dệt lụa và những hoa văn thủ công đã góp phần tạo nên sắc màu văn hóa phố Hội.",
   },
@@ -179,6 +230,13 @@ const crafts = [
     title: "Nghề mây tre đan Phú Vinh",
     category: "Mây tre đan",
     place: "Chương Mỹ, Hà Nội",
+    location: "Chương Mỹ, Hà Nội",
+    rating: "4.7",
+    reviews: "573",
+    history: "Nghề đan lát lâu đời",
+    featuredImage: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1200&q=85",
+    gallery: ["https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1200&q=85", "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=900&q=85", "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=900&q=85"],
+    tagline: "Từ sợi mây tre mộc mạc đến tác phẩm tinh xảo",
     image: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1000&q=85",
     description: "Khám phá kỹ thuật đan mây tre tinh xảo, biến những sợi nguyên liệu mộc mạc thành vật dụng và tác phẩm thủ công.",
   },
@@ -190,6 +248,12 @@ const products = [
     title: "Bình gốm men lam",
     category: "Gốm Bát Tràng",
     craftId: "craft-bat-trang",
+    price: 650000,
+    rating: "4.8",
+    reviews: 124,
+    material: "Đất sét cao cấp, men lam truyền thống",
+    dimensions: "Cao 25cm, đường kính 15cm",
+    highlights: ["Chất liệu: Đất sét cao cấp, nung ở nhiệt độ cao", "Kỹ thuật: Men lam truyền thống", "Kích thước: Cao khoảng 25cm, đường kính 15cm", "Phù hợp: Trang trí, làm quà tặng"],
     image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=700&q=85",
     description: "Bình gốm tạo hình thủ công, phủ men lam truyền thống và nung ở nhiệt độ cao.",
   },
@@ -198,6 +262,12 @@ const products = [
     title: "Khăn lụa tơ tằm",
     category: "Lụa Vạn Phúc",
     craftId: "craft-van-phuc",
+    price: 450000,
+    rating: "4.9",
+    reviews: 76,
+    material: "Tơ tằm tự nhiên",
+    dimensions: "Dài 180cm, rộng 50cm",
+    highlights: ["Chất liệu: Tơ tằm tự nhiên mềm nhẹ", "Kỹ thuật: Dệt lụa thủ công truyền thống", "Họa tiết thanh nhã, màu sắc hài hòa", "Phù hợp làm quà tặng và phụ kiện"],
     image: "https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=700&q=85",
     description: "Khăn lụa dệt từ tơ tằm, nổi bật với chất vải mềm nhẹ và hoa văn thanh nhã.",
   },
@@ -206,6 +276,12 @@ const products = [
     title: "Nón lá làng Chuông",
     category: "Nón lá",
     craftId: "craft-chuong",
+    price: 120000,
+    rating: "4.8",
+    reviews: 49,
+    material: "Lá cọ, vành tre",
+    dimensions: "Đường kính khoảng 45cm",
+    highlights: ["Chất liệu: Lá cọ và vành tre tuyển chọn", "Kỹ thuật: Khâu nón thủ công nhiều lớp", "Trọng lượng nhẹ, chắc chắn và thoáng mát", "Phù hợp sử dụng hằng ngày hoặc làm quà"],
     image: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=700&q=85",
     description: "Chiếc nón được làm từ vành tre, lá cọ và những đường khâu đều đặn của người thợ làng Chuông.",
   },
@@ -359,11 +435,11 @@ const mediaItems = [
 const allItems = [...artisans, ...crafts, ...products, ...stories, ...activities];
 const navigation = [
   { label: "Trang chủ", to: ROUTES.TOURIST, view: "home" },
-  { label: "Làng nghề", to: "/tourist/crafts", view: "crafts" },
   { label: "Nghệ nhân", to: "/tourist/artisans", view: "artisans" },
+  { label: "Làng nghề", to: "/tourist/crafts", view: "crafts" },
+  { label: "Sản phẩm", to: "/tourist/products", view: "products" },
   { label: "Văn hóa", to: "/tourist/stories", view: "stories" },
   { label: "Hoạt động trải nghiệm", to: "/tourist/activities", view: "activities" },
-  { label: "Câu chuyện văn hóa", to: "/tourist/stories", view: "stories" },
 ];
 
 function readStorage(key, fallback) {
@@ -378,6 +454,8 @@ function readStorage(key, fallback) {
 export default function TouristHome() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [headerPanel, setHeaderPanel] = useState("");
+  const headerActionsRef = useRef(null);
   const segments = location.pathname.split("/").filter(Boolean);
   const view = segments[1] || "home";
   const detailId = segments[2] || "";
@@ -419,6 +497,25 @@ export default function TouristHome() {
   useEffect(() => {
     window.localStorage.setItem("tourist-profile", JSON.stringify(profile));
   }, [profile]);
+
+  useEffect(() => {
+    if (!headerPanel) return undefined;
+
+    const closeHeaderPanel = (event) => {
+      if (event.type === "keydown" && event.key === "Escape") {
+        setHeaderPanel("");
+      } else if (event.type === "pointerdown" && !headerActionsRef.current?.contains(event.target)) {
+        setHeaderPanel("");
+      }
+    };
+
+    document.addEventListener("pointerdown", closeHeaderPanel);
+    document.addEventListener("keydown", closeHeaderPanel);
+    return () => {
+      document.removeEventListener("pointerdown", closeHeaderPanel);
+      document.removeEventListener("keydown", closeHeaderPanel);
+    };
+  }, [headerPanel]);
 
   const savedItems = useMemo(() => allItems.filter((item) => favoriteIds.includes(item.id)), [favoriteIds]);
   const showNotice = (message) => {
@@ -467,29 +564,107 @@ export default function TouristHome() {
 
   const goToView = (destination) => navigate(`/tourist/${destination}`);
   const activeView = view;
+  const initials = (profile.name || "Du khách")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(-2)
+    .map((part) => part[0])
+    .join("")
+    .toLocaleUpperCase("vi");
+  const logout = () => {
+    window.localStorage.removeItem("auth-token");
+    window.localStorage.removeItem("auth-user");
+    navigate(ROUTES.HOME);
+  };
 
   return (
     <div className={`tourist-page${view === "home" ? " tourist-home-shell" : ""}`} id="top">
       <header className="tourist-header">
-        <Link className="tourist-brand" to={ROUTES.TOURIST} aria-label="Hồn Việt - Trang chủ">
+        <Link className="tourist-brand" to={ROUTES.TOURIST} aria-label="Tinh Hoa Việt - Trang chủ">
           <img src={logoImg} alt="" className="tourist-brand-logo" />
-          <span><strong>Hồn Việt</strong><small>Nền tảng di sản - Tinh hoa tương lai</small></span>
+          <span><strong>Tinh Hoa Việt</strong><small>Nền tảng di sản - Tinh hoa tương lai</small></span>
         </Link>
         <nav className="tourist-nav" aria-label="Điều hướng chính">
-          {navigation.map((item) => <Link className={view === item.view || (view === "artisan" && item.view === "artisans") ? "is-current" : ""} to={item.to} key={item.label}>{item.label}</Link>)}
+          {navigation.map((item) => <Link className={view === item.view || (view === "artisan" && item.view === "artisans") || (view === "craft" && item.view === "crafts") || (view === "product" && item.view === "products") ? "is-current" : ""} to={item.to} key={item.label}>{item.label}</Link>)}
         </nav>
-        <div className="tourist-header-actions">
+        <div className="tourist-header-actions" ref={headerActionsRef}>
           <Link className="tourist-icon-button" to="/tourist/search" aria-label="Tìm kiếm"><Search size={18} /></Link>
           <Link className="tourist-icon-button tourist-saved-shortcut" to="/tourist/favorites" aria-label={`Nội dung yêu thích${favoriteIds.length ? `, ${favoriteIds.length} mục đã lưu` : ""}`}><Heart size={18} />{favoriteIds.length > 0 && <span className="tourist-favorite-count">{favoriteIds.length}</span>}</Link>
-          <Link className="tourist-avatar" to="/tourist/profile" aria-label="Thông tin cá nhân">YK</Link>
+          <div className="tourist-header-popover-wrap">
+            <button
+              className="tourist-icon-button"
+              type="button"
+              aria-label="Thông báo"
+              aria-expanded={headerPanel === "notifications"}
+              onClick={() => setHeaderPanel(headerPanel === "notifications" ? "" : "notifications")}
+            >
+              <Bell size={18} />
+            </button>
+            {headerPanel === "notifications" && (
+              <section className="tourist-header-popover tourist-notification-popover" aria-label="Thông báo">
+                <strong>Thông báo</strong>
+                <p>Bạn chưa có thông báo mới.</p>
+                <Link to="/tourist/activities" onClick={() => setHeaderPanel("")}>Khám phá hoạt động trải nghiệm</Link>
+              </section>
+            )}
+          </div>
+          <div className="tourist-header-popover-wrap">
+            <button
+              className="tourist-account-button"
+              type="button"
+              aria-label="Mở menu tài khoản"
+              aria-expanded={headerPanel === "account"}
+              onClick={() => setHeaderPanel(headerPanel === "account" ? "" : "account")}
+            >
+              <span className="tourist-avatar">{initials || <UserRound size={17} />}</span>
+              <ChevronDown size={14} />
+            </button>
+            {headerPanel === "account" && (
+              <section className="tourist-header-popover tourist-account-popover" aria-label="Menu tài khoản">
+                <div className="tourist-account-summary">
+                  <strong>{profile.name}</strong>
+                  <span>{profile.email}</span>
+                </div>
+                <Link to="/tourist/profile" onClick={() => setHeaderPanel("")}>
+                  <UserRound size={16} /> Thông tin cá nhân
+                </Link>
+                <button type="button" onClick={logout}>
+                  <LogOut size={16} /> Đăng xuất
+                </button>
+              </section>
+            )}
+          </div>
         </div>
       </header>
 
       <main>
         {view === "home" ? (
-          <TouristLanding query={query} onQuery={setQuery} onSearch={submitSearch} />
+          <TouristLanding
+            query={query}
+            onQuery={setQuery}
+            onSearch={submitSearch}
+            data={data}
+          />
+        ) : view === "crafts" ? (
+          <TouristVillagePages
+            crafts={crafts}
+            favoriteIds={favoriteIds}
+            onFavorite={toggleFavorite}
+            query={query}
+            onQuery={setQuery}
+          />
+        ) : view === "craft" ? (
+          <TouristVillageDetail
+            village={crafts.find((item) => item.id === detailId)}
+            artisans={artisans}
+            products={products}
+            activities={activities}
+            favoriteIds={favoriteIds}
+            onFavorite={toggleFavorite}
+            onNotice={showNotice}
+          />
         ) : (
-          <div className={`tourist-content tourist-view-content${view === "activities" ? " tourist-activities-content" : ""}${view === "activity" ? " tourist-activity-detail-content" : ""}${view === "artisans" ? " tourist-artisans-content" : ""}${view === "artisan" ? " tourist-artisan-detail-content" : ""}`}>
+          <div className={`tourist-content tourist-view-content${view === "activities" ? " tourist-activities-content" : ""}${view === "activity" ? " tourist-activity-detail-content" : ""}${view === "artisans" ? " tourist-artisans-content" : ""}${view === "artisan" ? " tourist-artisan-detail-content" : ""}${["products", "product"].includes(view) ? " tourist-product-content" : ""}`}>
             <TouristViews
               view={activeView}
               data={data}
@@ -520,9 +695,37 @@ export default function TouristHome() {
       </main>
 
       <footer className="tourist-footer">
-        <Link className="tourist-brand" to={ROUTES.TOURIST}><img src={logoImg} alt="" className="tourist-brand-logo" /><span><strong>Hồn Việt</strong><small>Nền tảng di sản - Tinh hoa tương lai</small></span></Link>
-        <p>Gìn giữ tinh hoa nghề Việt, lan tỏa những câu chuyện văn hóa.</p>
-        <Link to={ROUTES.TOURIST}>Trở về trang chủ <ArrowRightIcon /></Link>
+        <div className="tourist-footer-main">
+          <div className="tourist-footer-brand">
+            <Link className="tourist-brand" to={ROUTES.TOURIST}>
+              <img src={logoImg} alt="" className="tourist-brand-logo" />
+              <span><strong>Tinh Hoa Việt</strong><small>Nền tảng di sản - Tinh hoa tương lai</small></span>
+            </Link>
+            <p>Hành trình kết nối những giá trị văn hóa và nghề truyền thống, để tinh hoa Việt tiếp tục được gìn giữ và lan tỏa.</p>
+          </div>
+          <div className="tourist-footer-column">
+            <strong>Khám phá</strong>
+            <Link to="/tourist/crafts">Làng nghề Việt</Link>
+            <Link to="/tourist/artisans">Nghệ nhân</Link>
+            <Link to="/tourist/products">Sản phẩm thủ công</Link>
+          </div>
+          <div className="tourist-footer-column">
+            <strong>Dành cho du khách</strong>
+            <Link to="/tourist/activities">Hoạt động trải nghiệm</Link>
+            <Link to="/tourist/stories">Câu chuyện văn hóa</Link>
+            <Link to="/tourist/favorites">Nội dung yêu thích</Link>
+          </div>
+          <div className="tourist-footer-column">
+            <strong>Tài khoản</strong>
+            <Link to="/tourist/profile">Thông tin cá nhân</Link>
+            <Link to="/tourist/search">Tìm kiếm</Link>
+            <Link to={ROUTES.HOME}>Trang khách vãng lai</Link>
+          </div>
+        </div>
+        <div className="tourist-footer-bottom">
+          <span>© 2026 Tinh Hoa Việt · Gìn giữ tinh hoa nghề Việt.</span>
+          <span>Đồng hành cùng nghệ nhân và làng nghề Việt Nam.</span>
+        </div>
       </footer>
 
       {notice && <div className="tourist-toast" role="status">{notice}</div>}
@@ -538,8 +741,4 @@ export default function TouristHome() {
       )}
     </div>
   );
-}
-
-function ArrowRightIcon() {
-  return <span aria-hidden="true">→</span>;
 }
