@@ -3,6 +3,7 @@ export const ROUTES = {
   TOURIST: "/tourist",
   LOGIN: "/login",
   ARTISAN_LOGIN: "/artisan-login",
+  ADMIN_LOGIN: "/admin-login",
   REGISTER: "/register",
   ARTISAN_REGISTER: "/artisan-register",
   ARTISAN_DASHBOARD: "/artisan-dashboard",

@@ -543,6 +543,17 @@
   box-shadow: 0 2px 6px rgb(61 42 27 / 14%);
 }
 
+.login-page-redesign .admin-login-home-link {
+  color: #744023;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-page-redesign.admin-auth-page .login-toolbar {
+  justify-content: space-between;
+}
+
 .login-page-redesign .login-brand {
   display: flex;
   align-items: center;
@@ -1100,4 +1111,255 @@
 
 .artisan-register-page .account-tab {
   text-decoration: none;
+}
+
+.admin-auth-page {
+  display: grid;
+  min-height: 100svh;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: 18px 24px 12px;
+  background:
+    radial-gradient(ellipse at 9% 18%, rgb(213 151 100 / 13%), transparent 34%),
+    radial-gradient(ellipse at 93% 84%, rgb(160 69 35 / 8%), transparent 31%),
+    linear-gradient(rgb(143 111 82 / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(143 111 82 / 5%) 1px, transparent 1px),
+    #faf8f4;
+  background-size: auto, auto, 40px 40px, 40px 40px, auto;
+}
+
+.admin-auth-page .admin-login-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  justify-self: start;
+  color: #a04523;
+}
+
+.admin-auth-page .admin-login-header-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 9px;
+  background: #a04523;
+  box-shadow: 0 3px 9px rgb(160 69 35 / 20%);
+  color: #fffdfa;
+}
+
+.admin-auth-page .admin-login-header strong,
+.admin-auth-page .admin-login-header small {
+  display: block;
+}
+
+.admin-auth-page .admin-login-header strong {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+.admin-auth-page .admin-login-header small {
+  margin-top: 3px;
+  color: #81776d;
+  font-size: 9px;
+}
+
+.admin-auth-page .login-container {
+  display: flex;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.admin-auth-page .login-banner {
+  display: none;
+}
+
+.admin-auth-page .login-form-wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: transparent;
+}
+
+.admin-auth-page .admin-login-card {
+  position: relative;
+  isolation: isolate;
+  width: min(420px, 100%);
+  max-width: 420px;
+  overflow: hidden;
+  padding: 32px 34px 28px;
+  border: 1px solid #e8dfd4;
+  border-radius: 14px;
+  background: #fffdfa;
+  color: #35251f;
+  box-shadow: 0 18px 42px rgb(74 40 21 / 10%);
+}
+
+.admin-auth-page .admin-login-card::before {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #b85b35 0%, #d28a55 52%, #8b6a45 100%);
+  content: "";
+}
+
+.admin-auth-page .admin-login-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 14px;
+  place-items: center;
+  border: 1px solid #ead8c7;
+  border-radius: 14px;
+  background: #f7eee3;
+  color: #a04523;
+}
+
+.admin-auth-page .admin-login-card .form-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.admin-auth-page .admin-login-card .form-header h2 {
+  margin-bottom: 6px;
+  color: #35251f;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.admin-auth-page .admin-login-card .form-header p {
+  color: #81776d;
+  font-size: 11px;
+  text-align: center;
+}
+
+.admin-auth-page .admin-login-card .input-group {
+  margin-bottom: 15px;
+  color: #67594d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25px;
+}
+
+.admin-auth-page .admin-login-card .input-group b {
+  color: #a04523;
+}
+
+.admin-auth-page .admin-login-card .input-box input {
+  border-color: #e8dfd4;
+  background: #f7f3ed;
+  color: #35251f;
+}
+
+.admin-auth-page .admin-login-card .input-box input::placeholder {
+  color: #9b8c7d;
+}
+
+.admin-auth-page .admin-login-card .input-box input:focus {
+  border-color: #a04523;
+  background: #fffdfa;
+  box-shadow: 0 0 0 3px rgb(160 69 35 / 10%);
+}
+
+.admin-auth-page .admin-login-card .field-icon,
+.admin-auth-page .admin-login-card .eye-btn {
+  color: #76695c;
+}
+
+.admin-auth-page .admin-login-card .forgot-link {
+  color: #a04523;
+}
+
+.admin-auth-page .admin-login-card .remember-row {
+  margin: 3px 0 17px;
+  color: #84796e;
+}
+
+.admin-auth-page .admin-login-card .checkbox-label input {
+  accent-color: #a04523;
+}
+
+.admin-auth-page .admin-login-card .submit-btn {
+  min-height: 44px;
+  border-radius: 11px;
+  background: linear-gradient(100deg, #a94c2b 0%, #c66b39 100%);
+  box-shadow: 0 6px 16px rgb(160 69 35 / 20%);
+  color: #fffdfa;
+  font-weight: 700;
+}
+
+.admin-auth-page .admin-login-card .submit-btn:hover {
+  background: linear-gradient(100deg, #934020 0%, #b85b2d 100%);
+}
+
+.admin-auth-page .admin-login-card .auth-status {
+  color: #a04523;
+}
+
+.admin-auth-page .admin-login-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  margin-top: 25px;
+  padding-top: 19px;
+  border-top: 1px solid #ece4d9;
+  color: #8b7e70;
+  font-size: 10px;
+  text-align: center;
+}
+
+.admin-auth-page .admin-login-demo-badge {
+  padding: 5px 10px;
+  border: 1px solid #e8dfd4;
+  border-radius: 7px;
+  background: #f7f3ed;
+  color: #67594d;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.admin-auth-page .admin-login-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: #8b7e70;
+  font-size: 9px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .admin-auth-page {
+    padding: 16px 16px 12px;
+  }
+
+  .admin-auth-page .login-container {
+    min-height: 0;
+    padding: 8px 0;
+  }
+
+  .admin-auth-page .login-form-wrapper {
+    flex: initial;
+    padding: 16px 0;
+  }
+
+  .admin-auth-page .admin-login-card {
+    padding: 30px 24px 26px;
+  }
 }

@@ -1,11 +1,20 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const multer = require("multer");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"), {
+    dotfiles: "deny",
+    index: false,
+  })
+);
 
 // Kiểm tra API
 app.get("/", (req, res) => {
@@ -22,9 +31,17 @@ app.use("/api/products", require("./routes/productRoutes"));
 app.use((err, req, res, next) => {
   console.error(err);
 
-  res.status(500).json({
+  const status = err.status
+    || (err.code === "LIMIT_FILE_SIZE" ? 413 : null)
+    || (err instanceof multer.MulterError ? 400 : 500);
+
+  res.status(status).json({
     success: false,
-    message: "Lỗi máy chủ",
+    message: status === 413
+      ? "Tệp tải lên không được vượt quá 50 MB."
+      : status === 400
+        ? err.message
+        : "Lỗi máy chủ",
   });
 });
 

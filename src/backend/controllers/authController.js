@@ -3,8 +3,9 @@ const jwt = require("jsonwebtoken");
 const pool = require("../config/database");
 
 const allowedLoginRoles = {
-  visitor: "DU_KHACH",
-  artisan: "NGHE_NHAN",
+  visitor: "du_khach",
+  artisan: "nghe_nhan",
+  admin: "quan_tri",
 };
 
 function createSession(account) {
@@ -59,9 +60,10 @@ const authController = {
     try {
       const passwordHash = await bcrypt.hash(password, 12);
       const result = await pool.query(
-        `INSERT INTO tai_khoan (ho_ten, email, mat_khau, so_dien_thoai, vai_tro)
-         VALUES ($1, $2, $3, $4, 'DU_KHACH')
-         RETURNING ma_tai_khoan, ho_ten, email, so_dien_thoai, vai_tro`,
+        `INSERT INTO tai_khoan (ho_ten, email, mat_khau_hash, sdt, vai_tro)
+         VALUES ($1, $2, $3, $4, 'du_khach')
+         RETURNING ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai,
+                   upper(vai_tro) AS vai_tro`,
         [name, email, passwordHash, phone]
       );
 
@@ -71,7 +73,7 @@ const authController = {
         data: createSession(result.rows[0]),
       });
     } catch (error) {
-      if (error.code === "23505" && error.constraint === "tai_khoan_email_key") {
+      if (error.code === "23505") {
         return res.status(409).json({ success: false, message: "Email này đã được đăng ký." });
       }
 
@@ -96,14 +98,20 @@ const authController = {
       const isEmail = identifier.includes("@");
       const accountResult = isEmail
         ? await pool.query(
-          `SELECT ma_tai_khoan, ho_ten, email, so_dien_thoai, mat_khau, vai_tro, trang_thai
-           FROM tai_khoan WHERE lower(email) = lower($1) AND vai_tro = $2 LIMIT 1`,
+          `SELECT ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai,
+                  mat_khau_hash AS mat_khau, upper(vai_tro) AS vai_tro,
+                  upper(trang_thai_tk) AS trang_thai
+           FROM tai_khoan
+           WHERE lower(email) = lower($1) AND vai_tro = $2
+           LIMIT 1`,
           [identifier, role]
         )
         : await pool.query(
-          `SELECT ma_tai_khoan, ho_ten, email, so_dien_thoai, mat_khau, vai_tro, trang_thai
+          `SELECT ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai,
+                  mat_khau_hash AS mat_khau, upper(vai_tro) AS vai_tro,
+                  upper(trang_thai_tk) AS trang_thai
            FROM tai_khoan
-           WHERE regexp_replace(coalesce(so_dien_thoai, ''), '\\D', '', 'g') = $1
+           WHERE regexp_replace(coalesce(sdt, ''), '\\D', '', 'g') = $1
              AND vai_tro = $2
            LIMIT 1`,
           [identifier.replace(/\D/g, ""), role]

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../../styles/Login.css";
-import { ArrowRight, Compass, Eye, EyeOff, Hammer, LockKeyhole, Mail } from "lucide-react";
+import { ArrowRight, Compass, Eye, EyeOff, Hammer, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes/path.js";
 import { loginAccount, saveAuthSession } from "../../services/authService.js";
@@ -12,6 +12,7 @@ export default function Login({ initialAccountType = "visitor" }) {
   const [statusMessage, setStatusMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isArtisan = accountType === "artisan";
+  const isAdmin = accountType === "admin";
   const registerPath = isArtisan ? ROUTES.ARTISAN_REGISTER : ROUTES.REGISTER;
 
   const handleLogin = async (event) => {
@@ -27,7 +28,12 @@ export default function Login({ initialAccountType = "visitor" }) {
         accountType,
       });
       saveAuthSession(session);
-      navigate(isArtisan ? ROUTES.ARTISAN_DASHBOARD : ROUTES.TOURIST, { replace: true });
+      const destination = isAdmin
+        ? ROUTES.ADMIN_DASHBOARD
+        : isArtisan
+          ? ROUTES.ARTISAN_DASHBOARD
+          : ROUTES.TOURIST;
+      navigate(destination, { replace: true });
     } catch (error) {
       setStatusMessage(error.message);
     } finally {
@@ -36,7 +42,19 @@ export default function Login({ initialAccountType = "visitor" }) {
   };
 
   return (
-    <div className={`login-page login-page-redesign${isArtisan ? " artisan-auth-page" : ""}`}>
+    <div className={`login-page login-page-redesign${isArtisan ? " artisan-auth-page" : ""}${isAdmin ? " admin-auth-page" : ""}`}>
+      {isAdmin && (
+        <header className="admin-login-header">
+          <span className="admin-login-header-icon" aria-hidden="true">
+            <ShieldCheck size={18} />
+          </span>
+          <span>
+            <strong>HỆ THỐNG QUẢN TRỊ</strong>
+            <small>Nghề Nhân &amp; Văn Hóa Việt Nam</small>
+          </span>
+        </header>
+      )}
+
       <main className="login-container">
         <div className="login-banner">
           <div className="banner-content">
@@ -67,7 +85,13 @@ export default function Login({ initialAccountType = "visitor" }) {
         </div>
 
         <div className="login-form-wrapper">
-          <div className="login-card">
+          <div className={`login-card${isAdmin ? " admin-login-card" : ""}`}>
+            {isAdmin ? (
+              <div className="admin-login-icon" aria-hidden="true">
+                <LockKeyhole size={23} />
+              </div>
+            ) : null}
+            {!isAdmin && (
             <div className="login-toolbar">
               <div className="account-tabs" role="group" aria-label="Loại tài khoản">
                 <button
@@ -92,19 +116,24 @@ export default function Login({ initialAccountType = "visitor" }) {
                 <Link to={registerPath} className="tab-btn">Đăng ký</Link>
               </nav>
             </div>
+            )}
 
-            <div className="login-brand">
-              <span className="login-brand-mark" aria-hidden="true">✥</span>
-              <span>
-                <strong>Tinh Hoa Việt</strong>
-                <small>GÌN GIỮ &amp; LAN TỎA BẢN SẮC</small>
-              </span>
-            </div>
+            {!isAdmin && (
+              <div className="login-brand">
+                <span className="login-brand-mark" aria-hidden="true">✥</span>
+                <span>
+                  <strong>Tinh Hoa Việt</strong>
+                  <small>GÌN GIỮ &amp; LAN TỎA BẢN SẮC</small>
+                </span>
+              </div>
+            )}
 
             <div className="form-header">
-              <h2>{isArtisan ? "Đăng nhập - Nghệ nhân" : "Đăng nhập"}</h2>
+              <h2>{isAdmin ? "Đăng Nhập Quản Trị" : isArtisan ? "Đăng nhập - Nghệ nhân" : "Đăng nhập"}</h2>
               <p>
-                {isArtisan
+                {isAdmin
+                  ? "Vui lòng nhập thông tin tài khoản được cấp để tiếp tục."
+                  : isArtisan
                   ? "Đăng nhập để quản lý hồ sơ, sản phẩm, câu chuyện và hoạt động trải nghiệm của bạn."
                   : "Đăng nhập để lưu lại những trải nghiệm yêu thích và khám phá thêm nhiều nội dung hấp dẫn."}
               </p>
@@ -112,16 +141,22 @@ export default function Login({ initialAccountType = "visitor" }) {
 
             <form onSubmit={handleLogin}>
               <label className="input-group">
-                <span>Email hoặc số điện thoại</span>
+                <span>{isAdmin ? <>Email / Tên đăng nhập <b>*</b></> : "Email hoặc số điện thoại"}</span>
                 <div className="input-box">
                   <Mail className="field-icon" size={15} aria-hidden="true" />
-                  <input name="identifier" type="text" autoComplete="username" placeholder="example@gmail.com hoặc 0912345678" required />
+                  <input
+                    name="identifier"
+                    type="text"
+                    autoComplete="username"
+                    placeholder={isAdmin ? "admin@vanhoa.vn" : "example@gmail.com hoặc 0912345678"}
+                    required
+                  />
                 </div>
               </label>
 
               <label className="input-group">
                 <div className="label-row">
-                  <span>Mật khẩu</span>
+                  <span>{isAdmin ? <>Mật khẩu <b>*</b></> : "Mật khẩu"}</span>
                   <a href="#forgot" className="forgot-link">Quên mật khẩu?</a>
                 </div>
                 <div className="input-box">
@@ -152,27 +187,46 @@ export default function Login({ initialAccountType = "visitor" }) {
               </div>
 
               <button type="submit" className="submit-btn" disabled={isSubmitting}>
-                {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"} <ArrowRight size={16} />
+                {isSubmitting
+                  ? "Đang đăng nhập..."
+                  : isAdmin
+                    ? "Đăng Nhập Hệ Thống"
+                    : "Đăng nhập"} <ArrowRight size={16} />
               </button>
             </form>
 
             {statusMessage && <p className="auth-status" role="status">{statusMessage}</p>}
 
-            <div className="divider">
-              <span>HOẶC</span>
-            </div>
+            {isAdmin ? (
+              <div className="admin-login-demo">
+                <span>Chỉ tài khoản được cấp quyền quản trị mới có thể đăng nhập.</span>
+                <span className="admin-login-demo-badge">Quản trị viên (Admin)</span>
+              </div>
+            ) : (
+              <>
+                <div className="divider">
+                  <span>HOẶC</span>
+                </div>
 
-            <button className="google-login" type="button">
-              <span className="google-mark" aria-hidden="true">G</span>
-              Đăng nhập bằng Google
-            </button>
+                <button className="google-login" type="button">
+                  <span className="google-mark" aria-hidden="true">G</span>
+                  Đăng nhập bằng Google
+                </button>
 
-            <div className="login-register-prompt">
-              Chưa có tài khoản? <Link to={registerPath}>Đăng ký ngay</Link>
-            </div>
+                <div className="login-register-prompt">
+                  Chưa có tài khoản? <Link to={registerPath}>Đăng ký ngay</Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </main>
+      {isAdmin && (
+        <footer className="admin-login-footer">
+          <span>© 2026 Hệ thống Quản lý Nghệ Nhân &amp; Văn Hóa.</span>
+          <span>Bảo mật dành riêng cho tài khoản quản trị.</span>
+        </footer>
+      )}
     </div>
   );
 }

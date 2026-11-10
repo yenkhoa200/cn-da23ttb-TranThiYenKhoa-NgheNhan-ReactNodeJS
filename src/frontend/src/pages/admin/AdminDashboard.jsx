@@ -655,7 +655,14 @@ export default function AdminDashboard() {
                     <div className="admin-profile-menu">
                     <strong>Quản trị viên</strong>
                     <small>admin@tinhhoaviet.vn</small>
-                    <Link to={ROUTES.LOGIN} onClick={() => setAccountMenuOpen(false)}>
+                    <Link
+                        to={ROUTES.ADMIN_LOGIN}
+                        onClick={() => {
+                          window.localStorage.removeItem("auth-token");
+                          window.localStorage.removeItem("auth-user");
+                          setAccountMenuOpen(false);
+                        }}
+                    >
                         <LogOut size={14} />Đăng xuất
                     </Link>
                     </div>

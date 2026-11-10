@@ -25,6 +25,24 @@ import AdminReviewsPage from "../pages/admin/AdminReviewsPage.jsx";
 import AdminReportsPage from "../pages/admin/AdminReportsPage.jsx";
 import { ROUTES } from "./path.js";
 
+function RequireAdmin({ children }) {
+  let user = null;
+  try {
+    user = JSON.parse(window.localStorage.getItem("auth-user") || "null");
+  } catch {
+    window.localStorage.removeItem("auth-user");
+    window.localStorage.removeItem("auth-token");
+  }
+
+  const isAdmin = window.localStorage.getItem("auth-token")
+    && typeof user?.role === "string"
+    && user.role.toUpperCase() === "QUAN_TRI";
+
+  return isAdmin
+    ? children
+    : <Navigate to={ROUTES.ADMIN_LOGIN} replace />;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -33,6 +51,7 @@ function AppRoutes() {
       <Route path={`${ROUTES.TOURIST}/*`} element={<TouristHomePage />} />
       <Route path={ROUTES.LOGIN} element={<LoginPage />} />
       <Route path={ROUTES.ARTISAN_LOGIN} element={<LoginPage initialAccountType="artisan" />} />
+      <Route path={ROUTES.ADMIN_LOGIN} element={<LoginPage initialAccountType="admin" />} />
       <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
       <Route path={ROUTES.ARTISAN_REGISTER} element={<ArtisanRegisterPage />} />
       {/* Các trang nghệ nhân dùng chung layout điều hướng và header. */}
@@ -47,7 +66,7 @@ function AppRoutes() {
       </Route>
       <Route path="/admin-dashboard" element={<Navigate to={ROUTES.ADMIN_DASHBOARD} replace />} />
       {/* Shell dùng chung, mỗi chức năng quản trị có route và component riêng. */}
-      <Route path="/admin" element={<AdminDashboardPage />}>
+      <Route path="/admin" element={<RequireAdmin><AdminDashboardPage /></RequireAdmin>}>
         <Route index element={<AdminOverviewPage />} />
         <Route path="accounts" element={<AdminAccountsPage />} />
         <Route path="artisans" element={<AdminArtisansPage />} />

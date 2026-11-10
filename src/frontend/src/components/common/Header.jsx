@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function ArtisanHeader() {
   return (
     <header className="artisan-top-nav">
