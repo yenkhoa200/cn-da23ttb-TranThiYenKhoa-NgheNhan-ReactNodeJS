@@ -59,7 +59,6 @@ export default function AdminOverviewPage() {
           <h2><span className="admin-welcome-seal"><Leaf size={14} /></span>Cùng gìn giữ và lan tỏa giá trị văn hóa Việt</h2>
           <p>Kết nối du khách, nghệ nhân và làng nghề truyền thống</p>
         </div>
-        <img className="admin-welcome-art" src="/admin-landscape.svg" alt="" aria-hidden="true" />
       </section>
 
       <section className="admin-metrics" aria-label="Thống kê tổng quan">

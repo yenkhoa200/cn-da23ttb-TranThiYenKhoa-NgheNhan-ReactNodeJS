@@ -1845,21 +1845,6 @@
   background: linear-gradient(180deg, #fcf8ee 0%, #fbf7ee 74%, rgb(250 246 235 / 70%) 100%);
 }
 
-.admin-sidebar::after {
-  position: absolute;
-  z-index: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 175px;
-  background: url("/admin-landscape.svg") center bottom / auto 175px no-repeat;
-  content: "";
-  opacity: .66;
-  pointer-events: none;
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 35%);
-  mask-image: linear-gradient(180deg, transparent, #000 35%);
-}
-
 .admin-sidebar > * {
   position: relative;
   z-index: 1;
@@ -1879,7 +1864,7 @@
 .admin-brand strong {
   color: #70452d;
   font-family: Georgia, serif !important;
-  font-size: 19px;
+  font-size: 18px;
 }
 
 .admin-nav-caption {
@@ -2036,18 +2021,6 @@
   margin: 2px 0 0 30px;
   color: #674d32;
   font-size: 11px;
-}
-
-.admin-welcome-art {
-  position: absolute;
-  inset: 0 0 0 auto;
-  width: 55%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 57%;
-  opacity: .94;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 24%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 24%);
 }
 
 .admin-metrics {
@@ -2609,10 +2582,6 @@
     margin-left: 30px;
     font-size: 10px;
   }
-  .admin-welcome-art {
-    width: 65%;
-    opacity: .58;
-  }
   .admin-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 7px;
@@ -2668,4 +2637,437 @@
   .admin-overview-three-columns .admin-compact-row time {
     display: none;
   }
+}
+
+/* Bảng màu quản trị: nền kem, điểm nhấn đỏ đất và sidebar xanh rừng. */
+.admin-shell {
+  --admin-ink: #2c2a29;
+  --admin-muted: #77736e;
+  --admin-line: #e8e3db;
+  --admin-paper: #ffffff;
+  --admin-canvas: #fbf9f5;
+  --admin-brown: #a8432b;
+  --admin-green: #315d49;
+  background: var(--admin-canvas);
+  color: var(--admin-ink);
+}
+
+.admin-sidebar {
+  border-right-color: #e8e3db;
+  background: linear-gradient(180deg, #fbf9f5 0%, #f7f4ee 100%);
+  color: #2c2a29;
+}
+
+.admin-brand strong {
+  color: #2c2a29;
+}
+
+.admin-brand img {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+}
+
+.admin-brand small,
+.admin-nav-caption {
+  color: #77736e;
+}
+
+.admin-sidebar-toggle {
+  color: #77736e;
+}
+
+.admin-nav-link {
+  color: #5f5b56;
+}
+
+.admin-nav-link:hover {
+  background: #f0ece4;
+  color: #315d49;
+}
+
+.admin-nav-link.active,
+.admin-nav-link.active:hover {
+  background: #a8432b;
+  color: #ffffff;
+}
+
+.admin-nav-link.active::before {
+  background: #a8432b;
+}
+
+.admin-nav-link i {
+  background: #a8432b;
+  color: #ffffff;
+}
+
+.admin-sidebar-tip {
+  border-color: #e8e3db;
+  background: #ffffff;
+  color: #5f5b56;
+}
+
+.admin-sidebar-tip strong {
+  color: #2c2a29;
+}
+
+.admin-sidebar-tip small,
+.admin-sidebar-version {
+  color: #77736e;
+}
+
+.admin-sidebar > .admin-logout,
+.admin-logout {
+  color: #5f5b56;
+}
+
+.admin-sidebar > .admin-logout:hover,
+.admin-logout:hover {
+  background: #f0ece4;
+  color: #a8432b;
+}
+
+.admin-header {
+  border-bottom-color: var(--admin-line);
+  background: rgb(255 255 255 / 96%);
+}
+
+.admin-header-title h1,
+.admin-management-heading h2,
+.admin-modal-heading h2 {
+  color: var(--admin-ink);
+}
+
+.admin-header-title > span,
+.admin-breadcrumb,
+.admin-management-heading p,
+.admin-panel-heading p {
+  color: var(--admin-muted);
+}
+
+.admin-header-search,
+.admin-search,
+.admin-filter select,
+.admin-mobile-menu,
+.admin-notification,
+.admin-icon-button,
+.admin-subtle-button,
+.admin-pagination button {
+  border-color: var(--admin-line);
+  background: #ffffff;
+}
+
+.admin-header-search input,
+.admin-search input,
+.admin-filter select,
+.admin-form-grid input,
+.admin-form-grid select,
+.admin-form-grid textarea {
+  color: var(--admin-ink);
+}
+
+.admin-welcome {
+  border-color: #e9dfd1;
+  background: linear-gradient(105deg, #f7f1e7 0%, #fbf9f5 72%, #f1eee5 100%);
+}
+
+.admin-welcome .admin-eyebrow,
+.admin-eyebrow,
+.admin-heading-icon,
+.admin-heading-icon.gold {
+  color: #a8432b;
+}
+
+.admin-welcome h2 {
+  color: var(--admin-ink);
+}
+
+.admin-welcome p {
+  color: #71685f;
+}
+
+.admin-welcome-seal {
+  background: #a8432b;
+  color: #ffffff;
+}
+
+.admin-metric-card,
+.admin-panel,
+.admin-table-wrap,
+.admin-media-card {
+  border-color: var(--admin-line);
+  background: var(--admin-paper);
+}
+
+.admin-metric-copy .admin-metric-label,
+.admin-metric-copy strong,
+.admin-panel-heading h3,
+.admin-compact-row strong,
+.admin-review-heading strong,
+.admin-management-heading h2 {
+  color: var(--admin-ink);
+}
+
+.admin-metric-icon.clay,
+.admin-metric-icon.orange,
+.admin-metric-icon.brown {
+  background: #f5e7e1;
+  color: #a8432b;
+}
+
+.admin-metric-icon.moss,
+.admin-metric-icon.green {
+  background: #e8efe9;
+  color: #315d49;
+}
+
+.admin-metric-copy small,
+.admin-metric-card > small span,
+.admin-chart-total {
+  color: #315d49;
+}
+
+.admin-metric-sparkline polyline {
+  stroke: #a8432b;
+}
+
+.admin-metric-card:nth-child(3n) .admin-metric-sparkline polyline,
+.admin-metric-card:nth-child(4n) .admin-metric-sparkline polyline {
+  stroke: #6d9477;
+}
+
+.admin-bar-track > span,
+.admin-progress-track > span,
+.admin-popular-row:nth-child(even) .admin-popular-track i {
+  background: #6d9477;
+}
+
+.admin-stacked-bar i,
+.admin-popular-track i {
+  background: #315d49;
+}
+
+.admin-stacked-bar b {
+  background: #a8432b;
+}
+
+.admin-status.success {
+  background: #e8f0e9;
+  color: #315d49;
+}
+
+.admin-status.pending {
+  background: #f7efdc;
+  color: #8a6a2d;
+}
+
+.admin-status.danger {
+  background: #f7e8e3;
+  color: #a8432b;
+}
+
+.admin-status.neutral {
+  background: #efeeeb;
+  color: #68645f;
+}
+
+.admin-primary-button {
+  border-color: #a8432b;
+  background: #a8432b;
+  color: #ffffff;
+}
+
+.admin-primary-button:hover {
+  border-color: #8f3825;
+  background: #8f3825;
+}
+
+.admin-secondary-button,
+.admin-subtle-button {
+  color: #5e5a55;
+}
+
+.admin-management-heading > a,
+.admin-panel-heading > a,
+.admin-profile-menu a,
+.admin-not-found a {
+  color: #a8432b;
+}
+
+.admin-table th {
+  border-bottom-color: var(--admin-line);
+  background: #f7f5f0;
+  color: #625e58;
+}
+
+.admin-table td {
+  border-bottom-color: #efede8;
+  color: #3f3d3a;
+}
+
+.admin-table tbody tr:hover {
+  background: #fbf9f5;
+}
+
+.admin-row-actions button.approve {
+  color: #315d49;
+}
+
+.admin-row-actions button.warning,
+.admin-row-actions button.delete {
+  color: #a8432b;
+}
+
+.admin-pagination button:not(:disabled):hover,
+.admin-mobile-menu:hover,
+.admin-notification:hover,
+.admin-icon-button:hover {
+  color: #a8432b;
+}
+
+.admin-modal,
+.admin-profile-menu {
+  border-color: var(--admin-line);
+  background: #ffffff;
+}
+
+.admin-modal-heading {
+  border-bottom-color: var(--admin-line);
+}
+
+.admin-form-grid input:focus,
+.admin-form-grid select:focus,
+.admin-form-grid textarea:focus {
+  border-color: #a8432b;
+  box-shadow: 0 0 0 3px rgb(168 67 43 / 10%);
+}
+
+/* Increase admin text size for readability while keeping the dashboard layout intact. */
+.admin-shell {
+  font-size: 15px;
+}
+
+.admin-brand strong {
+  font-size: 18px;
+}
+
+.admin-nav-caption {
+  font-size: 10px;
+}
+
+.admin-nav-link {
+  font-size: 13px;
+}
+
+.admin-sidebar-tip strong {
+  font-size: 12px;
+}
+
+.admin-sidebar-tip small,
+.admin-sidebar-version {
+  font-size: 10px;
+}
+
+.admin-logout {
+  font-size: 13px;
+}
+
+.admin-header-title h1 {
+  font-size: 19px;
+}
+
+.admin-header-search input,
+.admin-profile strong {
+  font-size: 12px;
+}
+
+.admin-profile small,
+.admin-breadcrumb {
+  font-size: 10px;
+}
+
+.admin-eyebrow,
+.admin-welcome .admin-eyebrow {
+  font-size: 11px;
+}
+
+.admin-welcome h2 {
+  font-size: 18px;
+}
+
+.admin-welcome p,
+.admin-management-heading p {
+  font-size: 12px;
+}
+
+.admin-metric-copy .admin-metric-label {
+  font-size: 12px;
+}
+
+.admin-metric-copy strong {
+  font-size: 22px;
+}
+
+.admin-metric-copy small,
+.admin-metric-card > small {
+  font-size: 10px;
+}
+
+.admin-panel-heading h3 {
+  font-size: 15px;
+}
+
+.admin-panel-heading p,
+.admin-chart-y-labels,
+.admin-registration-plot .admin-chart-legend span,
+.admin-month-column small {
+  font-size: 10px;
+}
+
+.admin-panel-heading > a,
+.admin-overview-three-columns .admin-panel-heading > a,
+.admin-popular-row > strong,
+.admin-popular-row > b,
+.admin-overview-three-columns .admin-compact-row strong,
+.admin-latest-reviews .admin-review-heading strong,
+.admin-latest-reviews .admin-review-row p {
+  font-size: 12px;
+}
+
+.admin-overview-three-columns .admin-compact-row small,
+.admin-overview-three-columns .admin-compact-row time,
+.admin-latest-reviews .admin-review-row > small,
+.admin-status {
+  font-size: 10px;
+}
+
+.admin-management-heading h2 {
+  font-size: 22px;
+}
+
+.admin-primary-button,
+.admin-secondary-button,
+.admin-search input,
+.admin-filter,
+.admin-result-count,
+.admin-table th,
+.admin-table td,
+.admin-pagination,
+.admin-modal,
+.admin-form-grid label {
+  font-size: 13px;
+}
+
+.admin-empty-row > small,
+.admin-pagination > span {
+  font-size: 11px;
+}
+
+.admin-profile-menu strong {
+  font-size: 13px;
+}
+
+.admin-profile-menu small,
+.admin-profile-menu a {
+  font-size: 11px;
 }

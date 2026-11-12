@@ -145,9 +145,10 @@ export default function TouristVillagePages({ crafts, favoriteIds, onFavorite, q
               </nav>
             )}
           </div>
-
+ 
           <aside className="tourist-villages-sidebar">
             <FeaturedVillage village={crafts[0]} />
+            {/* 
             <section className="tourist-villages-reasons">
               <h2>Vì sao nên khám phá làng nghề?</h2>
               <div>
@@ -156,7 +157,9 @@ export default function TouristVillagePages({ crafts, favoriteIds, onFavorite, q
                 <span><i>♡</i>Góp phần<br />bảo tồn nghề</span>
               </div>
             </section>
+            */}
           </aside>
+          
         </div>
       </div>
     </div>
