@@ -1,182 +1,349 @@
-import "../../styles/ArtisanProfile.css";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
+import artisanProfileService, { getProfileImageUrl } from "../../services/artisanProfileService.js";
+import "../../styles/ArtisanProfile.css";
+
+const emptyProfile = {
+  ho_ten: "",
+  email: "",
+  sdt: "",
+  anh_dai_dien: "",
+  dia_chi: "",
+  gioi_thieu: "",
+  so_nam_kn: 0,
+  qua_trinh_lam_nghe: "",
+  nghe_truyen_thong: "",
+  lang_nghe: "",
+  hoat_dong: [],
+};
+
+function updateCachedAuthUser(updates) {
+  try {
+    const user = JSON.parse(window.localStorage.getItem("auth-user") || "null");
+    if (!user || typeof user !== "object") return;
+
+    window.localStorage.setItem("auth-user", JSON.stringify({ ...user, ...updates }));
+    window.dispatchEvent(new Event("auth-user-updated"));
+  } catch (error) {
+    console.error("Không thể đồng bộ ảnh và tên hồ sơ lên thanh tiêu đề:", error);
+  }
+}
 
 export default function ArtisanProfile() {
+  const [profile, setProfile] = useState(emptyProfile);
+  const [images, setImages] = useState([]);
+  const [caption, setCaption] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [uploading, setUploading] = useState("");
+  const notify = useArtisanToast();
+  const avatarInput = useRef(null);
+  const galleryInput = useRef(null);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      artisanProfileService.getProfile(),
+      artisanProfileService.getImages(),
+    ])
+      .then(([savedProfile, savedImages]) => {
+        if (!active) return;
+        setProfile({ ...emptyProfile, ...savedProfile });
+        setImages(savedImages);
+        updateCachedAuthUser({
+          name: savedProfile.ho_ten,
+          email: savedProfile.email,
+          avatarUrl: savedProfile.anh_dai_dien || "",
+        });
+      })
+      .catch((error) => {
+        if (active) notify(error.message, "error");
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [notify]);
+
+  const updateField = (event) => {
+    const { name, value } = event.target;
+    setProfile((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleSave = async (event) => {
+    event.preventDefault();
+    setIsSaving(true);
+
+    try {
+      const savedProfile = await artisanProfileService.updateProfile({
+        name: profile.ho_ten,
+        phone: profile.sdt,
+        address: profile.dia_chi,
+        introduction: profile.gioi_thieu,
+        yearsOfExperience: profile.so_nam_kn,
+        careerHistory: profile.qua_trinh_lam_nghe,
+        crafts: profile.nghe_truyen_thong,
+      });
+      setProfile({ ...emptyProfile, ...savedProfile });
+      updateCachedAuthUser({
+        name: savedProfile.ho_ten,
+        email: savedProfile.email,
+        avatarUrl: savedProfile.anh_dai_dien || "",
+      });
+      notify("Đã lưu hồ sơ nghệ nhân.");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setUploading("avatar");
+    try {
+      const result = await artisanProfileService.uploadAvatar(file);
+      setProfile((current) => ({ ...current, anh_dai_dien: result.avatarUrl }));
+      updateCachedAuthUser({ avatarUrl: result.avatarUrl });
+      notify("Đã cập nhật ảnh đại diện.");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setUploading("");
+    }
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    setUploading("image");
+    try {
+      const image = await artisanProfileService.uploadImage(file, caption);
+      setImages((current) => [image, ...current]);
+      setCaption("");
+      notify("Đã tải ảnh lên hồ sơ.");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setUploading("");
+    }
+  };
+
+  const handleImageDelete = async (image) => {
+    if (!window.confirm("Bạn có chắc muốn xóa ảnh này khỏi hồ sơ?")) return;
+
+    try {
+      await artisanProfileService.deleteImage(image.ma_pt);
+      setImages((current) => current.filter((item) => item.ma_pt !== image.ma_pt));
+      notify("Đã xóa ảnh khỏi hồ sơ.");
+    } catch (error) {
+      notify(error.message, "error");
+    }
+  };
+
+  if (isLoading) {
+    return <main className="profile-content"><p role="status">Đang tải hồ sơ nghệ nhân...</p></main>;
+  }
+
   return (
     <main className="profile-content">
-          {/* Breadcrumb & Title */}
-          <div className="breadcrumb-row">
-            <Link to={ROUTES.ARTISAN_DASHBOARD}>Tổng quan</Link>
-            <span>›</span>
-            <span className="active">Hồ sơ nghệ nhân</span>
-          </div>
+      <div className="breadcrumb-row">
+        <Link to={ROUTES.ARTISAN_DASHBOARD}>Tổng quan</Link>
+        <span>›</span>
+        <span className="active">Hồ sơ nghệ nhân</span>
+      </div>
 
-          <div className="title-section-row">
-            <div>
-              <h1>Sổ Lưu Danh & Hồ Sơ Nghệ Nhân</h1>
-              <p className="subtitle">
-                Thông tin được chứng thực dành cho du khách, nhà nghiên cứu và bạn bè quốc tế tìm hiểu nghề gốm cổ.
-              </p>
-            </div>
-            <div className="verified-badge-pill">
-              <span>✔ Đã xác minh cấp quốc gia</span>
-            </div>
-          </div>
+      <div className="title-section-row">
+        <div>
+          <h1>Hồ sơ nghệ nhân</h1>
+          <p className="subtitle">Cập nhật thông tin giới thiệu và hình ảnh để chia sẻ với du khách.</p>
+        </div>
+        <div className="verified-badge-pill">
+          {profile.trang_thai_xac_minh === "da_xac_minh" ? "✔ Đã xác minh" : "Hồ sơ nghệ nhân"}
+        </div>
+      </div>
 
-          {/* CARD 1: ẢNH ĐẠI DIỆN TRANG TRỌNG */}
-          <div className="profile-card avatar-section-card">
-            <div className="avatar-wrapper">
-              <img 
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=85" 
-                alt="Bác Nguyễn Văn An chân dung" 
+      <form onSubmit={handleSave}>
+        <section className="profile-card avatar-section-card">
+          <div className="avatar-wrapper">
+            {profile.anh_dai_dien
+              ? <img src={getProfileImageUrl(profile.anh_dai_dien)} alt={`Ảnh đại diện ${profile.ho_ten}`} />
+              : <div className="profile-avatar-placeholder" aria-label="Chưa có ảnh đại diện">Ảnh nghệ nhân</div>}
+          </div>
+          <div className="avatar-info-right">
+            <span className="section-tag-red">Ảnh đại diện</span>
+            <h2>{profile.ho_ten || "Nghệ nhân"}</h2>
+            <p className="desc-text">Ảnh đại diện sẽ xuất hiện cùng thông tin hồ sơ của bạn.</p>
+            <div className="avatar-action-row">
+              <button
+                className="change-avatar-btn"
+                type="button"
+                onClick={() => avatarInput.current?.click()}
+                disabled={uploading !== ""}
+              >
+                {uploading === "avatar" ? "Đang tải ảnh..." : "📷 Đổi ảnh đại diện"}
+              </button>
+              <input
+                ref={avatarInput}
+                className="profile-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleAvatarChange}
               />
-              <span className="badge-on-img">🎖 Nghệ nhân Ưu tú</span>
-            </div>
-
-            <div className="avatar-info-right">
-              <span className="section-tag-red">Ảnh đại diện trang trọng</span>
-              <h2>Bác Nguyễn Văn An</h2>
-              <p className="desc-text">
-                Bức ảnh chân dung này sẽ xuất hiện trên trang giới thiệu của Làng Nghề Việt và sách hướng dẫn trải nghiệm cho khách du lịch trong và ngoài nước.
-              </p>
-
-              <div className="avatar-action-row">
-                <button className="change-avatar-btn">
-                  📷 Đổi ảnh đại diện
-                </button>
-                <div className="tip-box">
-                  <span className="tip-icon">💡</span>
-                  <span><strong>Mẹo nhỏ cho Bác:</strong> Hãy nhờ con cháu hoặc thợ chụp giúp ảnh chân dung rõ nét, thể hiện thần thái tự nhiên.</span>
-                </div>
-              </div>
+              <span className="profile-upload-hint">JPG, PNG hoặc WEBP, tối đa 10 MB.</span>
             </div>
           </div>
+        </section>
 
-          {/* CARD 2: THÔNG TIN CƠ BẢN CỦA NGHỆ NHÂN */}
-          <div className="profile-card form-section-card">
-            <div className="form-card-header">
-              <h2>📝 Thông tin cơ bản của nghệ nhân</h2>
-              <span className="tip-note">* Nhấp vào từng ô bên dưới để sửa chữ</span>
+        <section className="profile-card form-section-card">
+          <div className="form-card-header">
+            <h2>Thông tin cơ bản</h2>
+            <span className="tip-note">Thông tin được lưu vào hồ sơ của bạn</span>
+          </div>
+          <div className="artisan-form">
+            <div className="form-grid-2col">
+              <div className="form-group">
+                <label htmlFor="artisan-name">Họ và tên</label>
+                <input id="artisan-name" name="ho_ten" value={profile.ho_ten} onChange={updateField} maxLength={100} required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="artisan-email">Email tài khoản</label>
+                <input id="artisan-email" value={profile.email} readOnly />
+              </div>
+              <div className="form-group">
+                <label htmlFor="artisan-crafts">Nghề truyền thống gắn bó</label>
+                <input
+                  id="artisan-crafts"
+                  name="nghe_truyen_thong"
+                  value={profile.nghe_truyen_thong}
+                  onChange={updateField}
+                  placeholder="Nhập đúng tên nghề, phân cách bằng dấu phẩy"
+                />
+                <small className="field-hint">Tên nghề cần tồn tại trong danh sách nghề truyền thống của hệ thống.</small>
+              </div>
+              <div className="form-group">
+                <label htmlFor="artisan-years">Số năm kinh nghiệm</label>
+                <input
+                  id="artisan-years"
+                  name="so_nam_kn"
+                  type="number"
+                  min="0"
+                  max="32767"
+                  value={profile.so_nam_kn}
+                  onChange={updateField}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="artisan-phone">Số điện thoại liên hệ</label>
+                <input id="artisan-phone" name="sdt" type="tel" value={profile.sdt || ""} onChange={updateField} maxLength={30} />
+              </div>
             </div>
+            <div className="form-group full-width">
+              <label htmlFor="artisan-address">Địa chỉ hoạt động / đón khách</label>
+              <input id="artisan-address" name="dia_chi" value={profile.dia_chi || ""} onChange={updateField} maxLength={255} />
+            </div>
+            <div className="form-group full-width">
+              <label htmlFor="artisan-introduction">Giới thiệu bản thân</label>
+              <textarea id="artisan-introduction" name="gioi_thieu" rows={4} value={profile.gioi_thieu || ""} onChange={updateField} maxLength={10000} />
+            </div>
+            <div className="form-group full-width">
+              <label htmlFor="artisan-history">Hành trình gìn giữ và truyền nghề</label>
+              <textarea id="artisan-history" name="qua_trinh_lam_nghe" rows={4} value={profile.qua_trinh_lam_nghe || ""} onChange={updateField} maxLength={10000} />
+            </div>
+          </div>
+        </section>
 
-            <form className="artisan-form" onSubmit={(e) => e.preventDefault()}>
-              <div className="form-grid-2col">
-                <div className="form-group">
-                  <label>1. Họ và tên nghệ nhân:</label>
+        <section className="profile-card profile-linked-data">
+          <div className="form-card-header">
+            <div>
+              <h2>Làng nghề và hoạt động trải nghiệm</h2>
+              <p className="header-desc">Thông tin được lấy từ các bản ghi liên kết với tài khoản nghệ nhân trong cơ sở dữ liệu.</p>
+            </div>
+          </div>
+          <div className="profile-linked-item">
+            <strong>Làng nghề:</strong>
+            <span>{profile.lang_nghe || "Chưa có làng nghề được liên kết."}</span>
+          </div>
+          {profile.hoat_dong?.length ? (
+            <div className="profile-activities">
+              {profile.hoat_dong.map((activity) => (
+                <article className="profile-linked-item" key={`${activity.name}-${activity.venue}`}>
+                  <strong>{activity.name}</strong>
+                  <span>{activity.venue}{activity.status ? ` · ${activity.status}` : ""}</span>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="profile-empty-gallery">Chưa có hoạt động trải nghiệm được liên kết.</p>
+          )}
+        </section>
 
-                    <input type="text" defaultValue="Nguyễn Văn An" />
-  
-                </div>
-
-                <div className="form-group">
-                  <label>2. Nghề truyền thống gắn bó:</label>
-                  <input type="text" defaultValue="Nghề làm gốm Chu Đậu - Bát Tràng" />
-                </div>
-
-                <div className="form-group">
-                  <label>3. Thâm niên gắn bó với nghề:</label>
-                  <input type="text" defaultValue="42 năm truyền nghề" />
-                </div>
-
-                <div className="form-group">
-                  <label>4. Số điện thoại liên hệ đón khách:</label>
-                  <input type="text" defaultValue="0912 345 678" />
-                </div>
-              </div>
-
-              <div className="form-group full-width">
-                <label>5. Địa chỉ lò gốm / Không gian nhà cổ đón khách:</label>
-                <input type="text" defaultValue="Số 12, Ngõ Cổ, Làng Gốm Bát Tràng, Gia Lâm, Hà Nội" />
-                <small className="field-hint">Du khách sẽ tìm đến địa chỉ này theo bản đồ chỉ dẫn.</small>
-              </div>
-
-              <div className="form-group full-width">
-                <div className="label-with-tip">
-                  <label>6. Lời tự thuật của nghệ nhân (Giới thiệu bản thân & Truyền thống gia tộc):</label>
-                  <span className="auto-text-tip">✏ Bác có thể đọc để máy tự viết</span>
-                </div>
-                <textarea 
-                  rows={4}
-                  defaultValue="Gia đình tôi đã bốn đời gắn bó với đất sét trắng và ngọn lửa lò bầu tại Làng gốm Bát Tràng. Kế thừa đôi bàn tay khéo léo và ngọn lửa yêu nghề từ cụ thân sinh, tôi luôn tâm niệm mỗi chiếc bình, chiếc bát vuốt tay không chỉ là vật dụng, mà còn chứa đựng cái hồn, cái mộc mạc và sự thanh tịnh của cốt đất quê hương Việt Nam. Tôi mong muốn truyền kiến thức, kỹ thuật cho thế hệ trẻ và du khách bốn phương ghé thăm."
-                />
-              </div>
-
-              <div className="form-group full-width">
-                <label>7. Hành trình gìn giữ & Phục dựng tinh hoa di sản:</label>
-                <textarea 
-                  rows={4}
-                  defaultValue="Hơn bốn mươi năm qua, tôi đã dành trọn tâm huyết phục chế thành công công thức bôi men lam cổ và men rạn tam thái từ thế kỷ 16 vốn từng bị thất truyền. Xưởng gốm vinh dự nhận Giải Bàn Tay Vàng Làng Nghề năm 2005 và Bằng khen Tinh Hoa Đất Việt năm 2018. Hiện nay, xưởng vẫn kiên quyết giữ kỹ thuật vuốt gốm thủ công bằng tay hoàn toàn không dùng khuôn đúc công nghiệp."
-                />
-              </div>
-            </form>
+        <section className="profile-card certificates-section-card">
+          <div className="form-card-header">
+            <div>
+              <h2>Hình ảnh hồ sơ</h2>
+              <p className="header-desc">Ảnh tải lên được lưu cùng hồ sơ nghệ nhân.</p>
+            </div>
+          </div>
+          <div className="profile-gallery-upload">
+            <input
+              aria-label="Chú thích ảnh"
+              type="text"
+              value={caption}
+              onChange={(event) => setCaption(event.target.value)}
+              placeholder="Chú thích ảnh (không bắt buộc)"
+              maxLength={500}
+            />
+            <button type="button" className="btn-upload-cert" onClick={() => galleryInput.current?.click()} disabled={uploading !== ""}>
+              {uploading === "image" ? "Đang tải ảnh..." : "📷 Tải ảnh lên"}
+            </button>
+            <input
+              ref={galleryInput}
+              className="profile-file-input"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleImageUpload}
+            />
           </div>
 
-          {/* CARD 3: GIẤY CHỨNG NHẬN & KỶ NIỆM CHƯƠNG */}
-          <div className="profile-card certificates-section-card">
-            <div className="form-card-header">
-              <div>
-                <h2>🎖 Giấy chứng nhận nghệ nhân & Kỷ niệm chương</h2>
-                <p className="header-desc">Các bằng khen, huy chương, giấy khen nhà nước đã được tải lên để khách tham quan chiêm ngưỡng.</p>
-              </div>
-              <button className="btn-upload-cert">📷 Chụp thêm bằng khen</button>
-            </div>
-
+          {images.length ? (
             <div className="certificates-grid">
-              {/* Bằng khen 1 */}
-              <div className="cert-item-card">
-                <div className="cert-img-box">
-                  <img src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=400&q=85" alt="Bằng Nghệ Nhân Ưu Tú" />
-                  <span className="year-tag">Năm 2012</span>
-                </div>
-                <h4>Bằng Nghệ Nhân Ưu Tú Cấp Nhà Nước</h4>
-                <p>Chứng nhận cống hiến trọn đời cho di sản gốm Việt Nam do Chủ tịch nước phong tặng.</p>
-                <div className="cert-footer">
-                  <span className="verified-text">✔ Bản gốc xác thực</span>
-                  <button className="del-btn">Gỡ ảnh</button>
-                </div>
-              </div>
-
-              {/* Bằng khen 2 */}
-              <div className="cert-item-card">
-                <div className="cert-img-box">
-                  <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=400&q=85" alt="Kỷ Niệm Chương" />
-                  <span className="year-tag">Năm 2006</span>
-                </div>
-                <h4>Kỷ Niệm Chương Bàn Tay Vàng</h4>
-                <p>Giải thưởng hội thi tay nghề vuốt gốm mộc không dùng khuôn đúc Làng Bát Tràng.</p>
-                <div className="cert-footer">
-                  <span className="verified-text">✔ Bản gốc xác thực</span>
-                  <button className="del-btn">Gỡ ảnh</button>
-                </div>
-              </div>
-
-              {/* Ô Thêm bằng khen */}
-              <div className="add-cert-card">
-                <div className="add-icon-circle">📷</div>
-                <h4>Thêm bằng khen khác</h4>
-                <p>Bác có thể chụp thêm ảnh kỷ niệm chương hoặc bài báo viết về xưởng gốm của mình.</p>
-              </div>
+              {images.map((image) => (
+                <article className="cert-item-card" key={image.ma_pt}>
+                  <div className="cert-img-box">
+                    <img src={getProfileImageUrl(image.url)} alt={image.caption || "Ảnh hồ sơ nghệ nhân"} />
+                  </div>
+                  <p>{image.caption || "Ảnh hồ sơ"}</p>
+                  <div className="cert-footer">
+                    <span>{image.uploaded_at ? new Date(image.uploaded_at).toLocaleDateString("vi-VN") : ""}</span>
+                    <button className="del-btn" type="button" onClick={() => handleImageDelete(image)}>Xóa ảnh</button>
+                  </div>
+                </article>
+              ))}
             </div>
-          </div>
+          ) : (
+            <p className="profile-empty-gallery">Bạn chưa tải ảnh nào lên hồ sơ.</p>
+          )}
+        </section>
 
-          {/* DÒNG NÚT LƯU BÊN DƯỚI */}
-          <div className="bottom-action-bar">
-            <button className="btn-print">🖨 In hồ sơ ra giấy</button>
-            <button className="btn-save-primary">💾 Lưu thay đổi hồ sơ</button>
-          </div>
-
-          {/* FLOATING SUPPORT BAR */}
-          <div className="support-banner">
-            <div className="support-left">
-              <span className="support-icon">☎</span>
-              <div>
-                <strong>Bác gặp vướng mắc khi dùng máy tính?</strong>
-                <p>Nếu bác gặp khó khăn, hãy bấm gọi <strong>1900 8888</strong> để được các cháu thanh niên hỗ trợ tận nhà miễn phí.</p>
-              </div>
-            </div>
-            <button className="call-now-btn">📞 Bấm gọi 1900 8888</button>
-          </div>
+        <div className="bottom-action-bar">
+          <button type="button" className="btn-print" onClick={() => window.print()}>🖨 In hồ sơ</button>
+          <button type="submit" className="btn-save-primary" disabled={isSaving || uploading !== ""}>
+            {isSaving ? "Đang lưu..." : "💾 Lưu thay đổi hồ sơ"}
+          </button>
+        </div>
+      </form>
     </main>
   );
 }

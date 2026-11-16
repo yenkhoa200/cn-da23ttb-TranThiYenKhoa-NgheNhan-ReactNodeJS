@@ -25,6 +25,8 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/artisan/crafts", require("./routes/artisanCraftRoutes"));
+app.use("/api/artisan/profile", require("./routes/artisanProfileRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 
 // Xử lý lỗi
@@ -38,7 +40,9 @@ app.use((err, req, res, next) => {
   res.status(status).json({
     success: false,
     message: status === 413
-      ? "Tệp tải lên không được vượt quá 50 MB."
+      ? req.path.startsWith("/api/artisan/profile")
+        ? "Ảnh hồ sơ không được vượt quá 10 MB."
+        : "Tệp tải lên không được vượt quá 50 MB."
       : status === 400
         ? err.message
         : "Lỗi máy chủ",

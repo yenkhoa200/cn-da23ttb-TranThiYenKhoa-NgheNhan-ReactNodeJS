@@ -48,8 +48,9 @@ export default function Login({ initialAccountType = "visitor" }) {
           <div className="banner-content">
             <span className="quote-icon">“</span>
             <h1>
-              Gìn giữ tinh hoa, <i>tiếp nối</i> câu chuyện Việt.
+             <i> Gìn giữ tinh hoa, tiếp nối câu chuyện Việt.</i>
             </h1>
+            <span className="quote-icon">”</span>
             <p>
               Gặp gỡ nghệ nhân, khám phá làng nghề và cùng lan tỏa những giá trị văn hóa Việt.
             </p>

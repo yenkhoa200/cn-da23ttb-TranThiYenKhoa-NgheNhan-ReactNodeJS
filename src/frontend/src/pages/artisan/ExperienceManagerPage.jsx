@@ -12,8 +12,9 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
 import {
   DEFAULT_ARTISAN_EXPERIENCES,
@@ -41,6 +42,9 @@ function formatSchedule(value) {
 }
 
 export default function ExperienceManagerPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const notify = useArtisanToast();
   const [activities, setActivities] = useState(() =>
     readArtisanExperiences(DEFAULT_ARTISAN_EXPERIENCES),
   );
@@ -49,6 +53,14 @@ export default function ExperienceManagerPage() {
   const [craftFilter, setCraftFilter] = useState("all");
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
+
+  useEffect(() => {
+    const notice = location.state?.notice;
+    if (!notice) return;
+
+    notify(notice);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate, notify]);
 
   const crafts = useMemo(
     () => [...new Set(activities.map((activity) => activity.craft))],
@@ -94,9 +106,16 @@ export default function ExperienceManagerPage() {
     const updatedActivities = activities.map((activity) =>
       activity.id === modal.activityId ? savedActivity : activity,
     );
-    saveArtisanExperiences(updatedActivities);
+    try {
+      saveArtisanExperiences(updatedActivities);
+    } catch {
+      notify("Không thể lưu thay đổi hoạt động. Vui lòng thử lại.", "error");
+      return;
+    }
+
     setActivities(updatedActivities);
     setModal(null);
+    notify(modal.activityId ? "Đã cập nhật hoạt động." : "Đã tạo hoạt động mới.");
   };
 
   const handleDelete = (activityId) => {
@@ -104,11 +123,18 @@ export default function ExperienceManagerPage() {
     const updatedActivities = activities.filter(
       (activity) => activity.id !== activityId,
     );
-    saveArtisanExperiences(updatedActivities);
+    try {
+      saveArtisanExperiences(updatedActivities);
+    } catch {
+      notify("Không thể xóa hoạt động. Vui lòng thử lại.", "error");
+      return;
+    }
+
     setActivities(updatedActivities);
     if (modal?.type === "detail" && modal.activity.id === activityId) {
       setModal(null);
     }
+    notify("Đã xóa hoạt động.");
   };
 
   return (

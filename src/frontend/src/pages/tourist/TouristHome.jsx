@@ -437,6 +437,7 @@ const navigation = [
   { label: "Trang chủ", to: ROUTES.TOURIST, view: "home" },
   { label: "Nghệ nhân", to: "/tourist/artisans", view: "artisans" },
   { label: "Làng nghề", to: "/tourist/crafts", view: "crafts" },
+  { label: "Nghề truyền thống", to: "/tourist/crafts", view: "crafts" },
   { label: "Sản phẩm", to: "/tourist/products", view: "products" },
   { label: "Văn hóa", to: "/tourist/stories", view: "stories" },
   { label: "Hoạt động trải nghiệm", to: "/tourist/activities", view: "activities" },
@@ -585,7 +586,24 @@ export default function TouristHome() {
           <span><strong>Tinh Hoa Việt</strong><small>Nền tảng di sản - Tinh hoa tương lai</small></span>
         </Link>
         <nav className="tourist-nav" aria-label="Điều hướng chính">
-          {navigation.map((item) => <Link className={view === item.view || (view === "artisan" && item.view === "artisans") || (view === "craft" && item.view === "crafts") || (view === "product" && item.view === "products") ? "is-current" : ""} to={item.to} key={item.label}>{item.label}</Link>)}
+          {navigation.map((item) => {
+            const isCurrent =
+              view === item.view
+              || (view === "artisan" && item.view === "artisans")
+              || (view === "craft" && item.view === "crafts")
+              || (view === "product" && item.view === "products");
+
+            return (
+              <Link
+                className={isCurrent ? "is-current" : ""}
+                to={item.to}
+                key={item.label}
+                aria-current={isCurrent ? "page" : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
         <div className="tourist-header-actions" ref={headerActionsRef}>
           <Link className="tourist-icon-button" to="/tourist/search" aria-label="Tìm kiếm"><Search size={18} /></Link>
@@ -637,7 +655,7 @@ export default function TouristHome() {
         </div>
       </header>
 
-      <main>
+      <main className="tourist-main">
         {view === "home" ? (
           <TouristLanding
             query={query}

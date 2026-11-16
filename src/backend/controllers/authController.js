@@ -3,26 +3,43 @@ const jwt = require("jsonwebtoken");
 const pool = require("../config/database");
 
 const allowedLoginRoles = {
-  visitor: "du_khach",
-  artisan: "nghe_nhan",
-  admin: "quan_tri",
+  visitor: ["du_khach"],
+  artisan: ["nghe_nhan", "artisans"],
+  admin: ["quan_tri"],
 };
 
+function normalizeRole(role) {
+  const value = typeof role === "string" ? role.trim().toLowerCase() : "";
+
+  if (value === "artisans") return "nghe_nhan";
+  if (value === "du_khach" || value === "nghe_nhan" || value === "quan_tri") {
+    return value;
+  }
+
+  return value;
+}
+
+function normalizeStatus(status) {
+  return typeof status === "string" ? status.trim().toUpperCase() : "";
+}
+
 function createSession(account) {
+  const role = normalizeRole(account.vai_tro ?? account.role);
   const token = jwt.sign(
-    { role: account.vai_tro },
+    { role },
     process.env.JWT_SECRET,
-    { subject: String(account.ma_tai_khoan), expiresIn: "12h" }
+    { subject: String(account.ma_tai_khoan ?? account.account_id), expiresIn: "12h" }
   );
 
   return {
     token,
     user: {
-      id: account.ma_tai_khoan,
-      name: account.ho_ten,
+      id: account.ma_tai_khoan ?? account.account_id,
+      name: account.ho_ten ?? account.full_name,
       email: account.email,
-      phone: account.so_dien_thoai || "",
-      role: account.vai_tro,
+      phone: account.so_dien_thoai || account.phone_number || "",
+      role,
+      avatarUrl: account.anh_dai_dien || account.avatar_url || "",
     },
   };
 }
@@ -31,6 +48,17 @@ function validateCredentials(password) {
   return typeof password === "string"
     && password.length >= 6
     && Buffer.byteLength(password, "utf8") <= 72;
+}
+
+async function resolveAccountTable() {
+  const { rows } = await pool.query(`
+    SELECT
+      to_regclass('public.tai_khoan') AS tai_khoan,
+      to_regclass('public.accounts') AS accounts
+  `);
+
+  const tableInfo = rows[0] || {};
+  return tableInfo.tai_khoan ? "tai_khoan" : (tableInfo.accounts ? "accounts" : "tai_khoan");
 }
 
 const authController = {
@@ -59,13 +87,25 @@ const authController = {
 
     try {
       const passwordHash = await bcrypt.hash(password, 12);
-      const result = await pool.query(
-        `INSERT INTO tai_khoan (ho_ten, email, mat_khau_hash, sdt, vai_tro)
-         VALUES ($1, $2, $3, $4, 'du_khach')
-         RETURNING ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai,
-                   upper(vai_tro) AS vai_tro`,
-        [name, email, passwordHash, phone]
-      );
+      const tableName = await resolveAccountTable();
+      const isLegacyTable = tableName === "accounts";
+
+      const result = isLegacyTable
+        ? await pool.query(
+          `INSERT INTO accounts (full_name, email, password_hash, phone_number, role)
+           VALUES ($1, $2, $3, $4, 'du_khach')
+           RETURNING account_id AS ma_tai_khoan, full_name AS ho_ten, email, phone_number AS so_dien_thoai,
+                     avatar_url AS anh_dai_dien,
+                     upper(role) AS vai_tro`,
+          [name, email, passwordHash, phone]
+        )
+        : await pool.query(
+          `INSERT INTO tai_khoan (ho_ten, email, mat_khau_hash, sdt, vai_tro)
+           VALUES ($1, $2, $3, $4, 'du_khach')
+           RETURNING ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai, anh_dai_dien,
+                     upper(vai_tro) AS vai_tro`,
+          [name, email, passwordHash, phone]
+        );
 
       return res.status(201).json({
         success: true,
@@ -84,9 +124,9 @@ const authController = {
   async login(req, res, next) {
     const identifier = typeof req.body.identifier === "string" ? req.body.identifier.trim() : "";
     const { password } = req.body;
-    const role = allowedLoginRoles[req.body.accountType];
+    const roleCandidates = allowedLoginRoles[req.body.accountType];
 
-    if (!identifier || !validateCredentials(password) || !role) {
+    if (!identifier || !validateCredentials(password) || !roleCandidates || !roleCandidates.length) {
       return res.status(400).json({ success: false, message: "Thông tin đăng nhập không hợp lệ." });
     }
 
@@ -95,41 +135,74 @@ const authController = {
     }
 
     try {
+      const tableName = await resolveAccountTable();
+      const isLegacyTable = tableName === "accounts";
       const isEmail = identifier.includes("@");
-      const accountResult = isEmail
-        ? await pool.query(
-          `SELECT ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai,
-                  mat_khau_hash AS mat_khau, upper(vai_tro) AS vai_tro,
-                  upper(trang_thai_tk) AS trang_thai
-           FROM tai_khoan
-           WHERE lower(email) = lower($1) AND vai_tro = $2
-           LIMIT 1`,
-          [identifier, role]
-        )
-        : await pool.query(
-          `SELECT ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai,
-                  mat_khau_hash AS mat_khau, upper(vai_tro) AS vai_tro,
-                  upper(trang_thai_tk) AS trang_thai
-           FROM tai_khoan
-           WHERE regexp_replace(coalesce(sdt, ''), '\\D', '', 'g') = $1
-             AND vai_tro = $2
-           LIMIT 1`,
-          [identifier.replace(/\D/g, ""), role]
-        );
+      const roleFilter = roleCandidates.map((candidate) => candidate.toLowerCase());
+
+      const accountResult = isLegacyTable
+        ? isEmail
+          ? await pool.query(
+            `SELECT account_id AS ma_tai_khoan, full_name AS ho_ten, email,
+                    phone_number AS so_dien_thoai, avatar_url AS anh_dai_dien, password_hash AS mat_khau,
+                    lower(role) AS vai_tro, lower(account_status) AS trang_thai
+             FROM accounts
+             WHERE lower(email) = lower($1) AND lower(role) = ANY($2)
+             LIMIT 1`,
+            [identifier, roleFilter]
+          )
+          : await pool.query(
+            `SELECT account_id AS ma_tai_khoan, full_name AS ho_ten, email,
+                    phone_number AS so_dien_thoai, avatar_url AS anh_dai_dien, password_hash AS mat_khau,
+                    lower(role) AS vai_tro, lower(account_status) AS trang_thai
+             FROM accounts
+             WHERE regexp_replace(coalesce(phone_number, ''), '\\D', '', 'g') = $1
+               AND lower(role) = ANY($2)
+             LIMIT 1`,
+            [identifier.replace(/\D/g, ""), roleFilter]
+          )
+        : isEmail
+          ? await pool.query(
+            `SELECT ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai, anh_dai_dien,
+                    mat_khau_hash AS mat_khau, lower(vai_tro) AS vai_tro,
+                    lower(trang_thai_tk) AS trang_thai
+             FROM tai_khoan
+             WHERE lower(email) = lower($1) AND lower(vai_tro) = ANY($2)
+             LIMIT 1`,
+            [identifier, roleFilter]
+          )
+          : await pool.query(
+            `SELECT ma_tk AS ma_tai_khoan, ho_ten, email, sdt AS so_dien_thoai, anh_dai_dien,
+                    mat_khau_hash AS mat_khau, lower(vai_tro) AS vai_tro,
+                    lower(trang_thai_tk) AS trang_thai
+             FROM tai_khoan
+             WHERE regexp_replace(coalesce(sdt, ''), '\\D', '', 'g') = $1
+               AND lower(vai_tro) = ANY($2)
+             LIMIT 1`,
+            [identifier.replace(/\D/g, ""), roleFilter]
+          );
 
       const account = accountResult.rows[0];
-      if (!account || !(await bcrypt.compare(password, account.mat_khau))) {
+      if (!account) {
         return res.status(401).json({ success: false, message: "Email/số điện thoại hoặc mật khẩu không chính xác." });
       }
 
-      if (account.trang_thai !== "HOAT_DONG") {
+      const normalizedRole = normalizeRole(account.vai_tro ?? account.role);
+      const normalizedStatus = normalizeStatus(account.trang_thai ?? account.account_status);
+      const isPasswordValid = await bcrypt.compare(password, account.mat_khau || account.password_hash);
+
+      if (!isPasswordValid) {
+        return res.status(401).json({ success: false, message: "Email/số điện thoại hoặc mật khẩu không chính xác." });
+      }
+
+      if (normalizedStatus !== "HOAT_DONG") {
         return res.status(403).json({ success: false, message: "Tài khoản chưa được kích hoạt hoặc đã bị khóa." });
       }
 
       return res.status(200).json({
         success: true,
         message: "Đăng nhập thành công.",
-        data: createSession(account),
+        data: createSession({ ...account, vai_tro: normalizedRole, role: normalizedRole, trang_thai: normalizedStatus }),
       });
     } catch (error) {
       return next(error);

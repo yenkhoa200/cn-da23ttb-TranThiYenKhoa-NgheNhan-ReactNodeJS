@@ -44,20 +44,11 @@ const heroSlides = [
   },
 ];
 
-const categories = [
-  { label: "Nghệ nhân", icon: UserRound, to: "/tourist/artisans" },
-  { label: "Làng nghề", icon: Compass, to: "/tourist/crafts" },
-  { label: "Sản phẩm", icon: Bookmark, to: "/tourist/products" },
-  { label: "Văn hóa Việt", icon: BookOpen, to: "/tourist/stories" },
-  { label: "Hoạt động trải nghiệm", icon: CalendarDays, to: "/tourist/activities" },
-  { label: "Câu chuyện văn hóa", icon: Heart, to: "/tourist/stories" },
-];
-
-function HomeFeatureSection({ title, eyebrow, items, kind, link }) {
+function HomeFeatureSection({ id, title, eyebrow, items, kind, link }) {
   const routeForItem = (item) => `/tourist/${kind === "artisans" ? "artisan" : kind === "crafts" ? "craft" : kind === "products" ? "product" : kind === "stories" ? "story" : "activity"}/${item.id}`;
 
   return (
-    <section className={`tourist-section tourist-home-collection tourist-home-${kind}-section`}>
+    <section id={id} className={`tourist-section tourist-home-collection tourist-home-${kind}-section`}>
       <div className="tourist-section-title">
         <div>
           <span className="tourist-eyebrow">{eyebrow}</span>
@@ -164,20 +155,29 @@ export default function TouristLanding({ query, onQuery, onSearch, data }) {
 
       <div className="tourist-content tourist-landing-content">
         <section className="tourist-category-row" aria-label="Danh mục khám phá">
-          {categories.map(({ label, icon: Icon, to }) => (
-            <Link className="tourist-category" to={to} key={label}>
+          {[
+            { label: "Nghệ nhân", icon: UserRound, to: "#tourist-home-artisans" },
+            { label: "Làng nghề", icon: Compass, to: "#tourist-home-crafts" },
+            { label: "Nghề truyền thống", icon: BookOpen, to: "#tourist-home-traditional-crafts" },
+            { label: "Sản phẩm", icon: Bookmark, to: "#tourist-home-products" },
+            { label: "Câu chuyện văn hóa", icon: Heart, to: "#tourist-home-stories" },
+            { label: "Hoạt động trải nghiệm", icon: CalendarDays, to: "#tourist-home-activities" },
+            
+          ].map(({ label, icon: Icon, to }) => (
+            <a className="tourist-category" href={to} key={label}>
               <span className="tourist-category-icon"><Icon size={20} /></span>
               <strong>{label}</strong>
               <ArrowRight className="tourist-category-arrow" size={15} />
-            </Link>
+            </a>
           ))}
         </section>
 
-        <HomeFeatureSection title="Nghệ nhân nổi bật" eyebrow="Người gìn giữ tinh hoa" items={data.artisans} kind="artisans" link="/tourist/artisans" />
-        <HomeFeatureSection title="Làng nghề truyền thống" eyebrow="Miền di sản" items={data.crafts} kind="crafts" link="/tourist/crafts" />
-        <HomeFeatureSection title="Sản phẩm thủ công" eyebrow="Từ đôi tay đến đời sống" items={data.products} kind="products" link="/tourist/products" />
-        <HomeFeatureSection title="Câu chuyện văn hóa" eyebrow="Tri thức được trao truyền" items={data.stories} kind="stories" link="/tourist/stories" />
-        <HomeFeatureSection title="Hoạt động trải nghiệm" eyebrow="Sống cùng văn hóa" items={data.activities} kind="activities" link="/tourist/activities" />
+        <HomeFeatureSection id="tourist-home-artisans" title="Nghệ nhân nổi bật" eyebrow="Người gìn giữ tinh hoa" items={data.artisans} kind="artisans" link="/tourist/artisans" />
+        <HomeFeatureSection id="tourist-home-crafts" title="Làng nghề truyền thống" eyebrow="Miền di sản" items={data.crafts} kind="crafts" link="/tourist/crafts" />
+        <HomeFeatureSection id="tourist-home-traditional-crafts" title="Nghề truyền thống" eyebrow="Miền di sản" items={data.crafts} kind="crafts" link="/tourist/crafts" />
+        <HomeFeatureSection id="tourist-home-products" title="Sản phẩm thủ công" eyebrow="Từ đôi tay đến đời sống" items={data.products} kind="products" link="/tourist/products" />
+        <HomeFeatureSection id="tourist-home-stories" title="Câu chuyện văn hóa" eyebrow="Tri thức được trao truyền" items={data.stories} kind="stories" link="/tourist/stories" />
+        <HomeFeatureSection id="tourist-home-activities" title="Hoạt động trải nghiệm" eyebrow="Sống cùng văn hóa" items={data.activities} kind="activities" link="/tourist/activities" />
       </div>
     </>
   );

@@ -131,7 +131,7 @@ const stories = [
   },
 ];
 
-function SectionHeading({ eyebrow, title, description, link }) {
+function SectionHeading({ eyebrow, title, description, link, linkTo }) {
   return (
     <div className="section-heading">
       <div>
@@ -139,7 +139,7 @@ function SectionHeading({ eyebrow, title, description, link }) {
         <h2>{title}</h2>
         {description && <p>{description}</p>}
       </div>
-      {link && <a className="text-link" href="#stories">{link} ↗</a>}
+      {link && <Link className="text-link" to={linkTo}>{link} ↗</Link>}
     </div>
   );
 }
@@ -155,17 +155,17 @@ function Header() {
         </span>
       </Link>
 
-      <nav className="main-nav">
-        <Link className="active" to={ROUTES.HOME}>Trang chủ</Link>
+      <nav className="main-nav" aria-label="Điều hướng chính">
+        <a className="active" href="#home">Trang chủ</a>
         <a href="#artisans">Nghệ nhân</a>
         <a href="#crafts">Làng nghề</a>
-        <a href="#products">Sản phẩm thủ công</a>
-        <a href="#stories">Câu chuyện văn hóa</a>
+        <a href="#crafts">Nghề truyền thống</a>
+        <a href="#products">Sản phẩm</a>
+        <a href="#stories">Văn hóa</a>
         <a href="#activities">Hoạt động trải nghiệm</a>
       </nav>
 
       <div className="header-actions">
-        <button className="header-search" type="button" aria-label="Tìm kiếm">⌕</button>
         <Link className="login-link" to={ROUTES.LOGIN}>Đăng nhập</Link>
         <Link className="button button-small" to={ROUTES.REGISTER}>Đăng ký</Link>
       </div>
@@ -337,6 +337,7 @@ function CraftSection() {
         title="Mỗi làng nghề, một miền văn hóa"
         description="Chạm lời kể của những nghệ nhân và khám phá bản sắc từng vùng đất."
         link="Xem tất cả"
+        linkTo="/tourist/crafts"
       />
 
       <div className="craft-grid">
@@ -365,6 +366,7 @@ function ArtisanSection() {
         title="Những người gìn giữ tinh hoa nghề Việt"
         description="Đằng sau mỗi tác phẩm là một đôi tay khéo léo và một đời gắn bó với nghề."
         link="Xem tất cả"
+        linkTo="/tourist/artisans"
       />
 
       <div className="artisan-grid">
@@ -390,7 +392,7 @@ function ArtisanSection() {
               <h3>{artisan.name}</h3>
               <p>{artisan.craft}</p>
               <span className="artisan-place">⌖ {artisan.place}</span>
-              <a className="outline-button" href="#join">Xem hồ sơ nghệ nhân ↗</a>
+              <a className="outline-button" href="#artisans">Xem hồ sơ nghệ nhân ↗</a>
             </div>
           </article>
         ))}
@@ -407,11 +409,12 @@ function ProductSection() {
         title="Mang một chút Tinh Hoa Việt về nhà"
         description="Những vật phẩm mộc mạc, chứa đựng sự tỉ mỉ và vẻ đẹp của chất liệu bản địa."
         link="Xem tất cả"
+        linkTo="/tourist/products"
       />
 
       <div className="product-grid">
         {products.map((product) => (
-          <a className="product-card" href="#join" key={product.title}>
+          <a className="product-card" href="#products" key={product.title}>
             <img src={product.image} alt={product.title} loading="lazy" />
             <div className="product-info">
               <span>{product.category}</span>
@@ -433,6 +436,7 @@ function ActivitySection() {
         title="Workshop văn hóa & Trải nghiệm làng nghề sắp diễn ra"
         description="Tự tay khám phá tinh hoa nghề Việt, lưu giữ dấu ấn văn hóa truyền thống."
         link="Xem tất cả hoạt động"
+        linkTo="/tourist/activities"
       />
 
       <div className="activity-grid">
@@ -451,7 +455,7 @@ function ActivitySection() {
                   <small>Giá tham khảo từ</small>
                   <strong>{activity.price}</strong>
                 </div>
-                <a className="button" href="#join">Đăng ký tham gia</a>
+                <Link className="button" to={ROUTES.REGISTER}>Đăng ký tham gia</Link>
               </div>
             </div>
           </article>
@@ -471,10 +475,11 @@ function StorySection() {
         title="Có những câu chuyện còn mãi"
         description="Những câu chuyện về đôi bàn tay, ký ức và tình yêu dành cho nghề."
         link="Đọc thêm câu chuyện"
+        linkTo="/tourist/stories"
       />
 
       <div className="story-layout">
-        <a className="story-feature" href="#join">
+        <a className="story-feature" href="#stories">
           <img src={featuredStory.image} alt={featuredStory.title} loading="lazy" />
           <span className="story-tag">{featuredStory.tag}</span>
           <h3>Giữ hồn đất trong từng dáng gốm</h3>
@@ -483,7 +488,7 @@ function StorySection() {
         </a>
         <div className="story-side-list">
           {sideStories.map((story) => (
-            <a className="story-side-card" href="#join" key={story.title}>
+            <a className="story-side-card" href="#stories" key={story.title}>
             <img src={story.image} alt={story.title} loading="lazy" />
             <div className="story-content">
               <span className="story-tag">{story.tag}</span>
@@ -497,26 +502,6 @@ function StorySection() {
   );
 }
 
-function JoinSection() {
-  return (
-    <section className="join-section" id="join">
-      <div className="join-copy">
-        <span className="join-eyebrow">✧ Kết nối ký ức, nuôi dưỡng bản sắc</span>
-        <h2>Cùng viết tiếp câu chuyện nghề Việt</h2>
-        <p>Dù bạn là người yêu văn hóa hay người gìn giữ nghề, Tinh Hoa Việt luôn là một mái nhà cho câu chuyện của bạn.</p>
-        <div className="join-actions">
-          <a className="button join-primary" href="#artisans">Tham gia Tinh Hoa Việt ↗</a>
-          <Link className="join-button join-secondary" to={ROUTES.ARTISAN_REGISTER}>Dành cho nghệ nhân</Link>
-        </div>
-      </div>
-      <img
-        src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=85"
-        alt="Nghệ nhân hướng dẫn làm gốm"
-        loading="lazy"
-      />
-    </section>
-  );
-}
 
 function Footer() {
   return (
@@ -541,7 +526,7 @@ function Footer() {
           <a href="#home">Giới thiệu</a>
           <a href="#crafts">Làng nghề Việt</a>
           <a href="#artisans">Đội ngũ nghệ nhân</a>
-          <a href="#join">Liên hệ</a>
+          <a href="mailto:hello@honviet.vn">Liên hệ</a>
         </div>
 
         <div className="footer-column">
@@ -553,8 +538,8 @@ function Footer() {
 
         <div className="footer-column">
           <h4>Hợp tác & Nghệ nhân</h4>
-          <a href="#join">Đăng ký nghệ nhân</a>
-          <a href="#join">Trở thành đối tác</a>
+          <Link to={ROUTES.ARTISAN_REGISTER}>Đăng ký nghệ nhân</Link>
+          <a href="mailto:hello@honviet.vn?subject=H%E1%BB%A3p%20t%C3%A1c%20c%C3%B9ng%20Tinh%20Hoa%20Vi%E1%BB%87t">Trở thành đối tác</a>
           <a href="mailto:hello@honviet.vn">Hỗ trợ</a>
         </div>
       </div>
@@ -572,7 +557,7 @@ function Footer() {
 
 export default function HomePage() {
   return (
-    <>
+    <div className="public-homepage">
       <Header />
       <main>
         <Hero />
@@ -581,9 +566,8 @@ export default function HomePage() {
         <ProductSection />
         <StorySection />
         <ActivitySection />
-        <JoinSection />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
 import {
   DEFAULT_ARTISAN_EXPERIENCES,
@@ -66,49 +67,46 @@ export default function ExperienceCreatePage() {
   const [form, setForm] = useState(initialForm);
   const [image, setImage] = useState("");
   const [imageName, setImageName] = useState("");
-  const [imageError, setImageError] = useState("");
-  const [saveError, setSaveError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const notify = useArtisanToast();
 
   const updateForm = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
   };
 
   const handleImage = (file) => {
-    setImageError("");
     if (!file) return;
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      setImageError("Vui lòng chọn ảnh JPG, PNG hoặc WEBP.");
+      notify("Vui lòng chọn ảnh JPG, PNG hoặc WEBP.", "error");
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      setImageError("Ảnh cần có dung lượng tối đa 2 MB.");
+      notify("Ảnh cần có dung lượng tối đa 2 MB.", "error");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result !== "string") {
-        setImageError("Không thể đọc tệp ảnh. Vui lòng chọn ảnh khác.");
+        notify("Không thể đọc tệp ảnh. Vui lòng chọn ảnh khác.", "error");
         return;
       }
       setImage(reader.result);
       setImageName(file.name);
     };
-    reader.onerror = () => setImageError("Đã xảy ra lỗi khi đọc ảnh. Vui lòng thử lại.");
+    reader.onerror = () => notify("Đã xảy ra lỗi khi đọc ảnh. Vui lòng thử lại.", "error");
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setSaveError("");
 
     const submitterValue = event.nativeEvent.submitter?.value;
     const status = submitterValue === "draft" ? "draft" : "published";
     if (!image) {
-      setImageError("Vui lòng thêm ảnh đại diện cho hoạt động.");
+      notify("Vui lòng thêm ảnh đại diện cho hoạt động.", "error");
       return;
     }
 
@@ -133,7 +131,7 @@ export default function ExperienceCreatePage() {
       const activities = readArtisanExperiences(DEFAULT_ARTISAN_EXPERIENCES);
       saveArtisanExperiences([activity, ...activities]);
     } catch {
-      setSaveError("Không thể lưu hoạt động vào trình duyệt. Vui lòng thử lại.");
+      notify("Không thể lưu hoạt động vào trình duyệt. Vui lòng thử lại.", "error");
       return;
     }
 
@@ -395,13 +393,10 @@ export default function ExperienceCreatePage() {
                     />
                   </div>
                 )}
-                {imageError && <small className="experience-inline-error">{imageError}</small>}
                 <small>JPG, PNG hoặc WEBP · Tối đa 2 MB · Khuyến nghị ảnh ngang 1200 × 800 px.</small>
               </div>
             </div>
           </section>
-
-          {saveError && <p className="experience-save-error" role="alert">{saveError}</p>}
 
           <div className="experience-create-footer">
             <p><Info size={14} /> Lưu để hiển thị với du khách. Chọn lưu bản nháp nếu bạn muốn hoàn thiện nội dung sau.</p>

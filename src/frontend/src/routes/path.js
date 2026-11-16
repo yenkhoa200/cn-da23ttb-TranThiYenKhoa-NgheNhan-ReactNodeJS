@@ -7,6 +7,7 @@ export const ROUTES = {
   REGISTER: "/register",
   ARTISAN_REGISTER: "/artisan-register",
   ARTISAN_DASHBOARD: "/artisan-dashboard",
+  ARTISAN_CRAFTS: "/artisan-crafts",
   ARTISAN_PROFILE: "/artisan-profile",
   ARTISAN_ADD_PRODUCT: "/artisan-add-product",
   ARTISAN_STORY: "/artisan-story",

@@ -1,0 +1,504 @@
+.artisan-crafts-page {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--artisan-ink);
+}
+
+.artisan-crafts-banner {
+  position: relative;
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  overflow: hidden;
+  padding: 26px 34px;
+  border: 1px solid #e8dfd0;
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, rgb(31 39 29 / 83%), rgb(47 43 33 / 54%) 55%, rgb(37 42 32 / 12%)),
+    url("https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1600&q=85") center 48% / cover;
+  color: #fffefa;
+}
+
+.artisan-crafts-banner > div {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+}
+
+.artisan-crafts-eyebrow {
+  color: #e6d5aa;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.artisan-crafts-banner h1 {
+  margin: 8px 0;
+  font-family: inherit;
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.artisan-crafts-banner p {
+  max-width: 440px;
+  margin: 0;
+  color: rgb(255 254 250 / 90%);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.artisan-crafts-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.artisan-craft-stat {
+  display: flex;
+  min-height: 78px;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+  border: 1px solid var(--artisan-border);
+  border-radius: 12px;
+  background: var(--artisan-white);
+}
+
+.artisan-craft-stat-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.artisan-craft-stat > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.artisan-craft-stat small {
+  color: var(--artisan-muted);
+  font-size: 10px;
+}
+
+.artisan-craft-stat strong {
+  color: var(--artisan-ink);
+  font-family: inherit;
+  font-size: 22px;
+}
+
+.stat-green { background: linear-gradient(120deg, #f3f7ed, #fffefa); }
+.stat-green .artisan-craft-stat-icon { background: #dcebdd; color: #32684c; }
+.stat-orange { background: linear-gradient(120deg, #fff6e9, #fffefa); }
+.stat-orange .artisan-craft-stat-icon { background: #ffead0; color: #bc6b16; }
+.stat-purple { background: linear-gradient(120deg, #f7f2fc, #fffefa); }
+.stat-purple .artisan-craft-stat-icon { background: #ece3f8; color: #7652a6; }
+
+.artisan-crafts-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 310px);
+  align-items: start;
+  gap: 14px;
+}
+
+.artisan-craft-list-panel,
+.artisan-craft-select-panel {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--artisan-border);
+  border-radius: 13px;
+  background: var(--artisan-white);
+  box-shadow: 0 3px 12px rgb(65 57 42 / 4%);
+}
+
+.artisan-craft-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.artisan-craft-list-heading > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.artisan-crafts-section-mark {
+  display: grid;
+  color: #2f684d;
+}
+
+.artisan-craft-list-heading h2,
+.artisan-craft-select-heading h2 {
+  margin: 0;
+  color: var(--artisan-ink);
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.artisan-craft-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.artisan-craft-search,
+.artisan-craft-filter {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid var(--artisan-border);
+  border-radius: 18px;
+  background: #fffefa;
+  color: var(--artisan-muted);
+}
+
+.artisan-craft-search input,
+.artisan-craft-filter select {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--artisan-ink);
+  font: inherit;
+  font-size: 10px;
+}
+
+.artisan-craft-search { width: min(250px, 24vw); }
+.artisan-craft-search input::placeholder { color: #9b998f; }
+.artisan-craft-filter { width: 112px; }
+.artisan-craft-filter select { cursor: pointer; }
+
+.artisan-craft-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.artisan-craft-card {
+  display: grid;
+  grid-template-columns: minmax(140px, 190px) minmax(0, 1fr) 120px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px;
+  border: 1px solid #eeeae2;
+  border-radius: 11px;
+  background: #fffefa;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.artisan-craft-card:hover {
+  border-color: #d5e0d1;
+  box-shadow: 0 4px 14px rgb(65 57 42 / 6%);
+}
+
+.artisan-craft-photo {
+  display: grid;
+  min-height: 112px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e8eddf, #f4e8d8);
+  color: #54745a;
+}
+
+.artisan-craft-photo img {
+  width: 100%;
+  height: 112px;
+  object-fit: cover;
+}
+
+.artisan-craft-info { min-width: 0; }
+
+.artisan-craft-tag {
+  display: inline-flex;
+  padding: 4px 9px;
+  border-radius: 12px;
+  background: #edf3e8;
+  color: #47724d;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.artisan-craft-info h3 {
+  margin: 6px 0 4px;
+  color: #2e322c;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.artisan-craft-description {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 0 7px;
+  color: #707168;
+  font-size: 11px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.artisan-craft-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: #687267;
+  font-size: 9px;
+}
+
+.artisan-craft-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.artisan-craft-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 10px;
+  border-left: 3px solid #648467;
+  border-radius: 0 7px 7px 0;
+  background: #f5f7f1;
+  color: #55584f;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.artisan-craft-details p { margin: 0; }
+.artisan-craft-details a { color: #315d4c; font-weight: 600; }
+
+.artisan-craft-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.artisan-craft-status {
+  display: inline-flex;
+  min-height: 27px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 15px;
+  background: #f2f1ec;
+  color: #77766e;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.artisan-craft-status.is-selected {
+  background: #e8f2e7;
+  color: #357248;
+}
+
+.artisan-craft-view,
+.artisan-craft-remove {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid #d5dfd0;
+  border-radius: 17px;
+  background: #fffefa;
+  color: #3c674b;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.artisan-craft-view:hover { background: #f1f5ed; }
+
+.artisan-craft-remove {
+  border-color: #eee5e0;
+  color: #a44c3d;
+}
+
+.artisan-craft-remove:hover { background: #fff4f1; }
+
+.artisan-craft-empty {
+  padding: 24px 12px;
+  color: var(--artisan-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.artisan-craft-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.artisan-craft-pagination button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid var(--artisan-border);
+  border-radius: 50%;
+  background: #fffefa;
+  color: var(--artisan-ink);
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.artisan-craft-pagination button.active {
+  border-color: #306b4b;
+  background: #306b4b;
+  color: #fff;
+}
+
+.artisan-craft-pagination button:disabled {
+  cursor: default;
+  opacity: .45;
+}
+
+.artisan-craft-select-panel {
+  background: linear-gradient(160deg, #f1f6e9, #fffefa 75%);
+}
+
+.artisan-craft-select-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #386d4d;
+}
+
+.artisan-craft-select-panel > p {
+  margin: 8px 0 15px;
+  color: #747469;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.artisan-craft-select-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.artisan-craft-select-label {
+  margin-top: 3px;
+  color: #3e4239;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.artisan-craft-select-label span { color: #b34a38; }
+
+.artisan-craft-select-panel select,
+.artisan-craft-select-panel input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #e2e5d8;
+  border-radius: 8px;
+  outline: 0;
+  background: #fffefa;
+  color: var(--artisan-ink);
+  font: inherit;
+  font-size: 10px;
+}
+
+.artisan-craft-select-panel select:focus,
+.artisan-craft-select-panel input:focus { border-color: #66876a; }
+
+.artisan-craft-select-panel form > button {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 5px;
+  border: 0;
+  border-radius: 20px;
+  background: #2f6d4d;
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.artisan-craft-select-panel form > button:hover { background: #24553c; }
+.artisan-craft-select-panel form > button:disabled { cursor: default; opacity: .55; }
+
+.artisan-craft-all-selected {
+  padding: 8px;
+  border-radius: 7px;
+  background: #e8f2e7;
+  color: #3b6747 !important;
+}
+
+.artisan-craft-preservation-note {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px dashed #d2dec7;
+  border-radius: 8px;
+  color: #596552;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.artisan-craft-preservation-note svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #46724f;
+}
+
+.artisan-craft-preservation-note a { color: #315d4c; font-weight: 700; }
+
+@media (max-width: 1050px) {
+  .artisan-crafts-content { grid-template-columns: minmax(0, 1fr) 270px; }
+  .artisan-craft-card { grid-template-columns: 140px minmax(0, 1fr) 108px; gap: 10px; }
+  .artisan-craft-list-heading { align-items: flex-start; flex-direction: column; }
+  .artisan-craft-search { width: min(280px, 55vw); }
+}
+
+@media (max-width: 760px) {
+  .artisan-crafts-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .artisan-crafts-content { grid-template-columns: 1fr; }
+  .artisan-craft-select-panel { order: -1; }
+  .artisan-craft-card { grid-template-columns: 130px minmax(0, 1fr); }
+  .artisan-craft-actions { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
+  .artisan-craft-status { padding: 0 10px; }
+  .artisan-craft-view, .artisan-craft-remove { padding: 5px 10px; }
+}
+
+@media (max-width: 500px) {
+  .artisan-crafts-banner { min-height: 140px; padding: 20px; }
+  .artisan-crafts-banner h1 { font-size: 23px; }
+  .artisan-crafts-banner p { font-size: 11px; }
+  .artisan-crafts-stats { gap: 8px; }
+  .artisan-craft-stat { min-height: 68px; gap: 8px; padding: 9px; }
+  .artisan-craft-stat-icon { width: 34px; height: 34px; flex-basis: 34px; }
+  .artisan-craft-stat small { font-size: 9px; }
+  .artisan-craft-stat strong { font-size: 18px; }
+  .artisan-craft-list-panel, .artisan-craft-select-panel { padding: 12px; }
+  .artisan-craft-controls { width: 100%; }
+  .artisan-craft-search { flex: 1; width: auto; }
+  .artisan-craft-filter { flex: 0 0 105px; }
+  .artisan-craft-card { grid-template-columns: 1fr; }
+  .artisan-craft-photo, .artisan-craft-photo img { height: 165px; }
+  .artisan-craft-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .artisan-craft-status { grid-column: 1 / -1; }
+}

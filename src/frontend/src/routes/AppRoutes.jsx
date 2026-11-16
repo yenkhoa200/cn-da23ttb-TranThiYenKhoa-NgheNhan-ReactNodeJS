@@ -6,6 +6,7 @@ import LoginPage from "../pages/auth/Login.jsx";
 import RegisterPage from "../pages/auth/Register.jsx";
 import ArtisanRegisterPage from "../pages/artisan/ArtisanRegister.jsx";
 import ArtisanDashboardPage from "../pages/artisan/ArtisanDashboard.jsx";
+import ArtisanCraftsPage from "../pages/artisan/ArtisanCrafts.jsx";
 import ArtisanLayout from "../components/layout/ArtisanLayout.jsx";
 import ArtisanProfilePage from "../pages/artisan/ArtisanProfile.jsx";
 import ArtisanAddProductPage from "../pages/artisan/ArtisanAddProduct.jsx";
@@ -57,6 +58,7 @@ function AppRoutes() {
       {/* Các trang nghệ nhân dùng chung layout điều hướng và header. */}
       <Route element={<ArtisanLayout />}>
         <Route path={ROUTES.ARTISAN_DASHBOARD} element={<ArtisanDashboardPage />} />
+        <Route path={ROUTES.ARTISAN_CRAFTS} element={<ArtisanCraftsPage />} />
         <Route path={ROUTES.ARTISAN_PROFILE} element={<ArtisanProfilePage />} />
         <Route path={ROUTES.ARTISAN_ADD_PRODUCT} element={<ArtisanAddProductPage />} />
         <Route path={ROUTES.ARTISAN_STORY} element={<ArtisanStoryPage />} />

@@ -59,13 +59,13 @@ export default function ArtisanDashboard() {
             “Cùng gìn giữ và lan tỏa giá trị văn hóa Việt”
           </p>
           <div className="artisan-welcome-actions">
-            <Link className="artisan-primary-button" to={ROUTES.ARTISAN_PROFILE}>
+            <Link className="artisan-primary-button" to={ROUTES.ARTISAN_STORY}>
               <UserRound size={15} />
-              Cập nhật hồ sơ
-            </Link>
-            <Link className="artisan-secondary-button" to={ROUTES.ARTISAN_STORY}>
-              <BookOpen size={15} />
               Chia sẻ câu chuyện của bạn
+            </Link>
+            <Link className="artisan-secondary-button" to={ROUTES.ARTISAN_PROFILE}>
+              <BookOpen size={15} />
+              Cập nhật hồ sơ
             </Link>
           </div>
         </div>
