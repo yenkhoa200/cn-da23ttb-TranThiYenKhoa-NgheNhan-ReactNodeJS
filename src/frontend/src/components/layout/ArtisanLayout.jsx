@@ -30,12 +30,12 @@ const navigationGroups = [
       { label: "Nghề truyền thống", icon: Sprout, to: ROUTES.ARTISAN_CRAFTS },
       { label: "Câu chuyện văn hóa", icon: BookOpen, to: ROUTES.ARTISAN_STORY },
       { label: "Sản phẩm của tôi", icon: Package, to: ROUTES.ARTISAN_ADD_PRODUCT },
-      { label: "Thư viện hình ảnh & video", icon: Image, disabled: true },
+      { label: "Thư viện hình ảnh & video", icon: Image, to: ROUTES.ARTISAN_MEDIA },
       { label: "Hồ sơ cá nhân", icon: UserRound, to: ROUTES.ARTISAN_PROFILE },
 
       { label: "Hoạt động trải nghiệm", icon: CalendarDays, to: ROUTES.ARTISAN_EXPERIENCES },
-      { label: "Danh sách đăng ký", icon: ClipboardList, disabled: true },
-      { label: "Đánh giá & nhận xét", icon: MessageSquare, disabled: true },
+      { label: "Danh sách đăng ký", icon: ClipboardList, to: ROUTES.ARTISAN_REGISTRATIONS },
+      { label: "Đánh giá & nhận xét", icon: MessageSquare, to: ROUTES.ARTISAN_REVIEWS },
     ],
   },
   {

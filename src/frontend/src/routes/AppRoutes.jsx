@@ -13,6 +13,9 @@ import ArtisanAddProductPage from "../pages/artisan/ArtisanAddProduct.jsx";
 import ArtisanStoryPage from "../pages/artisan/ArtisanStory.jsx";
 import ExperienceManagerPage from "../pages/artisan/ExperienceManagerPage.jsx";
 import ExperienceCreatePage from "../pages/artisan/ExperienceCreatePage.jsx";
+import ArtisanRegistrationsPage from "../pages/artisan/ArtisanRegistrationsPage.jsx";
+import ArtisanMediaLibraryPage from "../pages/artisan/ArtisanMediaLibraryPage.jsx";
+import ArtisanReviewsPage from "../pages/artisan/ArtisanReviewsPage.jsx";
 import AdminDashboardPage from "../pages/admin/AdminDashboard.jsx";
 import AdminOverviewPage from "../pages/admin/AdminOverviewPage.jsx";
 import AdminAccountsPage from "../pages/admin/AdminAccountsPage.jsx";
@@ -64,6 +67,9 @@ function AppRoutes() {
         <Route path={ROUTES.ARTISAN_STORY} element={<ArtisanStoryPage />} />
         <Route path={ROUTES.ARTISAN_EXPERIENCES} element={<ExperienceManagerPage />} />
         <Route path={ROUTES.ARTISAN_EXPERIENCE_CREATE} element={<ExperienceCreatePage />} />
+        <Route path={ROUTES.ARTISAN_REGISTRATIONS} element={<ArtisanRegistrationsPage />} />
+        <Route path={ROUTES.ARTISAN_MEDIA} element={<ArtisanMediaLibraryPage />} />
+        <Route path={ROUTES.ARTISAN_REVIEWS} element={<ArtisanReviewsPage />} />
         <Route path="/artisan/dashboard" element={<Navigate to={ROUTES.ARTISAN_DASHBOARD} replace />} />
       </Route>
       <Route path="/admin-dashboard" element={<Navigate to={ROUTES.ADMIN_DASHBOARD} replace />} />

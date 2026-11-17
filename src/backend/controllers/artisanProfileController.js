@@ -320,6 +320,152 @@ const artisanProfileController = {
     }
   },
 
+  async getMedia(req, res, next) {
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `SELECT mf.media_id AS id, mf.media_type AS type, mf.file_url AS url,
+                  mf.caption, mf.uploaded_at,
+                  coalesce(p.product_name, 'Thư viện nghệ nhân') AS category
+           FROM media_files mf
+           LEFT JOIN products p ON p.product_id = mf.product_id
+           WHERE mf.uploaded_by_account_id = $1
+             AND mf.media_type IN ('hinh_anh', 'video')
+           ORDER BY mf.uploaded_at DESC, mf.media_id DESC`,
+          [req.user.id]
+        )
+        : await pool.query(
+          `SELECT pt.ma_pt AS id, pt.loai_tu_lieu AS type,
+                  pt.duong_dan_tep AS url, pt.chu_thich AS caption,
+                  pt.ngay_tai_len AS uploaded_at,
+                  coalesce(sp.ten_sp, 'Thư viện nghệ nhân') AS category
+           FROM da_phuong_tien pt
+           LEFT JOIN san_pham sp ON sp.ma_sp = pt.ma_sp
+           WHERE pt.ma_tk_tai_len = $1
+             AND pt.loai_tu_lieu IN ('hinh_anh', 'video')
+           ORDER BY pt.ngay_tai_len DESC, pt.ma_pt DESC`,
+          [req.user.id]
+        );
+
+      return res.status(200).json({ success: true, data: result.rows });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async getReviews(req, res, next) {
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `SELECT r.review_id AS id, r.rating,
+                  coalesce(r.review_content, '') AS comment,
+                  r.reviewed_at AS "createdAt",
+                  visitor.full_name AS "visitorName",
+                  visitor.avatar_url AS "visitorAvatar",
+                  CASE
+                    WHEN r.artisan_id IS NOT NULL THEN 'artisan'
+                    WHEN r.product_id IS NOT NULL THEN 'product'
+                    ELSE 'activity'
+                  END AS "targetType",
+                  coalesce(p.product_name, ea.activity_name, 'Hồ sơ nghệ nhân') AS subject
+           FROM reviews r
+           JOIN accounts visitor ON visitor.account_id = r.account_id
+           LEFT JOIN products p ON p.product_id = r.product_id
+           LEFT JOIN experience_activities ea ON ea.activity_id = r.activity_id
+           WHERE r.moderation_status = 'da_duyet'
+             AND (
+               r.artisan_id = $1
+               OR r.product_id IN (SELECT product_id FROM products WHERE artisan_id = $1)
+               OR r.activity_id IN (SELECT activity_id FROM experience_activities WHERE artisan_id = $1)
+             )
+           ORDER BY r.reviewed_at DESC, r.review_id DESC`,
+          [req.user.id]
+        )
+        : await pool.query(
+          `SELECT dg.ma_dg AS id, dg.diem_danh_gia AS rating,
+                  coalesce(dg.noi_dung_danh_gia, '') AS comment,
+                  dg.ngay_danh_gia AS "createdAt",
+                  visitor.ho_ten AS "visitorName",
+                  visitor.anh_dai_dien AS "visitorAvatar",
+                  CASE
+                    WHEN dg.ma_nn IS NOT NULL THEN 'artisan'
+                    WHEN dg.ma_sp IS NOT NULL THEN 'product'
+                    ELSE 'activity'
+                  END AS "targetType",
+                  coalesce(sp.ten_sp, hd.ten_hd, 'Hồ sơ nghệ nhân') AS subject
+           FROM danh_gia dg
+           JOIN tai_khoan visitor ON visitor.ma_tk = dg.ma_tk
+           LEFT JOIN san_pham sp ON sp.ma_sp = dg.ma_sp
+           LEFT JOIN hoat_dong_trai_nghiem hd ON hd.ma_hd = dg.ma_hd
+           WHERE dg.trang_thai_kiem_duyet = 'da_duyet'
+             AND (
+               dg.ma_nn = $1
+               OR dg.ma_sp IN (SELECT ma_sp FROM san_pham WHERE ma_nn = $1)
+               OR dg.ma_hd IN (SELECT ma_hd FROM hoat_dong_trai_nghiem WHERE ma_nn = $1)
+             )
+           ORDER BY dg.ngay_danh_gia DESC, dg.ma_dg DESC`,
+          [req.user.id]
+        );
+
+      return res.status(200).json({ success: true, data: result.rows });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async uploadMedia(req, res, next) {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Vui lòng chọn ảnh hoặc video để tải lên." });
+    }
+
+    const caption = typeof req.body.caption === "string" ? req.body.caption.trim() : "";
+    if (caption.length > 500) {
+      await removeUploadedFile(req.file.path);
+      return res.status(400).json({ success: false, message: "Chú thích không được vượt quá 500 ký tự." });
+    }
+
+    const mediaUrl = `/uploads/artisans/${req.file.filename}`;
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `INSERT INTO media_files (uploaded_by_account_id, media_type, file_url, caption, artisan_id)
+           SELECT a.account_id, $2, $3, $4, a.account_id
+           FROM accounts a
+           WHERE a.account_id = $1 AND lower(a.role) IN ('artisans', 'nghe_nhan')
+           RETURNING media_id AS id, media_type AS type, file_url AS url,
+                     caption, uploaded_at`,
+          [req.user.id, req.file.mediaType, mediaUrl, caption || null]
+        )
+        : await pool.query(
+          `INSERT INTO da_phuong_tien
+             (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn)
+           SELECT tk.ma_tk, $2, $3, $4, tk.ma_tk
+           FROM tai_khoan tk
+           WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
+           RETURNING ma_pt AS id, loai_tu_lieu AS type, duong_dan_tep AS url,
+                     chu_thich AS caption, ngay_tai_len AS uploaded_at`,
+          [req.user.id, req.file.mediaType, mediaUrl, caption || null]
+        );
+
+      if (!result.rowCount) {
+        await removeUploadedFile(req.file.path);
+        return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
+      }
+
+      return res.status(201).json({
+        success: true,
+        message: "Đã tải tư liệu lên thư viện.",
+        data: { ...result.rows[0], category: "Thư viện nghệ nhân" },
+      });
+    } catch (error) {
+      await removeUploadedFile(req.file.path);
+      return next(error);
+    }
+  },
+
   async uploadImage(req, res, next) {
     if (!req.file) {
       return res.status(400).json({ success: false, message: "Vui lòng chọn ảnh cần tải lên." });

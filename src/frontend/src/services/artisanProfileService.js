@@ -36,6 +36,8 @@ const artisanProfileService = {
   getProfile: () => request(""),
   updateProfile: (profile) => request("", { method: "PUT", body: profile }),
   getImages: () => request("/images"),
+  getMedia: () => request("/media"),
+  getReviews: () => request("/reviews"),
   deleteImage: (id) => request(`/images/${id}`, { method: "DELETE" }),
 
   uploadAvatar(file) {
@@ -49,6 +51,13 @@ const artisanProfileService = {
     body.append("file", file);
     body.append("caption", caption);
     return request("/images", { method: "POST", body, isFormData: true });
+  },
+
+  uploadMedia(file, caption = "") {
+    const body = new FormData();
+    body.append("file", file);
+    body.append("caption", caption);
+    return request("/media", { method: "POST", body, isFormData: true });
   },
 };
 

@@ -7,6 +7,25 @@ tạo thư mục lưu tệp khi khởi động và phục vụ tệp qua `/uploa
 
 ## API
 
+### Thư viện ảnh và video nghệ nhân
+
+- `GET /api/artisan/profile/media` trả về ảnh và video do nghệ nhân hiện tại tải
+  lên, gồm cả tư liệu gắn với sản phẩm.
+- `POST /api/artisan/profile/media` nhận `multipart/form-data` với trường `file`;
+  chấp nhận JPG, PNG, WEBP, MP4, MOV và WEBM, tối đa 50 MB. Có thể gửi thêm
+  `caption` tối đa 500 ký tự.
+- Ảnh/video tải trực tiếp lên thư viện được lưu tại
+  `src/backend/uploads/artisans/`; cơ sở dữ liệu chỉ lưu đường dẫn và thông tin
+  tư liệu.
+
+### Đánh giá và nhận xét nghệ nhân
+
+`GET /api/artisan/profile/reviews` trả về các đánh giá đã được duyệt dành cho
+hồ sơ nghệ nhân, sản phẩm và hoạt động trải nghiệm thuộc nghệ nhân đang đăng
+nhập. API yêu cầu xác thực bằng tài khoản nghệ nhân.
+
+### Tải tư liệu sản phẩm
+
 `POST /api/products/:id/media`
 
 - Yêu cầu đăng nhập bằng tài khoản nghệ nhân.

@@ -13,5 +13,8 @@ export const ROUTES = {
   ARTISAN_STORY: "/artisan-story",
   ARTISAN_EXPERIENCES: "/artisan-experiences",
   ARTISAN_EXPERIENCE_CREATE: "/artisan-experiences/create",
+  ARTISAN_REGISTRATIONS: "/artisan-registrations",
+  ARTISAN_MEDIA: "/artisan-media",
+  ARTISAN_REVIEWS: "/artisan-reviews",
   ADMIN_DASHBOARD: "/admin",
 };

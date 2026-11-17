@@ -41,7 +41,9 @@ app.use((err, req, res, next) => {
     success: false,
     message: status === 413
       ? req.path.startsWith("/api/artisan/profile")
-        ? "Ảnh hồ sơ không được vượt quá 10 MB."
+        ? req.path.startsWith("/api/artisan/profile/media")
+          ? "Ảnh hoặc video không được vượt quá 50 MB."
+          : "Ảnh hồ sơ không được vượt quá 10 MB."
         : "Tệp tải lên không được vượt quá 50 MB."
       : status === 400
         ? err.message

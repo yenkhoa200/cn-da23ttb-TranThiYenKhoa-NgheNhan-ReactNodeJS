@@ -849,3 +849,38 @@
     width: min(390px, calc(100vw - 24px));
   }
 }
+
+/* Shared artisan content typography; the sidebar and header keep their current scale. */
+.artisan-shell .artisan-layout-content * {
+  font-size: 16px !important;
+}
+
+.artisan-shell .artisan-layout-content h1 {
+  font-size: 40px !important;
+}
+
+.artisan-shell .artisan-layout-content h2 {
+  font-size: 26px !important;
+}
+
+.artisan-shell .artisan-layout-content h3 {
+  font-size: 17px !important;
+}
+
+.artisan-shell .artisan-layout-content :is(p, small) {
+  font-size: 14px !important;
+}
+
+@media (max-width: 680px) {
+  .artisan-shell .artisan-layout-content h1 {
+    font-size: 36px !important;
+  }
+
+  .artisan-shell .artisan-layout-content h2 {
+    font-size: 24px !important;
+  }
+
+  .artisan-shell .artisan-layout-content h3 {
+    font-size: 16px !important;
+  }
+}
