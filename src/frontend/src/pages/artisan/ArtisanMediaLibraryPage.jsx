@@ -184,10 +184,6 @@ export default function ArtisanMediaLibraryPage() {
 
   return (
     <main className="artisan-media-library-page">
-      <nav className="artisan-media-breadcrumb" aria-label="Điều hướng">
-        <span>Tổng quan</span><ChevronRight size={14} /><strong>Thư viện hình ảnh &amp; video</strong>
-      </nav>
-
       <section className="artisan-media-hero">
         <span className="artisan-media-hero-icon"><ImageIcon size={34} /></span>
         <div>

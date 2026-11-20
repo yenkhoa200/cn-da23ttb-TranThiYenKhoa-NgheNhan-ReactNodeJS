@@ -217,6 +217,46 @@
   font-size: 9px;
 }
 
+.artisan-header-breadcrumb {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: #858278;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.artisan-header-breadcrumb-part {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.artisan-header-breadcrumb a {
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  text-overflow: ellipsis;
+}
+
+.artisan-header-breadcrumb a:hover {
+  color: var(--artisan-green);
+}
+
+.artisan-header-breadcrumb-separator {
+  color: #aaa69b;
+}
+
+.artisan-header-breadcrumb strong {
+  overflow: hidden;
+  color: #4b4a44;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
 .artisan-header-actions {
   display: flex;
   align-items: center;
@@ -428,6 +468,15 @@
 
   .artisan-header-greeting {
     min-width: 0;
+  }
+
+  .artisan-header-breadcrumb {
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .artisan-header-breadcrumb-part {
+    gap: 5px;
   }
 
   .artisan-header-greeting h1 {

@@ -141,13 +141,6 @@ export default function ExperienceManagerPage() {
     <main className="experience-page">
       <div className="experience-page-heading">
         <div>
-          <div className="experience-breadcrumb">
-            <span>Tổng quan</span>
-            <span>/</span>
-            <span>Hoạt động trải nghiệm</span>
-            <span>/</span>
-            <strong>Danh sách hoạt động</strong>
-          </div>
           <span className="experience-eyebrow">KHÔNG GIAN NGHỆ NHÂN</span>
           <h1>Đưa nghề Việt đến gần du khách</h1>
           <p>Tạo, cập nhật và quản lý những buổi trải nghiệm làng nghề của bạn.</p>

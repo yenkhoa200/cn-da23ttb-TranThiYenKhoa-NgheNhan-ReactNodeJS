@@ -143,13 +143,6 @@ export default function ExperienceCreatePage() {
   return (
     <main className="experience-page experience-create-page">
       <div className="experience-create-heading">
-        <div className="experience-breadcrumb">
-          <Link to={ROUTES.ARTISAN_DASHBOARD}>Tổng quan</Link>
-          <span>/</span>
-          <Link to={ROUTES.ARTISAN_EXPERIENCES}>Hoạt động trải nghiệm</Link>
-          <span>/</span>
-          <strong>Thêm hoạt động mới</strong>
-        </div>
         <Link className="experience-back-link" to={ROUTES.ARTISAN_EXPERIENCES}>
           <ArrowLeft size={14} />
           Danh sách hoạt động

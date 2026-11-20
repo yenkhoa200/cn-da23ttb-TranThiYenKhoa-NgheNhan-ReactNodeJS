@@ -13,7 +13,7 @@ import {
   Trash2,
   Wrench,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import artisanCraftService from "../../services/artisanCraftService.js";
 import { getProfileImageUrl } from "../../services/artisanProfileService.js";
@@ -37,6 +37,7 @@ export default function ArtisanCrafts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const craftSelectRef = useRef(null);
   const notify = useArtisanToast();
 
   useEffect(() => {
@@ -83,6 +84,7 @@ export default function ArtisanCrafts() {
     event.preventDefault();
     if (!selectedId) {
       notify("Hãy chọn một nghề truyền thống trong danh mục.", "error");
+      craftSelectRef.current?.focus();
       return;
     }
 
@@ -274,8 +276,9 @@ export default function ArtisanCrafts() {
           <form onSubmit={handleSelect}>
             <label className="artisan-craft-select-label" htmlFor="craft-select">Nghề trong danh mục <span>*</span></label>
             <select
+              ref={craftSelectRef}
               id="craft-select"
-              required
+              aria-required="true"
               value={selectedId}
               onChange={(event) => setSelectedId(event.target.value)}
               disabled={!availableCrafts.length || isSaving}

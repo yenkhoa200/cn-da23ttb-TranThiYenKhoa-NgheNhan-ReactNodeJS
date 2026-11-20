@@ -1,10 +1,6 @@
-const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
-const multer = require("multer");
 
-const uploadDirectory = path.resolve(__dirname, "..", "uploads", "artisans");
-fs.mkdirSync(uploadDirectory, { recursive: true });
+const multer = require("multer");
+const path = require("path");
 
 const allowedTypes = {
   ".jpg": "image/jpeg",
@@ -14,17 +10,20 @@ const allowedTypes = {
 };
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, callback) => callback(null, uploadDirectory),
-    filename: (_req, file, callback) => {
-      callback(null, `${crypto.randomUUID()}${path.extname(file.originalname).toLowerCase()}`);
-    },
-  }),
-  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  storage: multer.memoryStorage(),
+
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+    files: 1,
+  },
+
   fileFilter: (_req, file, callback) => {
     const extension = path.extname(file.originalname).toLowerCase();
+
     if (allowedTypes[extension] !== file.mimetype) {
-      const error = new Error("Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.");
+      const error = new Error(
+        "Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP."
+      );
       error.status = 400;
       return callback(error);
     }
@@ -33,4 +32,6 @@ const upload = multer({
   },
 });
 
-module.exports = { uploadProfileImage: upload.single("file") };
+module.exports = {
+  uploadProfileImage: upload.single("file"),
+};

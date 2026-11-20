@@ -164,7 +164,11 @@ CREATE TABLE da_phuong_tien (
     CONSTRAINT ck_pt_loai CHECK (loai_tu_lieu IN ('hinh_anh', 'video', 'tai_lieu')),
     CONSTRAINT ck_pt_mot_doi_tuong CHECK (num_nonnulls(ma_nn, ma_sp, ma_nd, ma_hd) = 1)
 );
-
+/*cloudinary_public_id: mã định danh file trên Cloudinary.
+cloudinary_resource_type: loại tài nguyên Cloudinary (image, video hoặc raw)*/
+ALTER TABLE da_phuong_tien
+ADD COLUMN cloudinary_public_id VARCHAR(255),
+ADD COLUMN cloudinary_resource_type VARCHAR(20);
 -- =====================================================================
 -- 5. ĐẶT LỊCH TRẢI NGHIỆM
 -- =====================================================================
@@ -229,7 +233,7 @@ CREATE TABLE danh_gia (
     CONSTRAINT uq_dg_nd UNIQUE (ma_tk, ma_nd),
     CONSTRAINT uq_dg_hd UNIQUE (ma_tk, ma_hd)
 );
-
+/*
 -- =====================================================================
 -- 7. INDEX (hỗ trợ tìm kiếm / khóa ngoại)
 -- =====================================================================
@@ -414,32 +418,339 @@ FROM hoat_dong_trai_nghiem hd
 LEFT JOIN dat_lich_trai_nghiem dl
        ON dl.ma_hd = hd.ma_hd AND dl.trang_thai_dl IN ('cho_xac_nhan', 'da_xac_nhan')
 GROUP BY hd.ma_hd, hd.ten_hd, dl.ngay_trai_nghiem, hd.sl_tham_gia_max;
-
+*/
 -- =====================================================================
 -- 10. DỮ LIỆU MẪU TỐI THIỂU (để thử nghiệm)
 -- =====================================================================
+-- mã hóa pass bằng lệnh extension pgcrypto
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+--kiểm tra đã tạo chưa
+SELECT * FROM pg_extension WHERE extname = 'pgcrypto';
 
 INSERT INTO tai_khoan (ho_ten, email, mat_khau_hash, sdt, vai_tro) VALUES
- ('Quản trị viên',   'admin@vanhoa.vn',  'HASH_DEMO', '0900000001', 'quan_tri'),
- ('Nguyễn Văn Thợ',  'tho@vanhoa.vn',    'HASH_DEMO', '0900000002', 'nghe_nhan'),
- ('Trần Thị Khách',  'khach@vanhoa.vn',  'HASH_DEMO', '0900000003', 'du_khach');
+	('Quản trị viên',   'admin@vanhoa.vn',   crypt('123456', gen_salt('bf')), '0900000001', 'quan_tri'),
+	('Nguyễn Văn Thợ',   'tho@vanhoa.vn',     crypt('123456', gen_salt('bf')), '0900000002', 'nghe_nhan'),
+	('Trần Thị Khách',   'khach@vanhoa.vn',   crypt('123456', gen_salt('bf')), '0900000003', 'du_khach');
 
-INSERT INTO lang_nghe (ten_ln, dia_chi_ln, tinh_thanh_pho, gioi_thieu_ln)
-VALUES ('Làng gốm Bát Tràng', 'Xã Bát Tràng, Gia Lâm', 'Hà Nội', 'Làng gốm truyền thống hơn 500 năm.');
 
-INSERT INTO nghe_truyen_thong (ten_nghe, mo_ta, nguon_goc)
-VALUES ('Nghề làm gốm', 'Chế tác đồ gốm thủ công từ đất sét.', 'Hình thành từ thế kỷ 14-15.');
 
-INSERT INTO nghe_nhan (ma_nn, dia_chi, gioi_thieu, so_nam_kn, trang_thai_xac_minh)
-VALUES (2, 'Bát Tràng, Hà Nội', 'Nghệ nhân gốm 30 năm kinh nghiệm.', 30, 'da_xac_minh');
 
-INSERT INTO nghe_nhan_nghe VALUES (2, 1, 1995);
-INSERT INTO nghe_nhan_lang_nghe VALUES (2, 1);
-INSERT INTO lang_nghe_nghe VALUES (1, 1);
+BEGIN;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+-- =====================================================================
+-- 1. TÀI KHOẢN & HỒ SƠ NGHỆ NHÂN
+-- =====================================================================
+-- Giả định các tài khoản đầu tiên sẽ có ma_tk = 1..8 theo thứ tự chèn
+INSERT INTO tai_khoan (ho_ten, email, mat_khau_hash, sdt, anh_dai_dien, vai_tro, trang_thai_tk)
+VALUES
+    ('Nguyễn Minh Quản', 'admin@gmail.vn', crypt('1234567', gen_salt('bf')), '0901112233', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795170038/admin.png', 'quan_tri', 'hoat_dong'),
+    ('Thạch Sang', 'thachsangnn@gmail.vn', crypt('1234567', gen_salt('bf')), '0912345678', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795169788/nn2_chan.jpg', 'nghe_nhan', 'hoat_dong'),
+    ('Ngô Thị Pho ', 'ngothipho.det@nghenhan.vn', crypt('1234567', gen_salt('bf')), '0913456789', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1794881460/nn1.jpg', 'nghe_nhan', 'hoat_dong'),
+    ('Phạm Anh Đạo', 'phâmnhdao.sonmai@nghenhan.vn', crypt('1234567', gen_salt('bf')), '0914567890', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795171463/nn4_gom.jpg', 'nghe_nhan', 'hoat_dong'),
+    ('Đặng Thị Lan', 'dangthilan.nonla@nghenhan.vn', crypt('1234567', gen_salt('bf')), '0915678901', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795172525/k1.jpg', 'du_khach', 'hoat_dong'),
+    ('Hoàng Gia Huy', 'huy.hoang@dukhach.vn', crypt('1234567', gen_salt('bf')), '0987654321', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795172681/k5.jpg', 'du_khach', 'hoat_dong'),
+    ('Vũ Mai Phương', 'phuong.vu@dukhach.vn', crypt('1234567', gen_salt('bf')), '0988776655', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1794881227/samples/man-on-a-escalator.jpg', 'du_khach', 'hoat_dong'),
+    ('Bùi Quốc Tuấn', 'tuan.bui@dukhach.vn', crypt('1234567', gen_salt('bf')), '0123456789', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795172681/k4.jpg', 'du_khach', 'bi_khoa');
 
-INSERT INTO hoat_dong_trai_nghiem
- (ma_nn, ma_nghe, ma_ln, ten_hd, mo_ta_hd, dia_diem_to_chuc, thoi_luong_phut, sl_tham_gia_max, trang_thai_hd)
-VALUES (2, 1, 1, 'Trải nghiệm nặn gốm', 'Tự tay nặn một sản phẩm gốm.', 'Xưởng gốm Bát Tràng', 120, 10, 'dang_mo');
 
-INSERT INTO dat_lich_trai_nghiem (ma_tk, ma_hd, ngay_trai_nghiem, gio_bd, gio_kt, sl_nguoi_tham_gia)
-VALUES (3, 1, CURRENT_DATE + 7, '09:00', '11:00', 3);
+INSERT INTO nghe_nhan (
+    ma_nn, ngay_sinh, dia_chi, gioi_thieu, so_nam_kn,
+    qua_trinh_lam_nghe, trang_thai_xac_minh, ma_quan_tri_xac_minh, ngay_xac_minh
+)
+VALUES
+    (
+        2, '1965-04-12', 'Xóm 3, Bát Tràng, Gia Lâm, Hà Nội',
+        'Nghệ nhân gốm thủ công chuyên dòng men rạn và men lam cổ truyền.',
+        38,
+        'Học nghề từ năm 12 tuổi cùng gia đình, mở xưởng gốm truyền thống và đào tạo nhiều thợ trẻ.',
+        'da_xac_minh', 1, '2026-03-10 09:30:00+07'
+    ),
+    (
+        3, '1972-09-21', 'Làng lụa Vạn Phúc, Hà Đông, Hà Nội',
+        'Nghệ nhân dệt lụa tơ tằm hoa văn cổ, giữ gìn kỹ thuật dệt cửi gỗ.',
+        30,
+        'Gắn bó với khung cửi từ nhỏ, phục dựng nhiều mẫu hoa văn lụa truyền thống.',
+        'da_xac_minh', 1, '2026-03-15 14:00:00+07'
+    ),
+    (
+        4, '1968-11-05', 'Hạ Thái, Thường Tín, Hà Nội',
+        'Nghệ nhân sơn mài truyền thống với kỹ thuật mài nước và thếp vàng bạc.',
+        34,
+        'Tốt nghiệp mỹ thuật ứng dụng và tiếp nối nghề sơn mài gia truyền tại Hạ Thái.',
+        'da_xac_minh', 1, '2026-04-02 10:15:00+07'
+    ),
+    (
+        5, '1980-02-18', 'Làng Chuông, Thanh Oai, Hà Nội',
+        'Nghệ nhân làm nón lá truyền thống, kết hợp thêu hoa văn nhẹ nhàng.',
+        20,
+        'Học chằm nón từ mẹ và phát triển dòng nón lá phục vụ trải nghiệm du lịch văn hóa.',
+        'cho_xac_minh', NULL, NULL
+    );
+
+-- =====================================================================
+-- 2. LÀNG NGHỀ & NGHỀ TRUYỀN THỐNG
+-- =====================================================================
+-- ma_ln: 1..3; ma_nghe: 1..4
+INSERT INTO lang_nghe (ten_ln, dia_chi_ln, tinh_thanh_pho, lich_su_ln, gioi_thieu_ln, anh_dai_dien)
+VALUES
+    (
+        'Làng gốm Bát Tràng', 'Xã Bát Tràng, huyện Gia Lâm', 'Hà Nội',
+        'Hình thành từ khoảng thế kỷ XIV–XV, nổi tiếng với gốm gia dụng, gốm thờ và gốm mỹ nghệ.',
+        'Điểm đến văn hóa nổi bật với không gian làm gốm, chợ gốm và các xưởng thủ công lâu đời.',
+        'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795173129/lgbatrang.jpg'
+    ),
+    (
+        'Làng lụa Vạn Phúc', 'Phường Vạn Phúc, quận Hà Đông', 'Hà Nội',
+        'Có lịch sử hơn nghìn năm dệt lụa tơ tằm với nhiều hoa văn tinh xảo.',
+        'Nổi tiếng với các sản phẩm lụa vân, lụa sa, gấm và phố lụa trưng bày đặc sắc.',
+        'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795173127/lluavanphuc.jpg'
+    ),
+    (
+        'Làng sơn mài Hạ Thái', 'Xã Duyên Thái, huyện Thường Tín', 'Hà Nội',
+        'Phát triển mạnh từ thế kỷ XVII, gắn liền với kỹ thuật sơn ta và khảm trai, thếp vàng.',
+        'Nơi lưu giữ quy trình ủ sơn, mài bóng và trang trí thủ công đòi hỏi sự kiên nhẫn cao.',
+        'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795173128/lsonmai.jpg'
+    );
+
+INSERT INTO nghe_truyen_thong (
+    ten_nghe, mo_ta, nguon_goc, quy_trinh_thuc_hien, gia_tri_van_hoa, anh_dai_dien, trang_thai_hoat_dong
+)
+VALUES
+    (
+        'Nghề làm gốm thủ công',
+        'Chế tác đồ gốm từ đất sét cao lanh và đất sét dẻo qua bàn xoay hoặc khuôn.',
+        'Gắn liền với vùng ven sông Hồng giàu nguồn đất sét chất lượng.',
+        'Chọn đất -> nhào trộn -> tạo hình -> phơi/sấy -> tráng men -> nung lò.',
+        'Phản ánh thẩm mỹ, tín ngưỡng và đời sống sinh hoạt truyền thống của người Việt.',
+        'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795171463/nn4_gom.jpg', 'hoat_dong'
+    ),
+    (
+        'Nghề dệt lụa tơ tằm',
+        'Dệt sợi tơ tằm tự nhiên thành vải lụa mềm mại, bóng nhẹ.',
+        'Truyền thống trồng dâu nuôi tằm và dệt vải lâu đời ở đồng bằng Bắc Bộ.',
+        'Ươm tơ -> mắc cửi -> dệt vải -> nhuộm màu -> hoàn thiện thành phẩm.',
+        'Biểu tượng của sự tinh tế, khéo léo và bản sắc trang phục truyền thống.',
+        'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795173397/ndet.jpg', 'hoat_dong'
+    ),
+    (
+        'Nghề sơn mài truyền thống',
+        'Trang trí cốt gỗ hoặc tre bằng sơn ta, son, vàng quỳ, vỏ trứng và kỹ thuật mài.',
+        'Phát triển từ nghề sơn thếp cổ truyền kết hợp sáng tạo tạo hình.',
+        'Làm cốt -> bó hom -> sơn lót -> trang trí -> phủ bóng -> mài nước.',
+        'Mang giá trị nghệ thuật tạo hình cao và tính bền bỉ theo thời gian.',
+        'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795173128/lsonmai.jpg', 'hoat_dong'
+    ),
+    (
+        'Nghề làm nón lá',
+        'Chằm lá cọ hoặc lá buông trên khung tre thành chiếc nón che nắng mưa.',
+        'Nghề thủ công dân gian phổ biến gắn với đời sống nông nghiệp.',
+        'Chuốt vành -> chọn lá -> ủi lá -> xếp lá -> chằm nón -> nức vành.',
+        'Gắn bó mật thiết với hình ảnh người phụ nữ và văn hóa Việt Nam.',
+        'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795173397/ndannon.jpg', 'hoat_dong'
+    );
+
+INSERT INTO nghe_nhan_nghe (ma_nn, ma_nghe, nam_bat_dau)
+VALUES
+    (2, 1, 1977),
+    (3, 2, 1986),
+    (4, 3, 1984),
+    (5, 4, 2005);
+
+INSERT INTO nghe_nhan_lang_nghe (ma_nn, ma_ln)
+VALUES
+    (2, 1),
+    (3, 2),
+    (4, 3);
+
+INSERT INTO lang_nghe_nghe (ma_ln, ma_nghe)
+VALUES
+    (1, 1),
+    (2, 2),
+    (3, 3);
+
+-- =====================================================================
+-- 3. SẢN PHẨM, NỘI DUNG VĂN HÓA, HOẠT ĐỘNG TRẢI NGHIỆM
+-- =====================================================================
+-- ma_sp: 1..4; ma_nd: 1..3; ma_hd: 1..3
+INSERT INTO san_pham (
+    ma_nn, ma_nghe, ten_sp, mo_ta_sp, nguyen_lieu,
+    quy_trinh_che_tac, y_nghia_van_hoa, trang_thai_hien_thi
+)
+VALUES
+    (
+        2, 1, 'Bình gốm men rạn cổ Bát Tràng',
+        'Bình dáng củ tỏi phủ lớp men rạn đặc trưng, họa tiết vẽ tay.',
+        'Đất sét Bát Tràng, men tro thực vật, màu oxit truyền thống.',
+        'Tạo dáng trên bàn xoay, khắc tỉa, tráng men rạn và nung ở nhiệt độ cao.',
+        'Giữ gìn nét cổ kính của dòng men rạn đặc trưng vùng gốm Bát Tràng.',
+        'da_dang'
+    ),
+    (
+        3, 2, 'Khăn lụa tơ tằm hoa sen Vạn Phúc',
+        'Khăn lụa dệt thủ công nhẹ mát, dệt chìm họa tiết hoa sen.',
+        '100% sợi tơ tằm tự nhiên, thuốc nhuộm an toàn.',
+        'Xe tơ, mắc khung dệt hoa văn, dệt thủ công và vò mềm.',
+        'Tôn vinh vẻ đẹp thanh tao của hoa sen và kỹ thuật dệt lụa truyền thống.',
+        'da_dang'
+    ),
+    (
+        4, 3, 'Tranh sơn mài Phố cổ Hà Nội',
+        'Tranh sơn mài khắc họa mái ngói rêu phong và nhịp sống phố cổ.',
+        'Ván gỗ đã xử lý, sơn ta, vỏ trứng, vàng quỳ.',
+        'Vẽ phác thảo, gắn vỏ trứng và vàng, phủ nhiều lớp sơn và mài nước thủ công.',
+        'Lưu giữ ký ức đô thị cổ qua chất liệu sơn mài giàu chiều sâu.',
+        'da_dang'
+    ),
+    (
+        5, 4, 'Nón lá thêu hoa cúc Làng Chuông',
+        'Nón lá thanh mảnh có điểm xuyết họa tiết hoa cúc thêu tay.',
+        'Lá nón tuyển chọn, tre già làm vành, chỉ thêu.',
+        'Phơi ủi lá, vào khung, chằm đều tay và thêu họa tiết.',
+        'Làm mới món đồ truyền thống thân thuộc cho nhu cầu quà tặng và trải nghiệm.',
+        'cho_duyet'
+    );
+
+INSERT INTO nd_van_hoa (
+    ma_nn, ma_nghe, tieu_de, loai_nd, tom_tat, noi_dung_chi_tiet,
+    y_nghia_van_hoa, trang_thai_kiem_duyet, ma_quan_tri_duyet, ngay_duyet
+)
+VALUES
+    (
+        2, 1, 'Vì sao men rạn Bát Tràng tạo nên những đường vân độc bản?',
+        'ky_thuat',
+        'Giải thích sự chênh lệch hệ số giãn nở giữa xương gốm và lớp men.',
+        'Men rạn hình thành khi quá trình làm nguội tạo ra ứng suất vi mô giữa lớp men và cốt gốm. Mỗi sản phẩm có đường rạn khác nhau, tạo nên dấu ấn riêng không lặp lại.',
+        'Thể hiện kinh nghiệm làm gốm đúc kết qua nhiều thế hệ.',
+        'da_dang', 1, '2026-04-10 11:00:00+07'
+    ),
+    (
+        3, 2, 'Nhịp khung cửi gỗ và ký ức làng lụa Vạn Phúc',
+        'cau_chuyen',
+        'Câu chuyện về những người thợ dệt giữ gìn nghề qua thăng trầm.',
+        'Tiếng thoi đưa đều đặn trong những căn nhà cổ ở Vạn Phúc gợi nhớ thời kỳ nghề dệt phát triển rực rỡ và nỗ lực thích nghi của thế hệ hôm nay.',
+        'Giúp người xem hiểu giá trị tinh thần đằng sau từng mét lụa.',
+        'da_dang', 1, '2026-04-12 16:20:00+07'
+    ),
+    (
+        4, 3, 'Kiên nhẫn trong từng lớp sơn và lần mài nước',
+        'kien_thuc',
+        'Tổng quan về thời gian chờ khô và độ tỉ mỉ của tranh sơn mài.',
+        'Sơn ta cần độ ẩm phù hợp để khô đều, xen kẽ giữa nhiều lớp phủ và mài nhẹ bằng đá/than mịn để lộ chiều sâu màu sắc.',
+        'Giúp người yêu nghệ thuật trân trọng công sức lao động thủ công.',
+        'cho_duyet', NULL, NULL
+    );
+
+INSERT INTO hoat_dong_trai_nghiem (
+    ma_nn, ma_nghe, ma_ln, ten_hd, mo_ta_hd, dia_diem_to_chuc,
+    thoi_luong_phut, sl_tham_gia_max, thoi_gian_to_chuc, yeu_cau_tham_gia, trang_thai_hd
+)
+VALUES
+    (
+        2, 1, 1, 'Trải nghiệm vuốt nặn gốm cùng nghệ nhân Bát Tràng',
+        'Người tham gia tự tay nhào đất, thử vuốt nặn sản phẩm gốm nhỏ và nghe giới thiệu về men gốm.',
+        'Xưởng gốm truyền thống Bát Tràng, Gia Lâm, Hà Nội',
+        120, 15, 'Thứ 7 và Chủ nhật, 08:30 - 10:30',
+        'Không cần kinh nghiệm trước; mặc trang phục gọn gàng.', 'dang_mo'
+    ),
+    (
+        3, 2, 2, 'Tham quan khung cửi và tìm hiểu dệt lụa Vạn Phúc',
+        'Tìm hiểu quy trình từ sợi tơ đến mặt lụa hoàn chỉnh và quan sát thao tác dệt trực tiếp.',
+        'Không gian dệt lụa Vạn Phúc, Hà Đông, Hà Nội',
+        90, 20, 'Thứ 6 - Chủ nhật, 14:00 - 15:30',
+        'Đăng ký trước ít nhất 1 ngày để chuẩn bị đón tiếp.', 'dang_mo'
+    ),
+    (
+        4, 3, 3, 'Khám phá quy trình sơn mài tại xưởng Hạ Thái',
+        'Quan sát các công đoạn làm cốt, trang trí và thử mài mẫu sơn mài dưới sự hướng dẫn của nghệ nhân.',
+        'Xưởng sơn mài Hạ Thái, Thường Tín, Hà Nội',
+        150, 10, 'Thứ 7 hàng tuần, 09:00 - 11:30',
+        'Phù hợp cho người từ 12 tuổi trở lên.', 'dang_mo'
+    );
+
+-- =====================================================================
+-- 4. ĐA PHƯƠNG TIỆN (mỗi bản ghi gắn với đúng 1 đối tượng: ma_nn, ma_sp, ma_nd, ma_hd)
+-- =====================================================================
+INSERT INTO da_phuong_tien (
+    ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich,
+    ma_nn, ma_sp, ma_nd, ma_hd
+)
+VALUES
+    (2, 'hinh_anh', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1794881460/nn1.jpg', 'Nghệ nhân Trần Văn Bát tại xưởng gốm', 2, NULL, NULL, NULL),
+    (2, 'hinh_anh', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795174156/a1.jpg', 'Bình gốm men rạn cổ hoàn thiện', NULL, 1, NULL, NULL),
+    (3, 'hinh_anh', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795173127/lluavanphuc.jpg', 'Khăn lụa tơ tằm hoa sen Vạn Phúc', NULL, 2, NULL, NULL),
+    (2, 'video', 'https://res.cloudinary.com/zr8oa4fd/video/upload/v1795174051/vdchieu.mp4', 'Video giới thiệu kỹ thuật dệt chiếu', NULL, NULL, 1, NULL),
+    (2, 'hinh_anh', 'https://res.cloudinary.com/zr8oa4fd/image/upload/v1795174156/a1.jpg', 'Khách tham gia trải nghiệm dệt chiếu', NULL, NULL, NULL, 1);
+
+-- =====================================================================
+-- 5. ĐẶT LỊCH TRẢI NGHIỆM
+-- =====================================================================
+INSERT INTO dat_lich_trai_nghiem (
+    ma_tk, ma_hd, ngay_trai_nghiem, gio_bd, gio_kt,
+    sl_nguoi_tham_gia, ghi_chu, trang_thai_dl, ngay_xac_nhan
+)
+VALUES
+    (
+        6, 1, '2026-11-28', '08:30:00', '10:30:00',
+        2, 'Đi cùng bạn, muốn thử làm cốc gốm nhỏ.', 'da_xac_nhan', '2026-11-20 10:00:00+07'
+    ),
+    (
+        7, 2, '2026-11-29', '14:00:00', '15:30:00',
+        3, 'Nhóm bạn yêu thích văn hóa truyền thống.', 'cho_xac_nhan', NULL
+    ),
+    (
+        6, 3, '2026-12-05', '09:00:00', '11:30:00',
+        1, 'Quan tâm kỹ thuật sơn mài.', 'cho_xac_nhan', NULL
+    );
+
+-- =====================================================================
+-- 6. YÊU THÍCH & ĐÁNH GIÁ (mỗi bản ghi trỏ tới đúng 1 đối tượng)
+-- =====================================================================
+INSERT INTO yeu_thich (ma_tk, ma_nn, ma_nghe, ma_sp, ma_nd, ma_hd)
+VALUES
+    (6, 2, NULL, NULL, NULL, NULL),
+    (6, NULL, NULL, 1, NULL, NULL),
+    (6, NULL, NULL, NULL, NULL, 1),
+    (7, NULL, 2, NULL, NULL, NULL),
+    (7, NULL, NULL, NULL, 2, NULL);
+
+INSERT INTO danh_gia (
+    ma_tk, diem_danh_gia, noi_dung_danh_gia, trang_thai_kiem_duyet,
+    ma_quan_tri_duyet, ngay_duyet, ma_nn, ma_sp, ma_nd, ma_hd
+)
+VALUES
+    (
+        6, 5, 'Nghệ nhân hướng dẫn rất tận tình, không gian xưởng ấm cúng.',
+        'da_duyet', 1, '2026-11-18 15:30:00+07', 2, NULL, NULL, NULL
+    ),
+    (
+        6, 5, 'Men gốm đẹp và sắc nét, đóng gói cẩn thận.',
+        'da_duyet', 1, '2026-11-19 09:15:00+07', NULL, 1, NULL, NULL
+    ),
+    (
+        7, 4, 'Bài viết dễ hiểu, giúp mình hình dung rõ quy trình dệt lụa.',
+        'cho_duyet', NULL, NULL, NULL, NULL, 2, NULL
+    );
+
+COMMIT;
+
+
+
+-- Xóa dữ liệu và cascade sang các bảng phụ thuộc (cẩn thận vì xóa dây chuyền rất rộng)
+TRUNCATE TABLE hoat_dong_trai_nghiem RESTART IDENTITY CASCADE;
+
+
+SELECT * FROM tai_khoan ORDER BY 1;
+SELECT * FROM nghe_nhan ORDER BY 1;
+SELECT * FROM lang_nghe ORDER BY 1;
+SELECT * FROM nghe_truyen_thong ORDER BY 1;
+SELECT * FROM nghe_nhan_nghe ORDER BY 1;
+SELECT * FROM nghe_nhan_lang_nghe ORDER BY 1;
+SELECT * FROM lang_nghe_nghe ORDER BY 1;
+SELECT * FROM san_pham ORDER BY 1;
+SELECT * FROM nd_van_hoa ORDER BY 1;
+SELECT * FROM hoat_dong_trai_nghiem ORDER BY 1;
+SELECT * FROM da_phuong_tien ORDER BY 1;
+SELECT * FROM dat_lich_trai_nghiem ORDER BY 1;
+SELECT * FROM yeu_thich ORDER BY 1;
+SELECT * FROM danh_gia ORDER BY 1;
+

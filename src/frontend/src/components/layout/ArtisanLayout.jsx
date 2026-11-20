@@ -16,7 +16,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/icons/logo_v1.png";
 import ArtisanToastProvider from "../common/ArtisanToastProvider.jsx";
 import { ROUTES } from "../../routes/path.js";
@@ -56,6 +56,7 @@ function readStoredUser() {
 
 export default function ArtisanLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const userMenuRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -69,6 +70,27 @@ export default function ArtisanLayout() {
   const currentDate = `${dateParts.find((part) => part.type === "weekday")?.value}, ${dateParts.find((part) => part.type === "day")?.value}/${dateParts.find((part) => part.type === "month")?.value}/${dateParts.find((part) => part.type === "year")?.value}`;
   const userName = authUser?.name || "Nghệ nhân";
   const avatarUrl = authUser?.avatarUrl || authUser?.avatar || authUser?.anh_dai_dien;
+  const isDashboard = location.pathname === ROUTES.ARTISAN_DASHBOARD;
+  const breadcrumbItems = location.pathname === ROUTES.ARTISAN_EXPERIENCES
+    ? [
+      { label: "Tổng quan", to: ROUTES.ARTISAN_DASHBOARD },
+      { label: "Hoạt động trải nghiệm", to: ROUTES.ARTISAN_EXPERIENCES },
+      { label: "Danh sách hoạt động", current: true },
+    ]
+    : location.pathname === ROUTES.ARTISAN_EXPERIENCE_CREATE
+      ? [
+        { label: "Tổng quan", to: ROUTES.ARTISAN_DASHBOARD },
+        { label: "Hoạt động trải nghiệm", to: ROUTES.ARTISAN_EXPERIENCES },
+        { label: "Thêm hoạt động mới", current: true },
+      ]
+      : [
+        { label: "Tổng quan", to: ROUTES.ARTISAN_DASHBOARD },
+        {
+          label: navigationGroups.flatMap((group) => group.items)
+            .find((item) => item.to === location.pathname)?.label || "Không gian nghệ nhân",
+          current: true,
+        },
+      ];
 
   useEffect(() => {
     const syncUser = () => setAuthUser(readStoredUser());
@@ -146,7 +168,7 @@ export default function ArtisanLayout() {
                   ) : (
                     <NavLink
                       className={({ isActive }) => `artisan-nav-item${isActive ? " active" : ""}`}
-                      end
+                      end={to !== ROUTES.ARTISAN_EXPERIENCES}
                       key={label}
                       to={to}
                       onClick={() => setIsSidebarOpen(false)}
@@ -186,15 +208,32 @@ export default function ArtisanLayout() {
             >
               <Menu size={20} />
             </button>
-            <div className="artisan-header-greeting">
-              <h1>Xin chào {userName}!</h1>
-              <span>Chào mừng bạn trở lại với Tinh Hoa Việt</span>
-            </div>
-            <div className="artisan-header-actions">
-              <div className="artisan-date">
-                <CalendarDays size={15} />
-                <span>{currentDate}</span>
+            {isDashboard ? (
+              <div className="artisan-header-greeting">
+                <h1>Xin chào {userName}!</h1>
+                <span>Chào mừng bạn trở lại với Tinh Hoa Việt</span>
               </div>
+            ) : (
+              <nav className="artisan-header-breadcrumb" aria-label="Điều hướng">
+                {breadcrumbItems.map((item, index) => (
+                  <span className="artisan-header-breadcrumb-part" key={`${item.label}-${index}`}>
+                    {index > 0 && <span className="artisan-header-breadcrumb-separator">/</span>}
+                    {item.current ? (
+                      <strong aria-current="page">{item.label}</strong>
+                    ) : (
+                      <NavLink to={item.to}>{item.label}</NavLink>
+                    )}
+                  </span>
+                ))}
+              </nav>
+            )}
+            <div className="artisan-header-actions">
+              {isDashboard && (
+                <div className="artisan-date">
+                  <CalendarDays size={15} />
+                  <span>{currentDate}</span>
+                </div>
+              )}
               <button className="artisan-notification" type="button" aria-label="Thông báo, 3 thông báo mới">
                 <Bell size={17} />
                 <span className="artisan-notification-count">3</span>
@@ -205,20 +244,27 @@ export default function ArtisanLayout() {
                   type="button"
                   aria-haspopup="menu"
                   aria-expanded={isUserMenuOpen}
+                  aria-label={isDashboard ? undefined : "Tài khoản nghệ nhân"}
                   onClick={() => setIsUserMenuOpen((open) => !open)}
                 >
                   {avatarUrl
                     ? <img className="artisan-avatar" src={avatarUrl} alt="" />
                     : <span className="artisan-avatar artisan-avatar-fallback" aria-hidden="true">{userName.charAt(0)}</span>}
-                  <span>{userName}</span>
-                  <ChevronDown size={14} />
+                  {isDashboard && (
+                    <>
+                      <span>{userName}</span>
+                      <ChevronDown size={14} />
+                    </>
+                  )}
                 </button>
                 {isUserMenuOpen && (
                   <div className="artisan-user-dropdown" role="menu">
-                    <div className="artisan-user-dropdown-heading">
-                      <strong>{userName}</strong>
-                      {authUser?.email && <span>{authUser.email}</span>}
-                    </div>
+                    {isDashboard && (
+                      <div className="artisan-user-dropdown-heading">
+                        <strong>{userName}</strong>
+                        {authUser?.email && <span>{authUser.email}</span>}
+                      </div>
+                    )}
                     <NavLink
                       className="artisan-user-dropdown-item"
                       to={ROUTES.ARTISAN_PROFILE}

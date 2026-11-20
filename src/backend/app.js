@@ -1,4 +1,4 @@
-const express = require("express");
+/*onst express = require("express");
 const cors = require("cors");
 const path = require("path");
 const multer = require("multer");
@@ -52,6 +52,54 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+*/
+
+
+const express = require("express");
+const cors = require("cors");
+const multer = require("multer");
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Kiểm tra API
+app.get("/", (req, res) => {
+  res.json({
+    message: "API ứng dụng hỗ trợ nghệ nhân đang hoạt động",
+  });
+});
+
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/artisan/crafts", require("./routes/artisanCraftRoutes"));
+app.use("/api/artisan/profile", require("./routes/artisanProfileRoutes"));
+app.use("/api/products", require("./routes/productRoutes"));
+
+// Xử lý lỗi
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  const status =
+    err.status ||
+    (err.code === "LIMIT_FILE_SIZE" ? 413 : null) ||
+    (err instanceof multer.MulterError ? 400 : 500);
+
+  res.status(status).json({
+    success: false,
+    message:
+      status === 413
+        ? "Tệp tải lên vượt quá dung lượng cho phép."
+        : status === 400
+          ? err.message
+          : "Lỗi máy chủ",
+  });
+});
+
+module.exports = app;
+
 
 /*
 express.json(): Đọc dữ liệu JSON được gửi từ React.
