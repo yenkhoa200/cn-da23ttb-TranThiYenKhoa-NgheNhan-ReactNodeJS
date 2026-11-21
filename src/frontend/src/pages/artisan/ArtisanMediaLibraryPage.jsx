@@ -11,6 +11,7 @@ import {
   List,
   Play,
   Search,
+  Trash2,
   Video,
   X,
 } from "lucide-react";
@@ -24,7 +25,16 @@ import "../../styles/ArtisanMediaLibraryPage.css";
 const pageSize = 8;
 
 function mediaTitle(media) {
-  return media.caption?.trim() || decodeURIComponent(media.url.split("/").pop() || "Tư liệu nghệ nhân");
+  const fileName = decodeURIComponent(media.url.split("/").pop() || "");
+  const nameWithoutExtension = fileName.replace(/\.[^.]+$/, "");
+  const isCloudinaryId = /^[a-z0-9_-]{24,}$/i.test(nameWithoutExtension);
+  const caption = media.caption?.trim();
+
+  if (caption && !(isCloudinaryId && caption === nameWithoutExtension)) return caption;
+  if (isCloudinaryId) {
+    return media.type === "video" ? "Video nghệ nhân" : "Ảnh nghệ nhân";
+  }
+  return caption || fileName || "Tư liệu nghệ nhân";
 }
 
 function formatUploadDate(value) {
@@ -89,6 +99,8 @@ export default function ArtisanMediaLibraryPage() {
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [deletingMediaId, setDeletingMediaId] = useState(null);
+  const [mediaToDelete, setMediaToDelete] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -179,6 +191,24 @@ export default function ArtisanMediaLibraryPage() {
       notify(error.message || "Không thể tải tư liệu lên.", "error");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!mediaToDelete) return;
+    const item = mediaToDelete;
+    setDeletingMediaId(item.id);
+    try {
+      await artisanProfileService.deleteMedia(item.id);
+      setMedia((current) => current.filter((entry) => entry.id !== item.id));
+      setSelectedMedia((current) => current?.id === item.id ? null : current);
+      setCurrentPage(1);
+      setMediaToDelete(null);
+      notify("Đã xóa tư liệu khỏi thư viện.");
+    } catch (error) {
+      notify(error.message || "Không thể xóa tư liệu.", "error");
+    } finally {
+      setDeletingMediaId(null);
     }
   };
 
@@ -308,9 +338,26 @@ export default function ArtisanMediaLibraryPage() {
                 <h3>{mediaTitle(item)}</h3>
                 <div className="artisan-media-card-meta">
                   <span><CalendarDays size={14} />{formatUploadDate(item.uploaded_at)}</span>
-                  <button type="button" aria-label={`Xem ${mediaTitle(item)}`} onClick={() => setSelectedMedia(item)}>
-                    <Eye size={16} />
-                  </button>
+                  <div className="artisan-media-card-actions">
+                    <button
+                      type="button"
+                      title="Xem tư liệu"
+                      aria-label={`Xem ${mediaTitle(item)}`}
+                      onClick={() => setSelectedMedia(item)}
+                    >
+                      <Eye size={16} />
+                    </button>
+                    <button
+                      className="artisan-media-delete-button"
+                      type="button"
+                      title="Xóa tư liệu"
+                      aria-label={`Xóa ${mediaTitle(item)}`}
+                      disabled={deletingMediaId === item.id}
+                      onClick={() => setMediaToDelete(item)}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </article>
@@ -391,6 +438,49 @@ export default function ArtisanMediaLibraryPage() {
               <img src={selectedMedia.url} alt={mediaTitle(selectedMedia)} />
             )}
             <p><CalendarDays size={15} />Tải lên ngày {formatUploadDate(selectedMedia.uploaded_at)}</p>
+          </section>
+        </div>
+      )}
+
+      {mediaToDelete && (
+        <div
+          className="artisan-media-confirm-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deletingMediaId) setMediaToDelete(null);
+          }}
+        >
+          <section
+            className="artisan-media-confirm-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="artisan-media-confirm-title"
+            aria-describedby="artisan-media-confirm-description"
+          >
+            <span className="artisan-media-confirm-icon"><Trash2 size={22} /></span>
+            <h2 id="artisan-media-confirm-title">Xác nhận xóa tư liệu</h2>
+            <p id="artisan-media-confirm-description">
+              Bạn có muốn xóa <strong>“{mediaTitle(mediaToDelete)}”</strong> không?
+            </p>
+            <p className="artisan-media-confirm-warning">
+              Tư liệu này cũng sẽ bị gỡ khỏi nội dung liên quan nếu đang được sử dụng.
+            </p>
+            <div className="artisan-media-confirm-actions">
+              <button
+                type="button"
+                disabled={Boolean(deletingMediaId)}
+                onClick={() => setMediaToDelete(null)}
+              >
+                Hủy
+              </button>
+              <button
+                className="artisan-media-confirm-delete"
+                type="button"
+                disabled={Boolean(deletingMediaId)}
+                onClick={handleDelete}
+              >
+                {deletingMediaId ? "Đang xóa..." : "Xóa tư liệu"}
+              </button>
+            </div>
           </section>
         </div>
       )}

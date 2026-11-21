@@ -1,3 +1,5 @@
+import { readApiResponse } from "./apiResponse.js";
+
 const API_BASE_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
 
 async function request(path, { method = "GET", body } = {}) {
@@ -16,12 +18,7 @@ async function request(path, { method = "GET", body } = {}) {
     throw new Error("Không thể kết nối máy chủ. Vui lòng kiểm tra backend đang chạy.");
   }
 
-  const result = await response.json();
-  if (!response.ok || !result.success) {
-    throw new Error(result.message || "Không thể tải danh sách nghề truyền thống.");
-  }
-
-  return result.data;
+  return readApiResponse(response);
 }
 
 const artisanCraftService = {

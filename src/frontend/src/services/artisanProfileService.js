@@ -1,3 +1,5 @@
+import { readApiResponse } from "./apiResponse.js";
+
 const API_BASE_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
 
 export function getProfileImageUrl(fileUrl) {
@@ -24,12 +26,7 @@ async function request(path, { method = "GET", body, isFormData = false } = {}) 
     throw new Error("Không thể kết nối máy chủ. Vui lòng kiểm tra backend đang chạy.");
   }
 
-  const result = await response.json();
-  if (!response.ok || !result.success) {
-    throw new Error(result.message || "Yêu cầu không thành công.");
-  }
-
-  return result.data;
+  return readApiResponse(response);
 }
 
 const artisanProfileService = {
@@ -37,6 +34,7 @@ const artisanProfileService = {
   updateProfile: (profile) => request("", { method: "PUT", body: profile }),
   getImages: () => request("/images"),
   getMedia: () => request("/media"),
+  deleteMedia: (id) => request(`/media/${id}`, { method: "DELETE" }),
   getReviews: () => request("/reviews"),
   deleteImage: (id) => request(`/images/${id}`, { method: "DELETE" }),
 
@@ -48,8 +46,8 @@ const artisanProfileService = {
 
   uploadImage(file, caption = "") {
     const body = new FormData();
-    body.append("file", file);
     body.append("caption", caption);
+    body.append("file", file);
     return request("/images", { method: "POST", body, isFormData: true });
   },
 

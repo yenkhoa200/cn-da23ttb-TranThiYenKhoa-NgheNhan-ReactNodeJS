@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CalendarDays,
+  ChevronDown,
   ChevronRight,
   Handshake,
   ImagePlus,
@@ -10,16 +11,43 @@ import {
   Star,
   UserRound,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../routes/path.js";
+import artisanExperienceService from "../../services/artisanExperienceService.js";
+import artisanProfileService from "../../services/artisanProfileService.js";
+import artisanStoryService from "../../services/artisanStoryService.js";
+import productService from "../../services/productService.js";
 import "../../styles/ArtisanDashboard.css";
 
-const stats = [
-  { label: "Tổng số sản phẩm đã đăng", value: "24", change: "+2", icon: Package, tone: "terracotta" },
-  { label: "Câu chuyện văn hóa", value: "8", change: "+1", icon: BookOpen, tone: "green" },
-  { label: "Hoạt động trải nghiệm", value: "3", change: "+1", icon: CalendarDays, tone: "terracotta" },
-  { label: "Đánh giá và nhận xét", value: "45", change: "+5", icon: Star, tone: "green" },
-];
+const recentItemLimit = 5;
+
+function getStatusLabel(status) {
+  const labels = {
+    da_dang: "Đã đăng",
+    dang_mo: "Đang mở",
+    nhap: "Bản nháp",
+    draft: "Bản nháp",
+    published: "Đang mở",
+    cho_duyet: "Chờ duyệt",
+    tam_ngung: "Tạm ngưng",
+    bi_an: "Đã ẩn",
+  };
+  return labels[status] || status || "Chưa rõ";
+}
+
+function getTimestamp(value) {
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function formatRecentDate(value) {
+  if (!value) return "Chưa có ngày cập nhật";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Chưa có ngày cập nhật"
+    : date.toLocaleString("vi-VN");
+}
 
 const actions = [
   {
@@ -42,13 +70,118 @@ const actions = [
   },
   {
     label: "Tải hình ảnh, video",
-    description: "Lưu lại những khoảnh khắc nghề",
+    description: "Quản lý ảnh và video đã tải lên",
     icon: ImagePlus,
-    disabled: true,
+    to: ROUTES.ARTISAN_MEDIA,
   },
 ];
 
 export default function ArtisanDashboard() {
+  const [dashboardData, setDashboardData] = useState({
+    products: [],
+    stories: [],
+    experiences: [],
+    reviews: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [showAllRecent, setShowAllRecent] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      productService.getMine(),
+      artisanStoryService.list(),
+      artisanExperienceService.list(),
+      artisanProfileService.getReviews(),
+    ])
+      .then(([products, stories, experiences, reviews]) => {
+        if (!active) return;
+        setDashboardData({ products, stories, experiences, reviews });
+        setLoadError("");
+      })
+      .catch((error) => {
+        if (active) setLoadError(error.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const recentItems = useMemo(() => [
+    ...dashboardData.products.map((item) => ({
+      id: item.id,
+      type: "Sản phẩm",
+      title: item.title,
+      description: item.description || item.category,
+      status: item.status,
+      updatedAt: item.created_at,
+      icon: Package,
+      to: ROUTES.ARTISAN_ADD_PRODUCT,
+    })),
+    ...dashboardData.stories.map((item) => ({
+      id: item.ma_nd,
+      type: "Câu chuyện văn hóa",
+      title: item.tieu_de,
+      description: item.tom_tat || item.noi_dung_chi_tiet,
+      status: item.trang_thai_kiem_duyet,
+      updatedAt: item.ngay_cap_nhat || item.ngay_dang,
+      icon: BookOpen,
+      to: ROUTES.ARTISAN_STORY,
+    })),
+    ...dashboardData.experiences.map((item) => ({
+      id: item.id,
+      type: "Hoạt động trải nghiệm",
+      title: item.title,
+      description: item.description || item.location,
+      status: item.status,
+      updatedAt: item.created_at,
+      icon: CalendarDays,
+      to: ROUTES.ARTISAN_EXPERIENCES,
+    })),
+  ].sort((a, b) => getTimestamp(b.updatedAt) - getTimestamp(a.updatedAt)), [dashboardData]);
+
+  const publishedProductCount = dashboardData.products.filter((item) => item.status === "da_dang").length;
+  const publishedStoryCount = dashboardData.stories.filter((item) => item.trang_thai_kiem_duyet === "da_dang").length;
+  const openExperienceCount = dashboardData.experiences.filter(
+    (item) => item.status === "published" || item.status === "dang_mo",
+  ).length;
+  const stats = [
+    {
+      label: "Tổng số sản phẩm đã đăng",
+      value: publishedProductCount,
+      detail: "Đang hiển thị",
+      icon: Package,
+      tone: "terracotta",
+    },
+    {
+      label: "Câu chuyện văn hóa",
+      value: dashboardData.stories.length,
+      detail: `${publishedStoryCount} đã đăng`,
+      icon: BookOpen,
+      tone: "green",
+    },
+    {
+      label: "Hoạt động trải nghiệm",
+      value: dashboardData.experiences.length,
+      detail: `${openExperienceCount} đang mở`,
+      icon: CalendarDays,
+      tone: "terracotta",
+    },
+    {
+      label: "Đánh giá và nhận xét",
+      value: dashboardData.reviews.length,
+      detail: "Đã được duyệt",
+      icon: Star,
+      tone: "green",
+    },
+  ];
+  const visibleRecentItems = showAllRecent ? recentItems : recentItems.slice(0, recentItemLimit);
+
   return (
     <main className="artisan-dashboard-page">
       <section className="artisan-welcome">
@@ -79,12 +212,12 @@ export default function ArtisanDashboard() {
       </section>
 
       <section className="artisan-stats-grid" aria-label="Tổng quan nội dung">
-        {stats.map(({ label, value, change, icon: Icon, tone }) => (
+        {stats.map(({ label, value, detail, icon: Icon, tone }) => (
           <article className={`artisan-stat-card artisan-stat-${tone}`} key={label}>
             <span className="artisan-stat-icon"><Icon size={19} /></span>
             <div className="artisan-stat-copy">
               <span>{label}</span>
-              <div><strong>{value}</strong><small>↑ {change}</small></div>
+              <div><strong>{loading ? "—" : value}</strong><small>{loading ? "Đang tải" : detail}</small></div>
             </div>
           </article>
         ))}
@@ -126,21 +259,49 @@ export default function ArtisanDashboard() {
           <article className="artisan-recent-card">
             <div className="artisan-card-heading">
               <h2><CalendarDays size={17} />Nội dung gần đây</h2>
-              <Link className="artisan-filter-button" to={ROUTES.ARTISAN_ADD_PRODUCT}>
-                Tất cả nội dung <ChevronRight size={14} />
-              </Link>
+              {recentItems.length > recentItemLimit && (
+                <button
+                  className="artisan-filter-button"
+                  type="button"
+                  aria-expanded={showAllRecent}
+                  onClick={() => setShowAllRecent((showing) => !showing)}
+                >
+                  {showAllRecent ? "Thu gọn" : `Hiện tất cả (${recentItems.length})`}
+                  {showAllRecent ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </button>
+              )}
             </div>
-            <div className="artisan-empty-state">
-              <span className="artisan-empty-illustration"><BookOpen size={36} /></span>
-              <h3>Chưa có nội dung để hiển thị</h3>
-              <p>
-                Hãy bắt đầu đăng một sản phẩm, câu chuyện hoặc hoạt động mới nhé!
-              </p>
-              <Link className="artisan-primary-button" to={ROUTES.ARTISAN_ADD_PRODUCT}>
-                <Plus size={15} />
-                Thêm nội dung mới
-              </Link>
-            </div>
+            {loadError && <p className="artisan-dashboard-error" role="alert">{loadError}</p>}
+            {loading ? (
+              <p className="artisan-dashboard-message" role="status">Đang tải số liệu và nội dung...</p>
+            ) : recentItems.length === 0 ? (
+              <div className="artisan-empty-state">
+                <span className="artisan-empty-illustration"><BookOpen size={36} /></span>
+                <h3>Chưa có nội dung để hiển thị</h3>
+                <p>Hãy bắt đầu đăng một sản phẩm, câu chuyện hoặc hoạt động mới nhé!</p>
+                <Link className="artisan-primary-button" to={ROUTES.ARTISAN_ADD_PRODUCT}>
+                  <Plus size={15} />
+                  Thêm nội dung mới
+                </Link>
+              </div>
+            ) : (
+              <div className="artisan-recent-list">
+                {visibleRecentItems.map(({ id, type, title, description, status, updatedAt, icon: Icon, to }) => (
+                  <Link className="artisan-recent-item" to={to} key={`${type}-${id}`}>
+                    <span className="artisan-recent-icon"><Icon size={17} /></span>
+                    <span className="artisan-recent-copy">
+                      <strong>{title || "Chưa có tiêu đề"}</strong>
+                      <small>{type}{description ? ` · ${description}` : ""}</small>
+                      <time dateTime={updatedAt || undefined}>{formatRecentDate(updatedAt)}</time>
+                    </span>
+                    <span className={`artisan-recent-status artisan-recent-status-${status}`}>
+                      {getStatusLabel(status)}
+                    </span>
+                    <ChevronRight className="artisan-recent-chevron" size={15} />
+                  </Link>
+                ))}
+              </div>
+            )}
           </article>
         </div>
 

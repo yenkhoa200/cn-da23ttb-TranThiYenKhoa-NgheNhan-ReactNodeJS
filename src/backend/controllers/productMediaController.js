@@ -2,6 +2,25 @@
 const cloudinary = require("../config/cloudinary");
 const ProductMedia = require("../models/ProductMedia");
 
+function validId(value) {
+  return /^[1-9]\d*$/.test(String(value));
+}
+
+function getYouTubeId(value) {
+  try {
+    const url = new URL(value);
+    if (url.hostname === "youtu.be") return url.pathname.slice(1).split("/")[0] || null;
+    if (url.hostname === "youtube.com" || url.hostname === "www.youtube.com" || url.hostname === "m.youtube.com") {
+      return url.searchParams.get("v")
+        || (url.pathname.startsWith("/embed/") ? url.pathname.split("/")[2] : null)
+        || (url.pathname.startsWith("/shorts/") ? url.pathname.split("/")[2] : null);
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 // Hàm tải file từ bộ nhớ RAM lên Cloudinary.
 const uploadToCloudinary = (file) => {
   return new Promise((resolve, reject) => {
@@ -148,6 +167,53 @@ const productMediaController = {
         }
       }
 
+      return next(error);
+    }
+  },
+
+  async saveYoutube(req, res, next) {
+    if (!validId(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Mã sản phẩm không hợp lệ." });
+    }
+    const videoId = typeof req.body.url === "string" ? getYouTubeId(req.body.url.trim()) : null;
+    if (!videoId) {
+      return res.status(400).json({ success: false, message: "Liên kết YouTube không hợp lệ." });
+    }
+    try {
+      const media = await ProductMedia.saveYouTube(
+        req.params.id,
+        req.user.id,
+        `https://www.youtube.com/watch?v=${videoId}`
+      );
+      return res.status(201).json({
+        success: true,
+        data: {
+          id: media.ma_pt,
+          type: media.loai_tu_lieu,
+          url: media.duong_dan_tep,
+          caption: media.chu_thich,
+        },
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async remove(req, res, next) {
+    if (!validId(req.params.id) || !validId(req.params.mediaId)) {
+      return res.status(400).json({ success: false, message: "Mã tư liệu không hợp lệ." });
+    }
+    try {
+      const media = await ProductMedia.deleteById(req.params.id, req.params.mediaId);
+      if (!media) return res.status(404).json({ success: false, message: "Không tìm thấy tư liệu." });
+      if (media.cloudinary_public_id) {
+        await cloudinary.uploader.destroy(
+          media.cloudinary_public_id,
+          { resource_type: media.cloudinary_resource_type || "image" }
+        );
+      }
+      return res.status(200).json({ success: true, message: "Đã xóa tư liệu." });
+    } catch (error) {
       return next(error);
     }
   },

@@ -47,6 +47,30 @@ function RequireAdmin({ children }) {
     : <Navigate to={ROUTES.ADMIN_LOGIN} replace />;
 }
 
+function RequireArtisan({ children }) {
+  let user = null;
+  try {
+    user = JSON.parse(window.localStorage.getItem("auth-user") || "null");
+  } catch {
+    window.localStorage.removeItem("auth-user");
+    window.localStorage.removeItem("auth-token");
+  }
+
+  const isArtisan = window.localStorage.getItem("auth-token")
+    && typeof user?.role === "string"
+    && ["NGHE_NHAN", "ARTISANS"].includes(user.role.toUpperCase());
+
+  return isArtisan
+    ? children
+    : (
+      <Navigate
+        to={ROUTES.ARTISAN_LOGIN}
+        replace
+        state={{ notice: { type: "info", message: "Vui lòng đăng nhập bằng tài khoản nghệ nhân để tiếp tục." } }}
+      />
+    );
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -59,7 +83,7 @@ function AppRoutes() {
       <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
       <Route path={ROUTES.ARTISAN_REGISTER} element={<ArtisanRegisterPage />} />
       {/* Các trang nghệ nhân dùng chung layout điều hướng và header. */}
-      <Route element={<ArtisanLayout />}>
+      <Route element={<RequireArtisan><ArtisanLayout /></RequireArtisan>}>
         <Route path={ROUTES.ARTISAN_DASHBOARD} element={<ArtisanDashboardPage />} />
         <Route path={ROUTES.ARTISAN_CRAFTS} element={<ArtisanCraftsPage />} />
         <Route path={ROUTES.ARTISAN_PROFILE} element={<ArtisanProfilePage />} />

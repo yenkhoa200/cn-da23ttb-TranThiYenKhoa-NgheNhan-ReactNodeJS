@@ -1,15 +1,17 @@
 import { useState } from "react";
 import "../../styles/Login.css";
 import { ArrowRight, Compass, Database, Eye, EyeOff, Hammer, KeyRound, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes/path.js";
 import { loginAccount, saveAuthSession } from "../../services/authService.js";
 
 export default function Login({ initialAccountType = "visitor" }) {
+  const location = useLocation();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [accountType, setAccountType] = useState(initialAccountType);
-  const [statusMessage, setStatusMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState(location.state?.notice?.message || "");
+  const [statusType, setStatusType] = useState(location.state?.notice?.type || "error");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isArtisan = accountType === "artisan";
   const isAdmin = accountType === "admin";
@@ -18,6 +20,7 @@ export default function Login({ initialAccountType = "visitor" }) {
   const handleLogin = async (event) => {
     event.preventDefault();
     setStatusMessage("");
+    setStatusType("error");
     setIsSubmitting(true);
 
     try {
@@ -190,7 +193,11 @@ export default function Login({ initialAccountType = "visitor" }) {
               </button>
             </form>
 
-            {statusMessage && <p className="auth-status" role="status">{statusMessage}</p>}
+            {statusMessage && (
+              <p className={`auth-status auth-status-${statusType}`} role="status">
+                {statusMessage}
+              </p>
+            )}
 
             {isAdmin ? (
               <>

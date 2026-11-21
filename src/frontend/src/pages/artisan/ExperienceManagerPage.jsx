@@ -16,11 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
-import {
-  DEFAULT_ARTISAN_EXPERIENCES,
-  readArtisanExperiences,
-  saveArtisanExperiences,
-} from "../../services/artisanExperienceStorage.js";
+import artisanExperienceService from "../../services/artisanExperienceService.js";
 import "../../styles/ExperienceManagerPage.css";
 
 const statusLabels = {
@@ -45,14 +41,30 @@ export default function ExperienceManagerPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const notify = useArtisanToast();
-  const [activities, setActivities] = useState(() =>
-    readArtisanExperiences(DEFAULT_ARTISAN_EXPERIENCES),
-  );
+  const [activities, setActivities] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [craftFilter, setCraftFilter] = useState("all");
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
+
+  useEffect(() => {
+    let active = true;
+    artisanExperienceService.list()
+      .then((items) => {
+        if (active) setActivities(items);
+      })
+      .catch((error) => {
+        if (active) notify(error.message, "error");
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [notify]);
 
   useEffect(() => {
     const notice = location.state?.notice;
@@ -88,53 +100,47 @@ export default function ExperienceManagerPage() {
       ...activity,
       schedule: activity.schedule,
       capacity: String(activity.capacity),
+      duration: String(activity.duration),
     });
     setModal({ type: "form", activityId: activity.id });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const savedActivity = {
-      ...form,
+      craftId: form.craft_id,
+      title: form.title.trim(),
+      description: form.description || "",
+      location: form.location.trim(),
+      schedule: form.schedule || "",
+      requirements: form.requirements || "",
+      status: form.status,
+      duration: Number(form.duration),
       capacity: Number(form.capacity),
-      id: modal.activityId ?? Date.now(),
-      image:
-        form.image ||
-        "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1000&q=85",
     };
 
-    const updatedActivities = activities.map((activity) =>
-      activity.id === modal.activityId ? savedActivity : activity,
-    );
     try {
-      saveArtisanExperiences(updatedActivities);
-    } catch {
-      notify("Không thể lưu thay đổi hoạt động. Vui lòng thử lại.", "error");
-      return;
+      const saved = await artisanExperienceService.update(modal.activityId, savedActivity);
+      setActivities((current) => current.map((activity) => (
+        activity.id === saved.id ? { ...activity, ...saved, craft: activity.craft } : activity
+      )));
+      setModal(null);
+      notify("Đã cập nhật hoạt động.");
+    } catch (error) {
+      notify(error.message, "error");
     }
-
-    setActivities(updatedActivities);
-    setModal(null);
-    notify(modal.activityId ? "Đã cập nhật hoạt động." : "Đã tạo hoạt động mới.");
   };
 
-  const handleDelete = (activityId) => {
+  const handleDelete = async (activityId) => {
     if (!window.confirm("Bạn có chắc muốn xóa hoạt động này không?")) return;
-    const updatedActivities = activities.filter(
-      (activity) => activity.id !== activityId,
-    );
     try {
-      saveArtisanExperiences(updatedActivities);
-    } catch {
-      notify("Không thể xóa hoạt động. Vui lòng thử lại.", "error");
-      return;
+      await artisanExperienceService.remove(activityId);
+      setActivities((current) => current.filter((activity) => activity.id !== activityId));
+      if (modal?.type === "detail" && modal.activity.id === activityId) setModal(null);
+      notify("Đã xóa hoạt động.");
+    } catch (error) {
+      notify(error.message, "error");
     }
-
-    setActivities(updatedActivities);
-    if (modal?.type === "detail" && modal.activity.id === activityId) {
-      setModal(null);
-    }
-    notify("Đã xóa hoạt động.");
   };
 
   return (
@@ -227,7 +233,7 @@ export default function ExperienceManagerPage() {
           {" · "}Tất cả nghề thủ công Việt Nam
         </p>
 
-        {filteredActivities.length > 0 ? (
+        {isLoading ? <p role="status">Đang tải hoạt động...</p> : filteredActivities.length > 0 ? (
           <div className="experience-grid">
             {filteredActivities.map((activity) => (
               <article className="experience-card" key={activity.id}>
@@ -244,7 +250,7 @@ export default function ExperienceManagerPage() {
                   <div className="experience-meta">
                     <span><MapPin size={13} />{activity.location}</span>
                     <span><CalendarDays size={13} />{formatSchedule(activity.schedule)}</span>
-                    <span><Clock3 size={13} />{activity.duration}</span>
+                    <span><Clock3 size={13} />{activity.duration} phút</span>
                     <span><UsersRound size={13} />Tối đa {activity.capacity} người</span>
                   </div>
                   <div className="experience-card-actions">
@@ -305,16 +311,7 @@ export default function ExperienceManagerPage() {
               <div className="experience-form-row">
                 <label>
                   Nghề truyền thống
-                  <input
-                    required
-                    list="experience-craft-options"
-                    value={form.craft}
-                    onChange={(event) => setForm({ ...form, craft: event.target.value })}
-                    placeholder="Chọn hoặc nhập nghề"
-                  />
-                  <datalist id="experience-craft-options">
-                    {crafts.map((craft) => <option key={craft} value={craft} />)}
-                  </datalist>
+                  <input required value={form.craft || ""} readOnly />
                 </label>
                 <label>
                   Sức chứa tối đa
@@ -356,15 +353,7 @@ export default function ExperienceManagerPage() {
                   />
                 </label>
               </div>
-              <label>
-                Ảnh hoạt động (URL)
-                <input
-                  type="url"
-                  value={form.image}
-                  onChange={(event) => setForm({ ...form, image: event.target.value })}
-                  placeholder="https://..."
-                />
-              </label>
+              <p>Ảnh hoạt động được lưu cùng hoạt động; tải ảnh mới khi tạo hoạt động.</p>
               <label>
                 Mô tả
                 <textarea

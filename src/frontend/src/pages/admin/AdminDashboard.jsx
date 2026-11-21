@@ -26,9 +26,10 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { adminNavigation, AdminHeader, AdminSidebar } from "../../components/common/AdminNar.jsx";
+import productService from "../../services/productService.js";
 import "../../styles/AdminDashboard.css";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -82,11 +83,11 @@ export const pageDefinitions = {
     searchPlaceholder: "Tìm sản phẩm hoặc nghệ nhân...",
     filterLabel: "Trạng thái",
     filterKey: "status",
-    filterOptions: ["Đã duyệt", "Chờ duyệt", "Đã ẩn"],
-    fields: ["name", "artisan", "craft", "material", "process", "description", "image", "created", "status"],
+    filterOptions: ["Đã duyệt", "Chờ duyệt", "Bản nháp", "Đã ẩn"],
+    fields: ["name", "artisan", "category", "craft", "price", "material", "process", "description", "image", "video", "created", "status"],
     columns: [
-      ["name", "Sản phẩm"], ["artisan", "Nghệ nhân"], ["craft", "Nghề"],
-      ["material", "Chất liệu"], ["created", "Ngày đăng"], ["status", "Trạng thái"],
+      ["name", "Sản phẩm"], ["artisan", "Nghệ nhân"], ["category", "Danh mục"],
+      ["price", "Giá tham khảo"], ["created", "Ngày đăng"], ["status", "Trạng thái"],
     ],
   },
   stories: {
@@ -407,6 +408,52 @@ export default function AdminDashboard() {
     setToast(message);
     window.setTimeout(() => setToast(""), 3000);
   };
+
+  useEffect(() => {
+    if (pageKey !== "products") return undefined;
+    let ignore = false;
+    productService.getAdminAll()
+      .then((items) => {
+        if (ignore) return;
+        const statusLabels = {
+          da_dang: "Đã duyệt",
+          cho_duyet: "Chờ duyệt",
+          nhap: "Bản nháp",
+          bi_an: "Đã ẩn",
+        };
+        setRecords((current) => ({
+          ...current,
+          products: items.map((item) => {
+            const image = (item.media || []).find((media) => media.type === "hinh_anh")?.url || "";
+            const video = (item.media || []).find((media) => media.type === "video")?.url || "";
+            return {
+              id: Number(item.id),
+              name: item.title,
+              artisan: item.artisan,
+              category: item.category,
+              craft: item.craft || "",
+              price: `${Number(item.price || 0).toLocaleString("vi-VN")} đ`,
+              material: item.material || "",
+              process: item.process || "",
+              description: item.description || "",
+              image,
+              video,
+              created: item.created_at ? new Date(item.created_at).toLocaleDateString("vi-VN") : "",
+              status: statusLabels[item.status] || item.status,
+            };
+          }),
+        }));
+      })
+      .catch((error) => {
+        if (!ignore) {
+          setToast(error.message);
+          window.setTimeout(() => setToast(""), 3000);
+        }
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [pageKey]);
   const logActivity = (message) => setActivities((current) => [{ text: message, time: "Vừa xong" }, ...current].slice(0, 5));
 
   const openForm = (pageName, definition, record = null) => {
@@ -414,6 +461,7 @@ export default function AdminDashboard() {
     const fieldLabels = {
       name: "Tên nội dung", email: "Email", phone: "Số điện thoại", role: "Vai trò", created: "Ngày tạo",
       status: "Trạng thái", craft: "Nghề truyền thống", village: "Làng nghề", location: "Địa phương / địa điểm",
+      category: "Danh mục sản phẩm", price: "Giá tham khảo",
       history: "Lịch sử hình thành", process: "Quy trình thực hiện", value: "Giá trị văn hóa",
       experience: "Số năm kinh nghiệm", bio: "Giới thiệu bản thân", journey: "Quá trình gìn giữ nghề",
       verification: "Trạng thái xác minh", products: "Sản phẩm đã đăng",
@@ -498,6 +546,7 @@ export default function AdminDashboard() {
     const labels = Object.fromEntries(definition.fields.map((field) => [field, ({
       name: pageName === "accounts" || pageName === "artisans" ? "Họ và tên" : "Tên nội dung", code: "Mã nghề", email: "Email", phone: "Số điện thoại",
       role: "Vai trò", created: "Ngày tạo", status: "Trạng thái", craft: "Nghề truyền thống",
+      category: "Danh mục sản phẩm", price: "Giá tham khảo",
       village: "Làng nghề", location: "Địa phương / địa điểm", history: "Lịch sử hình thành",
       process: "Quy trình thực hiện", value: "Giá trị văn hóa", experience: "Năm kinh nghiệm",
       verification: "Xác minh", bio: "Giới thiệu bản thân",
@@ -577,7 +626,7 @@ export default function AdminDashboard() {
 
             <Outlet context={outletContext} />
             <footer className="admin-footer">
-                <span>© 2026 Tinh Hoa Việt. Gìn giữ tinh hoa nghề Việt.</span>
+                <span>. Gìn giữ tinh hoa nghề Việt.</span>
                 <span><i /> Hệ thống đang hoạt động</span>
             </footer>
             </div>

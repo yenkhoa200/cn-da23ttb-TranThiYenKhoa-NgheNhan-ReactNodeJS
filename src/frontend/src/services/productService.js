@@ -1,55 +1,52 @@
-import api from "./api";
+import { readApiResponse } from "./apiResponse.js";
+
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
+
+async function request(path, { method = "GET", body, file, caption = "" } = {}) {
+  const token = window.localStorage.getItem("auth-token");
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  let requestBody;
+  if (file) {
+    requestBody = new FormData();
+    requestBody.append("file", file);
+    requestBody.append("caption", caption);
+  } else if (body !== undefined) {
+    headers["Content-Type"] = "application/json";
+    requestBody = JSON.stringify(body);
+  }
+
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}/products${path}`, {
+      method,
+      headers,
+      body: requestBody,
+    });
+  } catch {
+    throw new Error("Không thể kết nối máy chủ. Vui lòng kiểm tra backend đang chạy.");
+  }
+  return readApiResponse(response);
+}
 
 const productService = {
-  // Lấy danh sách sản phẩm
-  getAll() {
-    return api.get("/products");
-  },
-
-  // Lấy sản phẩm theo ID
-  getById(id) {
-    return api.get(`/products/${id}`);
-  },
-
-  getMedia(id) {
-    return api.get(`/products/${id}/media`);
-  },
-
-  // Thêm sản phẩm
-  create(data) {
-    return api.post("/products", data);
-  },
-
-  async uploadMedia(id, file, caption = "") {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("caption", caption);
-
-    const token = window.localStorage.getItem("auth-token");
-    const baseUrl = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
-    const response = await fetch(`${baseUrl}/products/${id}/media`, {
-      method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
-    });
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || "Tải tư liệu lên không thành công.");
-    }
-
-    return result.data;
-  },
-
-  // Cập nhật sản phẩm
-  update(id, data) {
-    return api.put(`/products/${id}`, data);
-  },
-
-  // Xóa sản phẩm
-  delete(id) {
-    return api.delete(`/products/${id}`);
-  },
+  getAll: () => request(""),
+  getById: (id) => request(`/${id}`),
+  getMine: () => request("/mine"),
+  getAdminAll: () => request("/admin"),
+  getMedia: (id) => request(`/${id}/media`),
+  create: (data) => request("", { method: "POST", body: data }),
+  update: (id, data) => request(`/${id}`, { method: "PUT", body: data }),
+  delete: (id) => request(`/${id}`, { method: "DELETE" }),
+  uploadMedia: (id, file, caption = "") => request(`/${id}/media`, {
+    method: "POST",
+    file,
+    caption,
+  }),
+  saveYouTube: (id, url) => request(`/${id}/youtube`, {
+    method: "POST",
+    body: { url },
+  }),
+  removeMedia: (id, mediaId) => request(`/${id}/media/${mediaId}`, { method: "DELETE" }),
 };
 
 export default productService;

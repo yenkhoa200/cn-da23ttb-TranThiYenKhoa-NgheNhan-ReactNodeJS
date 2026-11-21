@@ -711,6 +711,14 @@
   text-align: center;
 }
 
+.login-page-redesign .auth-status-success {
+  color: #287747;
+}
+
+.login-page-redesign .auth-status-info {
+  color: #315d7a;
+}
+
 .login-page-redesign .divider {
   position: relative;
   margin: 23px 0 18px;

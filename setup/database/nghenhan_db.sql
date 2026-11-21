@@ -1,3 +1,4 @@
+
 CREATE DATABASE nghenhan_db;
 
 -- =====================================================================
@@ -20,6 +21,19 @@ CREATE TABLE tai_khoan (
     CONSTRAINT ck_tk_sdt       CHECK (sdt IS NULL OR sdt ~ '^[0-9+]{9,15}$')
 );
 CREATE UNIQUE INDEX uq_tai_khoan_email ON tai_khoan (lower(email));
+
+ALTER TABLE tai_khoan
+  ADD COLUMN IF NOT EXISTS anh_dai_dien_public_id VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS anh_dai_dien_resource_type VARCHAR(20);
+
+ALTER TABLE nghe_nhan
+  ADD COLUMN IF NOT EXISTS gioi_tinh VARCHAR(10),
+  ADD COLUMN IF NOT EXISTS lang_nghe_mo_ta TEXT,
+  ADD COLUMN IF NOT EXISTS hoat_dong_trai_nghiem_mo_ta TEXT;
+ALTER TABLE nghe_nhan
+    ADD CONSTRAINT chk_nghe_nhan_gioi_tinh
+    CHECK (gioi_tinh IN ('Nam', 'Nữ', 'Khác') OR gioi_tinh IS NULL);
+
 
 -- Quan hệ 1-1 với tai_khoan: dùng chung khóa chính
 CREATE TABLE nghe_nhan (
@@ -107,6 +121,24 @@ CREATE TABLE san_pham (
         ('nhap', 'cho_duyet', 'da_dang', 'bi_an'))
 );
 
+ALTER TABLE san_pham
+    ADD COLUMN IF NOT EXISTS danh_muc VARCHAR(100) NOT NULL DEFAULT 'Khác',
+    ADD COLUMN IF NOT EXISTS gia_tham_khao NUMERIC(14, 2);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'ck_san_pham_gia_tham_khao'
+    ) THEN
+        ALTER TABLE san_pham
+            ADD CONSTRAINT ck_san_pham_gia_tham_khao
+            CHECK (gia_tham_khao IS NULL OR gia_tham_khao >= 0);
+    END IF;
+END
+$$;
+
 CREATE TABLE nd_van_hoa (
     ma_nd           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ma_nn           BIGINT NOT NULL REFERENCES nghe_nhan (ma_nn) ON DELETE CASCADE,   -- "đăng"
@@ -126,6 +158,9 @@ CREATE TABLE nd_van_hoa (
     CONSTRAINT ck_nd_trang_thai CHECK (trang_thai_kiem_duyet IN
         ('nhap', 'cho_duyet', 'da_dang', 'bi_an'))
 );
+ALTER TABLE nd_van_hoa
+ALTER COLUMN trang_thai_kiem_duyet
+SET DEFAULT 'da_dang';
 
 CREATE TABLE hoat_dong_trai_nghiem (
     ma_hd            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -427,16 +462,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 --kiểm tra đã tạo chưa
 SELECT * FROM pg_extension WHERE extname = 'pgcrypto';
 
-INSERT INTO tai_khoan (ho_ten, email, mat_khau_hash, sdt, vai_tro) VALUES
-	('Quản trị viên',   'admin@vanhoa.vn',   crypt('123456', gen_salt('bf')), '0900000001', 'quan_tri'),
-	('Nguyễn Văn Thợ',   'tho@vanhoa.vn',     crypt('123456', gen_salt('bf')), '0900000002', 'nghe_nhan'),
-	('Trần Thị Khách',   'khach@vanhoa.vn',   crypt('123456', gen_salt('bf')), '0900000003', 'du_khach');
-
-
-
-
 BEGIN;
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- =====================================================================
 -- 1. TÀI KHOẢN & HỒ SƠ NGHỆ NHÂN
 -- =====================================================================
@@ -754,3 +780,8 @@ SELECT * FROM dat_lich_trai_nghiem ORDER BY 1;
 SELECT * FROM yeu_thich ORDER BY 1;
 SELECT * FROM danh_gia ORDER BY 1;
 
+
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'san_pham'
+ORDER BY ordinal_position;

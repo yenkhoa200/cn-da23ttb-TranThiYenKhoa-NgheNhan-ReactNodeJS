@@ -11,15 +11,12 @@ import {
   UsersRound,
   X,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
-import {
-  DEFAULT_ARTISAN_EXPERIENCES,
-  readArtisanExperiences,
-  saveArtisanExperiences,
-} from "../../services/artisanExperienceStorage.js";
+import artisanCraftService from "../../services/artisanCraftService.js";
+import artisanExperienceService from "../../services/artisanExperienceService.js";
 import "../../styles/ExperienceManagerPage.css";
 
 const initialForm = {
@@ -65,10 +62,32 @@ export default function ExperienceCreatePage() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const [form, setForm] = useState(initialForm);
-  const [image, setImage] = useState("");
+  const [crafts, setCrafts] = useState([]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [imageName, setImageName] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const notify = useArtisanToast();
+
+  useEffect(() => {
+    let active = true;
+    artisanCraftService.getAll()
+      .then((items) => {
+        if (active) setCrafts(items.filter((item) => item.selected && item.status === "hoat_dong"));
+      })
+      .catch((error) => {
+        if (active) notify(error.message, "error");
+      });
+    return () => {
+      active = false;
+    };
+  }, [notify]);
+
+  useEffect(() => {
+    if (!imagePreview) return undefined;
+    return () => URL.revokeObjectURL(imagePreview);
+  }, [imagePreview]);
 
   const updateForm = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
@@ -87,57 +106,64 @@ export default function ExperienceCreatePage() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result !== "string") {
-        notify("Không thể đọc tệp ảnh. Vui lòng chọn ảnh khác.", "error");
-        return;
-      }
-      setImage(reader.result);
-      setImageName(file.name);
-    };
-    reader.onerror = () => notify("Đã xảy ra lỗi khi đọc ảnh. Vui lòng thử lại.", "error");
-    reader.readAsDataURL(file);
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+    setImageName(file.name);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const submitterValue = event.nativeEvent.submitter?.value;
     const status = submitterValue === "draft" ? "draft" : "published";
-    if (!image) {
+    if (!imageFile) {
       notify("Vui lòng thêm ảnh đại diện cho hoạt động.", "error");
       return;
     }
 
+    const description = [
+      form.description.trim(),
+      form.details.trim() && `Nội dung trải nghiệm:\n${form.details.trim()}`,
+    ].filter(Boolean).join("\n\n");
+    const requirements = [
+      form.requirements.trim() && `Yêu cầu tham gia: ${form.requirements.trim()}`,
+      form.preparation.trim() && `Vật liệu cần chuẩn bị: ${form.preparation.trim()}`,
+      form.notes.trim() && `Lưu ý: ${form.notes.trim()}`,
+    ].filter(Boolean).join("\n");
     const activity = {
-      id: Date.now(),
       title: form.title.trim(),
-      craft: form.craft.trim(),
+      craftId: Number(form.craft),
       location: form.location.trim(),
       schedule: form.date && form.time ? `${form.date}T${form.time}` : "",
-      duration: form.duration ? `${form.duration} phút` : "",
-      capacity: Number(form.capacity) || 0,
+      duration: Number(form.duration),
+      capacity: Number(form.capacity),
       status,
-      image,
-      description: form.description.trim(),
-      details: form.details.trim(),
-      requirements: form.requirements.trim(),
-      preparation: form.preparation.trim(),
-      notes: form.notes.trim(),
+      description,
+      requirements,
     };
 
+    setIsSaving(true);
     try {
-      const activities = readArtisanExperiences(DEFAULT_ARTISAN_EXPERIENCES);
-      saveArtisanExperiences([activity, ...activities]);
-    } catch {
-      notify("Không thể lưu hoạt động vào trình duyệt. Vui lòng thử lại.", "error");
-      return;
-    }
+      const savedActivity = await artisanExperienceService.create(activity);
+      try {
+        await artisanExperienceService.uploadImage(savedActivity.id, imageFile);
+      } catch (error) {
+        try {
+          await artisanExperienceService.remove(savedActivity.id);
+        } catch (cleanupError) {
+          console.error("Không thể xóa hoạt động chưa tải được ảnh:", cleanupError);
+        }
+        throw error;
+      }
 
-    navigate(ROUTES.ARTISAN_EXPERIENCES, {
-      state: { notice: status === "draft" ? "Đã lưu bản nháp." : "Đã tạo hoạt động mới." },
-    });
+      navigate(ROUTES.ARTISAN_EXPERIENCES, {
+        state: { notice: status === "draft" ? "Đã lưu bản nháp." : "Đã tạo hoạt động mới." },
+      });
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -180,14 +206,10 @@ export default function ExperienceCreatePage() {
               <label className="experience-field">
                 Nghề truyền thống liên quan <span>*</span>
                 <select required value={form.craft} onChange={updateForm("craft")}>
-                  <option value="" disabled>Chọn nghề truyền thống</option>
-                  <option>Gốm sứ</option>
-                  <option>Dệt lụa</option>
-                  <option>Tranh dân gian</option>
-                  <option>Mây tre đan</option>
-                  <option>Điêu khắc gỗ</option>
-                  <option>Nghề truyền thống khác</option>
+                <option value="" disabled>Chọn nghề trong hồ sơ của bạn</option>
+                {crafts.map((craft) => <option key={craft.id} value={craft.id}>{craft.name}</option>)}
                 </select>
+                {crafts.length === 0 && <small>Hãy thêm nghề truyền thống vào hồ sơ trước khi tạo hoạt động.</small>}
               </label>
               <label className="experience-field">
                 Mô tả hoạt động <span>*</span>
@@ -345,13 +367,14 @@ export default function ExperienceCreatePage() {
             <div className="experience-create-fields">
               <div className="experience-field">
                 <span className="experience-field-title">Ảnh đại diện và ảnh hoạt động <span>*</span></span>
-                {image ? (
+                {imagePreview ? (
                   <div className="experience-upload-preview">
-                    <img src={image} alt="Ảnh minh họa hoạt động" />
+                    <img src={imagePreview} alt="Ảnh minh họa hoạt động" />
                     <div>
                       <strong>{imageName}</strong>
                       <button type="button" onClick={() => {
-                        setImage("");
+                        setImageFile(null);
+                        setImagePreview("");
                         setImageName("");
                       }}>
                         <X size={13} /> Gỡ ảnh
@@ -395,10 +418,10 @@ export default function ExperienceCreatePage() {
             <p><Info size={14} /> Lưu để hiển thị với du khách. Chọn lưu bản nháp nếu bạn muốn hoàn thiện nội dung sau.</p>
             <div>
               <Link className="experience-cancel-button" to={ROUTES.ARTISAN_EXPERIENCES}>Hủy</Link>
-              <button className="experience-cancel-button" type="submit" value="draft" formNoValidate>
+              <button className="experience-cancel-button" type="submit" value="draft" formNoValidate disabled={isSaving || crafts.length === 0}>
                 Lưu bản nháp
               </button>
-              <button className="experience-primary-button" type="submit" value="published">
+              <button className="experience-primary-button" type="submit" value="published" disabled={isSaving || crafts.length === 0}>
                 <Upload size={13} /> Lưu
               </button>
             </div>

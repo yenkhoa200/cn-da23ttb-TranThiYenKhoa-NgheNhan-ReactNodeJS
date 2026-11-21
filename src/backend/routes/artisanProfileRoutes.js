@@ -12,6 +12,7 @@ router.put("/", artisanProfileController.updateProfile);
 router.put("/avatar", uploadProfileImage, artisanProfileController.uploadAvatar);
 router.get("/media", artisanProfileController.getMedia);
 router.post("/media", uploadArtisanMedia, artisanProfileController.uploadMedia);
+router.delete("/media/:id", artisanProfileController.deleteMedia);
 router.get("/reviews", artisanProfileController.getReviews);
 router.get("/images", artisanProfileController.getImages);
 router.post("/images", uploadProfileImage, artisanProfileController.uploadImage);

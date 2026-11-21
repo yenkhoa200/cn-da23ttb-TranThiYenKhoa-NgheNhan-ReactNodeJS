@@ -1,6 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 const pool = require("../config/database");
+const cloudinary = require("../config/cloudinary");
 
 const uploadDirectory = path.resolve(__dirname, "..", "uploads", "artisans");
 
@@ -14,11 +15,59 @@ async function removeUploadedFile(filePath) {
   }
 }
 
-function parseCraftNames(value) {
-  if (typeof value !== "string") return null;
+function getCloudinaryErrorMessage(error) {
+  const status = Number(error.http_code || error.status);
+  const code = typeof error.code === "string" ? error.code : "";
 
-  const names = value.split(",").map((name) => name.trim()).filter(Boolean);
-  return [...new Set(names)];
+  if (status === 401 || /invalid (api key|signature|credentials)/i.test(error.message || "")) {
+    return "Cloudinary từ chối thông tin xác thực. Kiểm tra cấu hình CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY và CLOUDINARY_API_SECRET.";
+  }
+  if (status === 413 || /file too large|file size.*limit|payload too large/i.test(error.message || "")) {
+    return "Tệp vượt quá giới hạn tải lên của Cloudinary. Hãy chọn tệp nhỏ hơn.";
+  }
+  if (status === 429) {
+    return "Cloudinary đã giới hạn yêu cầu hoặc tài nguyên tài khoản. Hãy kiểm tra hạn mức Cloudinary.";
+  }
+  if (["ECONNREFUSED", "ECONNRESET", "ENOTFOUND", "ETIMEDOUT"].includes(code)) {
+    return "Không kết nối được Cloudinary. Kiểm tra mạng, DNS hoặc tường lửa của máy chạy backend.";
+  }
+  if (status) return `Cloudinary từ chối tệp (HTTP ${status}). Kiểm tra định dạng và giới hạn tải lên.`;
+  return "Không thể tải tư liệu lên Cloudinary. Kiểm tra cấu hình dịch vụ, kết nối mạng hoặc giới hạn tệp.";
+}
+
+async function uploadMediaToCloudinary(file, folder = "nghenhan/artisan-media") {
+  const config = cloudinary.config();
+  if (!config.cloud_name || !config.api_key || !config.api_secret) {
+    const error = new Error("Cloudinary chưa được cấu hình đầy đủ.");
+    error.status = 503;
+    error.publicMessage = "Dịch vụ tải tư liệu chưa được cấu hình. Hãy kiểm tra cấu hình Cloudinary trong backend.";
+    throw error;
+  }
+
+  const resourceType = file.mediaType === "video" ? "video" : "image";
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: resourceType },
+      (error, result) => {
+        if (error) return reject(error);
+        if (!result?.secure_url || !result?.public_id || !result?.resource_type) {
+          return reject(new Error("Cloudinary không trả về thông tin tệp đã tải."));
+        }
+        return resolve(result);
+      }
+    );
+    stream.end(file.buffer);
+  });
+}
+
+async function removeCloudinaryMedia(media) {
+  try {
+    await cloudinary.uploader.destroy(media.public_id, {
+      resource_type: media.resource_type || "image",
+    });
+  } catch (error) {
+    console.error("Không thể dọn tư liệu trên Cloudinary:", error);
+  }
 }
 
 async function usesLegacySchema(queryable = pool) {
@@ -32,9 +81,13 @@ function profileQuery(isLegacySchema) {
   if (isLegacySchema) {
     return `SELECT a.account_id AS ma_tk, a.full_name AS ho_ten, a.email,
                    a.phone_number AS sdt, a.avatar_url AS anh_dai_dien,
+                   NULL::date AS ngay_sinh,
+                   NULL::text AS gioi_tinh,
                    ar.address AS dia_chi, ar.introduction AS gioi_thieu,
                    ar.years_of_experience AS so_nam_kn,
                    ar.craft_background AS qua_trinh_lam_nghe,
+                   ''::text AS lang_nghe_mo_ta,
+                   ''::text AS hoat_dong_trai_nghiem_mo_ta,
                    coalesce((
                      SELECT string_agg(DISTINCT tc.craft_name, ', ')
                      FROM artisan_crafts ac
@@ -63,7 +116,9 @@ function profileQuery(isLegacySchema) {
   }
 
   return `SELECT tk.ma_tk, tk.ho_ten, tk.email, tk.sdt, tk.anh_dai_dien,
-                 nn.dia_chi, nn.gioi_thieu, nn.so_nam_kn, nn.qua_trinh_lam_nghe,
+                 nn.ngay_sinh, nn.gioi_tinh, nn.dia_chi, nn.gioi_thieu, nn.so_nam_kn,
+                 nn.qua_trinh_lam_nghe, nn.lang_nghe_mo_ta,
+                 nn.hoat_dong_trai_nghiem_mo_ta,
                  coalesce((
                    SELECT string_agg(DISTINCT nt.ten_nghe, ', ')
                    FROM nghe_nhan_nghe nnn
@@ -111,30 +166,54 @@ const artisanProfileController = {
     const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
     const phone = typeof req.body.phone === "string" ? req.body.phone.trim() : "";
     const phoneDigits = phone.replace(/\D/g, "");
+    const gender = typeof req.body.gender === "string" ? req.body.gender.trim() : "";
+    const birthDate = typeof req.body.birthDate === "string" ? req.body.birthDate.trim() : "";
     const address = typeof req.body.address === "string" ? req.body.address.trim() : "";
     const introduction = typeof req.body.introduction === "string" ? req.body.introduction.trim() : "";
     const careerHistory = typeof req.body.careerHistory === "string" ? req.body.careerHistory.trim() : "";
+    const craftVillageDescription = typeof req.body.craftVillageDescription === "string"
+      ? req.body.craftVillageDescription.trim()
+      : "";
+    const experienceDescription = typeof req.body.experienceDescription === "string"
+      ? req.body.experienceDescription.trim()
+      : "";
     const years = Number(req.body.yearsOfExperience);
-    const craftNames = parseCraftNames(req.body.crafts);
 
     if (!name || name.length > 100) {
       return res.status(400).json({ success: false, message: "Họ tên phải có từ 1 đến 100 ký tự." });
+    }
+
+    if (!["Nam", "Nữ", "Khác"].includes(gender)) {
+      return res.status(400).json({ success: false, message: "Vui lòng chọn giới tính hợp lệ." });
     }
 
     if (phone && (phoneDigits.length < 8 || phoneDigits.length > 15)) {
       return res.status(400).json({ success: false, message: "Vui lòng nhập số điện thoại hợp lệ." });
     }
 
-    if (address.length > 255 || introduction.length > 10000 || careerHistory.length > 10000) {
+    const birthDateValue = birthDate || null;
+    const validBirthDate = !birthDateValue
+      || (/^\d{4}-\d{2}-\d{2}$/.test(birthDateValue)
+        && !Number.isNaN(Date.parse(`${birthDateValue}T00:00:00.000Z`))
+        && new Date(`${birthDateValue}T00:00:00.000Z`).toISOString().slice(0, 10) === birthDateValue
+        && birthDateValue < new Date().toISOString().slice(0, 10));
+
+    if (!validBirthDate) {
+      return res.status(400).json({ success: false, message: "Ngày sinh không hợp lệ hoặc nằm trong tương lai." });
+    }
+
+    if (
+      address.length > 255
+      || introduction.length > 10000
+      || careerHistory.length > 10000
+      || craftVillageDescription.length > 1000
+      || experienceDescription.length > 10000
+    ) {
       return res.status(400).json({ success: false, message: "Một hoặc nhiều thông tin vượt quá độ dài cho phép." });
     }
 
     if (!Number.isInteger(years) || years < 0 || years > 32767) {
       return res.status(400).json({ success: false, message: "Số năm kinh nghiệm phải là số nguyên không âm." });
-    }
-
-    if (!craftNames) {
-      return res.status(400).json({ success: false, message: "Danh sách nghề truyền thống không hợp lệ." });
     }
 
     const client = await pool.connect();
@@ -176,68 +255,31 @@ const artisanProfileController = {
         );
       } else {
         await client.query(
-          `INSERT INTO nghe_nhan (ma_nn, dia_chi, gioi_thieu, so_nam_kn, qua_trinh_lam_nghe)
-           VALUES ($1, $2, $3, $4, $5)
+          `INSERT INTO nghe_nhan (
+             ma_nn, ngay_sinh, gioi_tinh, dia_chi, gioi_thieu, so_nam_kn, qua_trinh_lam_nghe,
+             lang_nghe_mo_ta, hoat_dong_trai_nghiem_mo_ta
+           )
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
            ON CONFLICT (ma_nn) DO UPDATE SET
+             ngay_sinh = EXCLUDED.ngay_sinh,
+             gioi_tinh = EXCLUDED.gioi_tinh,
              dia_chi = EXCLUDED.dia_chi,
              gioi_thieu = EXCLUDED.gioi_thieu,
              so_nam_kn = EXCLUDED.so_nam_kn,
-             qua_trinh_lam_nghe = EXCLUDED.qua_trinh_lam_nghe`,
-          [req.user.id, address || null, introduction || null, years, careerHistory || null]
-        );
-      }
-
-      const craftsResult = craftNames.length
-        ? isLegacySchema
-          ? await client.query(
-            "SELECT craft_id AS id FROM traditional_crafts WHERE craft_name = ANY($1::text[])",
-            [craftNames]
-          )
-          : await client.query(
-            "SELECT ma_nghe AS id FROM nghe_truyen_thong WHERE ten_nghe = ANY($1::text[])",
-            [craftNames]
-          )
-        : { rows: [], rowCount: 0 };
-
-      if (craftsResult.rowCount !== craftNames.length) {
-        await client.query("ROLLBACK");
-        return res.status(400).json({
-          success: false,
-          message: "Một hoặc nhiều nghề không tồn tại. Hãy nhập đúng tên nghề có trong danh sách hệ thống.",
-        });
-      }
-
-      const craftIds = craftsResult.rows.map((craft) => craft.id);
-      if (craftIds.length) {
-        if (isLegacySchema) {
-          await client.query(
-            "DELETE FROM artisan_crafts WHERE artisan_id = $1 AND NOT (craft_id = ANY($2::bigint[]))",
-            [req.user.id, craftIds]
-          );
-          await client.query(
-            `INSERT INTO artisan_crafts (artisan_id, craft_id)
-             SELECT $1, unnest($2::bigint[])
-             ON CONFLICT (artisan_id, craft_id) DO NOTHING`,
-            [req.user.id, craftIds]
-          );
-        } else {
-          await client.query(
-            "DELETE FROM nghe_nhan_nghe WHERE ma_nn = $1 AND NOT (ma_nghe = ANY($2::bigint[]))",
-            [req.user.id, craftIds]
-          );
-          await client.query(
-            `INSERT INTO nghe_nhan_nghe (ma_nn, ma_nghe)
-             SELECT $1, unnest($2::bigint[])
-             ON CONFLICT (ma_nn, ma_nghe) DO NOTHING`,
-            [req.user.id, craftIds]
-          );
-        }
-      } else {
-        await client.query(
-          isLegacySchema
-            ? "DELETE FROM artisan_crafts WHERE artisan_id = $1"
-            : "DELETE FROM nghe_nhan_nghe WHERE ma_nn = $1",
-          [req.user.id]
+             qua_trinh_lam_nghe = EXCLUDED.qua_trinh_lam_nghe,
+             lang_nghe_mo_ta = EXCLUDED.lang_nghe_mo_ta,
+             hoat_dong_trai_nghiem_mo_ta = EXCLUDED.hoat_dong_trai_nghiem_mo_ta`,
+          [
+            req.user.id,
+            birthDateValue,
+            gender || null,
+            address || null,
+            introduction || null,
+            years,
+            careerHistory || null,
+            craftVillageDescription || null,
+            experienceDescription || null,
+          ]
         );
       }
 
@@ -256,8 +298,17 @@ const artisanProfileController = {
       return res.status(400).json({ success: false, message: "Vui lòng chọn ảnh đại diện." });
     }
 
-    const imageUrl = `/uploads/artisans/${req.file.filename}`;
+    let uploadedFile;
     try {
+      try {
+        uploadedFile = await uploadMediaToCloudinary(req.file, "nghenhan/artisan-avatars");
+      } catch (error) {
+        console.error("Cloudinary không tải được ảnh đại diện nghệ nhân:", error);
+        error.status = error.status || 502;
+        error.publicMessage = error.publicMessage || getCloudinaryErrorMessage(error);
+        throw error;
+      }
+
       const isLegacySchema = await usesLegacySchema();
       const result = isLegacySchema
         ? await pool.query(
@@ -265,19 +316,41 @@ const artisanProfileController = {
            SET avatar_url = $1
            WHERE account_id = $2 AND lower(role) IN ('artisans', 'nghe_nhan')
            RETURNING avatar_url AS anh_dai_dien`,
-          [imageUrl, req.user.id]
+          [uploadedFile.secure_url, req.user.id]
         )
         : await pool.query(
-          `UPDATE tai_khoan
-           SET anh_dai_dien = $1
-           WHERE ma_tk = $2 AND vai_tro = 'nghe_nhan'
-           RETURNING anh_dai_dien`,
-          [imageUrl, req.user.id]
+          `WITH previous AS (
+             SELECT anh_dai_dien_public_id, anh_dai_dien_resource_type
+             FROM tai_khoan
+             WHERE ma_tk = $4 AND vai_tro = 'nghe_nhan'
+           ), updated AS (
+             UPDATE tai_khoan
+             SET anh_dai_dien = $1,
+                 anh_dai_dien_public_id = $2,
+                 anh_dai_dien_resource_type = $3
+             WHERE ma_tk = $4 AND vai_tro = 'nghe_nhan'
+             RETURNING anh_dai_dien
+           )
+           SELECT updated.anh_dai_dien,
+                  previous.anh_dai_dien_public_id,
+                  previous.anh_dai_dien_resource_type
+           FROM updated CROSS JOIN previous`,
+          [uploadedFile.secure_url, uploadedFile.public_id, uploadedFile.resource_type, req.user.id]
         );
 
       if (!result.rowCount) {
-        await removeUploadedFile(req.file.path);
+        await removeCloudinaryMedia(uploadedFile);
         return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
+      }
+
+      const previousAvatar = !isLegacySchema && result.rows[0].anh_dai_dien_public_id
+        ? {
+          public_id: result.rows[0].anh_dai_dien_public_id,
+          resource_type: result.rows[0].anh_dai_dien_resource_type,
+        }
+        : null;
+      if (previousAvatar && previousAvatar.public_id !== uploadedFile.public_id) {
+        await removeCloudinaryMedia(previousAvatar);
       }
 
       return res.status(200).json({
@@ -286,33 +359,21 @@ const artisanProfileController = {
         data: { avatarUrl: result.rows[0].anh_dai_dien },
       });
     } catch (error) {
-      await removeUploadedFile(req.file.path);
+      if (uploadedFile?.public_id) await removeCloudinaryMedia(uploadedFile);
       return next(error);
     }
   },
 
   async getImages(req, res, next) {
     try {
-      const isLegacySchema = await usesLegacySchema();
-      const result = isLegacySchema
-        ? await pool.query(
-          `SELECT media_id AS ma_pt,
-                  CASE WHEN file_url LIKE '/%' THEN file_url ELSE '/' || file_url END AS url,
-                  caption, uploaded_at
-           FROM media_files
-           WHERE artisan_id = $1 AND media_type = 'hinh_anh'
-           ORDER BY uploaded_at DESC, media_id DESC`,
-          [req.user.id]
-        )
-        : await pool.query(
-          `SELECT ma_pt,
-                  CASE WHEN duong_dan_tep LIKE '/%' THEN duong_dan_tep ELSE '/' || duong_dan_tep END AS url,
-                  chu_thich AS caption, ngay_tai_len AS uploaded_at
-           FROM da_phuong_tien
-           WHERE ma_nn = $1 AND loai_tu_lieu = 'hinh_anh'
-           ORDER BY ngay_tai_len DESC, ma_pt DESC`,
-          [req.user.id]
-        );
+      const result = await pool.query(
+        `SELECT ma_pt, duong_dan_tep AS url, chu_thich AS caption,
+                ngay_tai_len AS uploaded_at
+         FROM da_phuong_tien
+         WHERE ma_nn = $1 AND loai_tu_lieu = 'hinh_anh'
+         ORDER BY ngay_tai_len DESC, ma_pt DESC`,
+        [req.user.id]
+      );
 
       return res.status(200).json({ success: true, data: result.rows });
     } catch (error) {
@@ -349,6 +410,47 @@ const artisanProfileController = {
         );
 
       return res.status(200).json({ success: true, data: result.rows });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async deleteMedia(req, res, next) {
+    if (!/^[1-9]\d*$/.test(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Mã tư liệu không hợp lệ." });
+    }
+
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `DELETE FROM media_files
+           WHERE media_id = $1 AND uploaded_by_account_id = $2
+           RETURNING file_url AS url`,
+          [req.params.id, req.user.id]
+        )
+        : await pool.query(
+          `DELETE FROM da_phuong_tien
+           WHERE ma_pt = $1 AND ma_tk_tai_len = $2
+           RETURNING duong_dan_tep AS url, cloudinary_public_id, cloudinary_resource_type`,
+          [req.params.id, req.user.id]
+        );
+
+      if (!result.rowCount) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy tư liệu của bạn." });
+      }
+
+      const media = result.rows[0];
+      if (media.cloudinary_public_id) {
+        await removeCloudinaryMedia({
+          public_id: media.cloudinary_public_id,
+          resource_type: media.cloudinary_resource_type,
+        });
+      } else if (media.url.startsWith("/uploads/artisans/")) {
+        await removeUploadedFile(path.join(uploadDirectory, path.basename(media.url)));
+      }
+
+      return res.status(200).json({ success: true, message: "Đã xóa tư liệu khỏi thư viện." });
     } catch (error) {
       return next(error);
     }
@@ -422,12 +524,21 @@ const artisanProfileController = {
 
     const caption = typeof req.body.caption === "string" ? req.body.caption.trim() : "";
     if (caption.length > 500) {
-      await removeUploadedFile(req.file.path);
       return res.status(400).json({ success: false, message: "Chú thích không được vượt quá 500 ký tự." });
     }
 
-    const mediaUrl = `/uploads/artisans/${req.file.filename}`;
+    const mediaCaption = caption || req.file.originalname;
+    let uploadedFile;
     try {
+      try {
+        uploadedFile = await uploadMediaToCloudinary(req.file);
+      } catch (error) {
+        console.error("Cloudinary không tải được tư liệu thư viện nghệ nhân:", error);
+        error.status = error.status || 502;
+        error.publicMessage = error.publicMessage || getCloudinaryErrorMessage(error);
+        throw error;
+      }
+
       const isLegacySchema = await usesLegacySchema();
       const result = isLegacySchema
         ? await pool.query(
@@ -437,31 +548,44 @@ const artisanProfileController = {
            WHERE a.account_id = $1 AND lower(a.role) IN ('artisans', 'nghe_nhan')
            RETURNING media_id AS id, media_type AS type, file_url AS url,
                      caption, uploaded_at`,
-          [req.user.id, req.file.mediaType, mediaUrl, caption || null]
+          [req.user.id, req.file.mediaType, uploadedFile.secure_url, mediaCaption]
         )
         : await pool.query(
           `INSERT INTO da_phuong_tien
-             (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn)
-           SELECT tk.ma_tk, $2, $3, $4, tk.ma_tk
+             (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn,
+              cloudinary_public_id, cloudinary_resource_type)
+           SELECT tk.ma_tk, $2, $3, $4, tk.ma_tk, $5, $6
            FROM tai_khoan tk
            WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
            RETURNING ma_pt AS id, loai_tu_lieu AS type, duong_dan_tep AS url,
                      chu_thich AS caption, ngay_tai_len AS uploaded_at`,
-          [req.user.id, req.file.mediaType, mediaUrl, caption || null]
+          [
+            req.user.id,
+            req.file.mediaType,
+            uploadedFile.secure_url,
+            mediaCaption,
+            uploadedFile.public_id,
+            uploadedFile.resource_type,
+          ]
         );
 
       if (!result.rowCount) {
-        await removeUploadedFile(req.file.path);
+        await removeCloudinaryMedia(uploadedFile);
         return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
       }
 
       return res.status(201).json({
         success: true,
         message: "Đã tải tư liệu lên thư viện.",
-        data: { ...result.rows[0], category: "Thư viện nghệ nhân" },
+        data: {
+          ...result.rows[0],
+          category: "Thư viện nghệ nhân",
+          cloudinary_public_id: uploadedFile.public_id,
+          cloudinary_resource_type: uploadedFile.resource_type,
+        },
       });
     } catch (error) {
-      await removeUploadedFile(req.file.path);
+      if (uploadedFile?.public_id) await removeCloudinaryMedia(uploadedFile);
       return next(error);
     }
   },
@@ -473,38 +597,55 @@ const artisanProfileController = {
 
     const caption = typeof req.body.caption === "string" ? req.body.caption.trim() : "";
     if (caption.length > 500) {
-      await removeUploadedFile(req.file.path);
       return res.status(400).json({ success: false, message: "Chú thích không được vượt quá 500 ký tự." });
     }
+    const imageCaption = caption || req.file.originalname.slice(0, 500);
 
+    let uploadedFile;
     try {
-      const isLegacySchema = await usesLegacySchema();
-      const result = isLegacySchema
-        ? await pool.query(
-          `INSERT INTO media_files (uploaded_by_account_id, media_type, file_url, caption, artisan_id)
-           SELECT a.account_id, 'hinh_anh', $2, $3, a.account_id
-           FROM accounts a
-           WHERE a.account_id = $1 AND lower(a.role) IN ('artisans', 'nghe_nhan')
-           RETURNING media_id AS ma_pt, file_url AS url, caption, uploaded_at`,
-          [req.user.id, `/uploads/artisans/${req.file.filename}`, caption || null]
-        )
-        : await pool.query(
-          `INSERT INTO da_phuong_tien (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn)
-           SELECT tk.ma_tk, 'hinh_anh', $2, $3, tk.ma_tk
-           FROM tai_khoan tk
-           WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
-           RETURNING ma_pt, duong_dan_tep AS url, chu_thich AS caption, ngay_tai_len AS uploaded_at`,
-          [req.user.id, `/uploads/artisans/${req.file.filename}`, caption || null]
-        );
+      try {
+        uploadedFile = await uploadMediaToCloudinary(req.file);
+      } catch (error) {
+        console.error("Cloudinary không tải được ảnh hồ sơ nghệ nhân:", error);
+        error.status = error.status || 502;
+        error.publicMessage = error.publicMessage || getCloudinaryErrorMessage(error);
+        throw error;
+      }
+
+      const result = await pool.query(
+        `INSERT INTO da_phuong_tien
+           (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn,
+            cloudinary_public_id, cloudinary_resource_type)
+         SELECT tk.ma_tk, 'hinh_anh', $2, $3, tk.ma_tk, $4, $5
+         FROM tai_khoan tk
+         WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
+         RETURNING ma_pt, duong_dan_tep AS url, chu_thich AS caption,
+                   ngay_tai_len AS uploaded_at`,
+        [
+          req.user.id,
+          uploadedFile.secure_url,
+          imageCaption,
+          uploadedFile.public_id,
+          uploadedFile.resource_type,
+        ]
+      );
 
       if (!result.rowCount) {
-        await removeUploadedFile(req.file.path);
+        await removeCloudinaryMedia(uploadedFile);
         return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
       }
 
-      return res.status(201).json({ success: true, message: "Đã tải ảnh lên hồ sơ.", data: result.rows[0] });
+      return res.status(201).json({
+        success: true,
+        message: "Đã tải ảnh lên hồ sơ.",
+        data: {
+          ...result.rows[0],
+          cloudinary_public_id: uploadedFile.public_id,
+          cloudinary_resource_type: uploadedFile.resource_type,
+        },
+      });
     } catch (error) {
-      await removeUploadedFile(req.file.path);
+      if (uploadedFile?.public_id) await removeCloudinaryMedia(uploadedFile);
       return next(error);
     }
   },
@@ -515,23 +656,25 @@ const artisanProfileController = {
     }
 
     try {
-      const isLegacySchema = await usesLegacySchema();
-      const result = isLegacySchema
-        ? await pool.query(
-          "DELETE FROM media_files WHERE media_id = $1 AND artisan_id = $2 RETURNING file_url AS duong_dan_tep",
-          [req.params.id, req.user.id]
-        )
-        : await pool.query(
-          "DELETE FROM da_phuong_tien WHERE ma_pt = $1 AND ma_nn = $2 RETURNING duong_dan_tep",
-          [req.params.id, req.user.id]
-        );
+      const result = await pool.query(
+        `DELETE FROM da_phuong_tien
+         WHERE ma_pt = $1 AND ma_nn = $2 AND loai_tu_lieu = 'hinh_anh'
+         RETURNING duong_dan_tep, cloudinary_public_id, cloudinary_resource_type`,
+        [req.params.id, req.user.id]
+      );
 
       if (!result.rowCount) {
         return res.status(404).json({ success: false, message: "Không tìm thấy ảnh trong hồ sơ của bạn." });
       }
 
-      const imagePath = result.rows[0].duong_dan_tep;
-      if (imagePath.startsWith("/uploads/artisans/")) {
+      const {
+        duong_dan_tep: imagePath,
+        cloudinary_public_id: publicId,
+        cloudinary_resource_type: resourceType,
+      } = result.rows[0];
+      if (publicId) {
+        await removeCloudinaryMedia({ public_id: publicId, resource_type: resourceType });
+      } else if (imagePath.startsWith("/uploads/artisans/")) {
         await removeUploadedFile(path.join(uploadDirectory, path.basename(imagePath)));
       }
 

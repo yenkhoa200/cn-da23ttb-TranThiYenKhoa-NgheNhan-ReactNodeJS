@@ -77,6 +77,41 @@ const ProductMedia = {
 
     return result.rows[0];
   },
+
+  async saveYouTube(productId, accountId, url) {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "DELETE FROM da_phuong_tien WHERE ma_sp = $1 AND loai_tu_lieu = 'video'",
+        [productId]
+      );
+      const result = await client.query(
+        `INSERT INTO da_phuong_tien
+         (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_sp)
+       VALUES ($2, 'video', $3, 'Video YouTube', $1)
+       RETURNING ma_pt, loai_tu_lieu, duong_dan_tep, chu_thich, ma_sp`,
+        [productId, accountId, url]
+      );
+      await client.query("COMMIT");
+      return result.rows[0];
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  },
+
+  async deleteById(productId, mediaId) {
+    const result = await pool.query(
+      `DELETE FROM da_phuong_tien
+       WHERE ma_sp = $1 AND ma_pt = $2
+       RETURNING ma_pt, cloudinary_public_id, cloudinary_resource_type`,
+      [productId, mediaId]
+    );
+    return result.rows[0];
+  },
 };
 
 module.exports = ProductMedia;

@@ -10,11 +10,14 @@ const emptyProfile = {
   email: "",
   sdt: "",
   anh_dai_dien: "",
+  gioi_tinh: "",
+  ngay_sinh: "",
   dia_chi: "",
   gioi_thieu: "",
   so_nam_kn: 0,
   qua_trinh_lam_nghe: "",
-  nghe_truyen_thong: "",
+  lang_nghe_mo_ta: "",
+  hoat_dong_trai_nghiem_mo_ta: "",
   lang_nghe: "",
   hoat_dong: [],
 };
@@ -83,11 +86,14 @@ export default function ArtisanProfile() {
       const savedProfile = await artisanProfileService.updateProfile({
         name: profile.ho_ten,
         phone: profile.sdt,
+        gender: profile.gioi_tinh,
+        birthDate: profile.ngay_sinh,
         address: profile.dia_chi,
         introduction: profile.gioi_thieu,
         yearsOfExperience: profile.so_nam_kn,
         careerHistory: profile.qua_trinh_lam_nghe,
-        crafts: profile.nghe_truyen_thong,
+        craftVillageDescription: profile.lang_nghe_mo_ta,
+        experienceDescription: profile.hoat_dong_trai_nghiem_mo_ta,
       });
       setProfile({ ...emptyProfile, ...savedProfile });
       updateCachedAuthUser({
@@ -221,16 +227,34 @@ export default function ArtisanProfile() {
                 <input id="artisan-email" value={profile.email} readOnly />
               </div>
               <div className="form-group">
-                <label htmlFor="artisan-crafts">Nghề truyền thống gắn bó</label>
+                <label htmlFor="artisan-birth-date">Ngày sinh</label>
                 <input
-                  id="artisan-crafts"
-                  name="nghe_truyen_thong"
-                  value={profile.nghe_truyen_thong}
+                  id="artisan-birth-date"
+                  name="ngay_sinh"
+                  type="date"
+                  value={profile.ngay_sinh ? String(profile.ngay_sinh).slice(0, 10) : ""}
+                  max={new Date().toISOString().slice(0, 10)}
                   onChange={updateField}
-                  placeholder="Nhập đúng tên nghề, phân cách bằng dấu phẩy"
                 />
-                <small className="field-hint">Tên nghề cần tồn tại trong danh sách nghề truyền thống của hệ thống.</small>
               </div>
+              <fieldset className="gender-fieldset">
+                <legend>Giới tính</legend>
+                <div className="gender-options">
+                  {["Nam", "Nữ", "Khác"].map((gender) => (
+                    <label className="gender-option" key={gender}>
+                      <input
+                        type="radio"
+                        name="gioi_tinh"
+                        value={gender}
+                        checked={profile.gioi_tinh === gender}
+                        onChange={updateField}
+                        required
+                      />
+                      <span>{gender}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
               <div className="form-group">
                 <label htmlFor="artisan-years">Số năm kinh nghiệm</label>
                 <input
@@ -268,25 +292,34 @@ export default function ArtisanProfile() {
           <div className="form-card-header">
             <div>
               <h2>Làng nghề và hoạt động trải nghiệm</h2>
-              <p className="header-desc">Thông tin được lấy từ các bản ghi liên kết với tài khoản nghệ nhân trong cơ sở dữ liệu.</p>
+              <p className="header-desc">Bạn có thể tự nhập thông tin này; nếu chưa có làng nghề, hãy ghi tên nghề truyền thống.</p>
             </div>
           </div>
-          <div className="profile-linked-item">
-            <strong>Làng nghề:</strong>
-            <span>{profile.lang_nghe || "Chưa có làng nghề được liên kết."}</span>
-          </div>
-          {profile.hoat_dong?.length ? (
-            <div className="profile-activities">
-              {profile.hoat_dong.map((activity) => (
-                <article className="profile-linked-item" key={`${activity.name}-${activity.venue}`}>
-                  <strong>{activity.name}</strong>
-                  <span>{activity.venue}{activity.status ? ` · ${activity.status}` : ""}</span>
-                </article>
-              ))}
+          <div className="artisan-form">
+            <div className="form-group full-width">
+              <label htmlFor="artisan-craft-village">Làng nghề / nghề truyền thống</label>
+              <input
+                id="artisan-craft-village"
+                name="lang_nghe_mo_ta"
+                value={profile.lang_nghe_mo_ta || ""}
+                onChange={updateField}
+                maxLength={1000}
+                placeholder="Nhập tên làng nghề; nếu chưa có làng nghề, nhập tên nghề truyền thống"
+              />
             </div>
-          ) : (
-            <p className="profile-empty-gallery">Chưa có hoạt động trải nghiệm được liên kết.</p>
-          )}
+            <div className="form-group full-width">
+              <label htmlFor="artisan-experience-description">Hoạt động trải nghiệm</label>
+              <textarea
+                id="artisan-experience-description"
+                name="hoat_dong_trai_nghiem_mo_ta"
+                rows={4}
+                value={profile.hoat_dong_trai_nghiem_mo_ta || ""}
+                onChange={updateField}
+                maxLength={10000}
+                placeholder="Mô tả hoạt động trải nghiệm mà bạn tổ chức hoặc hướng dẫn"
+              />
+            </div>
+          </div>
         </section>
 
         <section className="profile-card certificates-section-card">

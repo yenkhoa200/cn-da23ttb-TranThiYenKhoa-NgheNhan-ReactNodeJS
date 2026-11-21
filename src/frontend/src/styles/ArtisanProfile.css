@@ -161,6 +161,50 @@
   font-size: 12px;
   font-weight: bold;
 }
+/*3 nút chọn giới tính của nghệ nhân*/
+
+.gender-fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.gender-fieldset legend {
+  margin-bottom: 6px;
+  padding: 0;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.gender-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gender-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.gender-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--primary-brown);
+}
 
 .form-group input, .form-group textarea {
   padding: 10px 12px;

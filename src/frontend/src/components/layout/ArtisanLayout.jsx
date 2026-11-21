@@ -9,11 +9,15 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  Moon,
   Package,
   Settings,
   Sprout,
+  Sun,
+  Type,
   UserRound,
   ClipboardList,
+  X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -21,6 +25,25 @@ import logo from "../../assets/icons/logo_v1.png";
 import ArtisanToastProvider from "../common/ArtisanToastProvider.jsx";
 import { ROUTES } from "../../routes/path.js";
 import "../../styles/ArtisanLayout.css";
+/*Chế độ cho chức năng cài đặt */
+const settingsStorageKey = "artisan-ui-settings";
+const defaultSettings = { fontSize: "medium", theme: "light" };
+
+function readStoredSettings() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(settingsStorageKey) || "null");
+    return {
+      fontSize: ["small", "medium", "large"].includes(stored?.fontSize)
+        ? stored.fontSize
+        : defaultSettings.fontSize,
+      theme: ["light", "dark"].includes(stored?.theme)
+        ? stored.theme
+        : defaultSettings.theme,
+    };
+  } catch {
+    return defaultSettings;
+  }
+}
 
 const navigationGroups = [
 
@@ -60,6 +83,10 @@ export default function ArtisanLayout() {
   const userMenuRef = useRef(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settings, setSettings] = useState(readStoredSettings);
+  const [draftSettings, setDraftSettings] = useState(settings);
+  const [settingsError, setSettingsError] = useState("");
   const [authUser, setAuthUser] = useState(readStoredUser);
   const dateParts = new Intl.DateTimeFormat("vi-VN", {
     day: "numeric",
@@ -116,6 +143,32 @@ export default function ArtisanLayout() {
     };
   }, [isUserMenuOpen]);
 
+  useEffect(() => {
+    if (!isSettingsOpen) return undefined;
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setIsSettingsOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isSettingsOpen]);
+
+  const openSettings = () => {
+    setDraftSettings(settings);
+    setSettingsError("");
+    setIsSettingsOpen(true);
+  };
+
+  const saveSettings = () => {
+    try {
+      window.localStorage.setItem(settingsStorageKey, JSON.stringify(draftSettings));
+      setSettings(draftSettings);
+      setIsSettingsOpen(false);
+      setSettingsError("");
+    } catch {
+      setSettingsError("Không thể lưu cài đặt trên thiết bị này. Vui lòng kiểm tra quyền lưu trữ của trình duyệt.");
+    }
+  };
+
   const handleLogout = () => {
     window.localStorage.removeItem("auth-token");
     window.localStorage.removeItem("auth-user");
@@ -126,7 +179,7 @@ export default function ArtisanLayout() {
 
   return (
     <ArtisanToastProvider>
-      <div className={`artisan-shell${isSidebarOpen ? " artisan-shell-menu-open" : ""}`}>
+      <div className={`artisan-shell${isSidebarOpen ? " artisan-shell-menu-open" : ""}`} data-theme={settings.theme} data-font-size={settings.fontSize}>
         <aside className="artisan-sidebar">
           <NavLink
             className="artisan-brand"
@@ -183,7 +236,7 @@ export default function ArtisanLayout() {
           </nav>
 
           <div className="artisan-sidebar-bottom">
-            <button className="artisan-nav-item" type="button">
+            <button className="artisan-nav-item" type="button" onClick={openSettings}>
               <Settings size={17} aria-hidden="true" />
               <span>Cài đặt</span>
             </button>
@@ -286,7 +339,7 @@ export default function ArtisanLayout() {
 
           <div className="artisan-layout-content">
             <Outlet />
-            <footer className="artisan-layout-footer">© 2026 Tinh Hoa Việt</footer>
+            {/*<footer className="artisan-layout-footer">© 2026 Tinh Hoa Việt</footer>*/}
           </div>
         </div>
         {isSidebarOpen && (
@@ -296,6 +349,96 @@ export default function ArtisanLayout() {
             aria-label="Đóng menu"
             onClick={() => setIsSidebarOpen(false)}
           />
+        )}
+        {isSettingsOpen && (
+          <div
+            className="artisan-settings-backdrop"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setIsSettingsOpen(false);
+            }}
+          >
+            <section
+              className="artisan-settings-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="artisan-settings-title"
+            >
+              <header className="artisan-settings-header">
+                <div>
+                  <span>CÁ NHÂN HÓA KHÔNG GIAN</span>
+                  <h2 id="artisan-settings-title">Cài đặt giao diện</h2>
+                </div>
+                <button type="button" aria-label="Đóng cài đặt" onClick={() => setIsSettingsOpen(false)}>
+                  <X size={19} />
+                </button>
+              </header>
+
+              <section className="artisan-settings-group" aria-labelledby="artisan-font-size-title">
+                <div className="artisan-settings-group-title">
+                  <Type size={18} />
+                  <div>
+                    <h3 id="artisan-font-size-title">Cỡ chữ</h3>
+                    <p>Chọn mức dễ đọc cho nội dung.</p>
+                  </div>
+                </div>
+                <div className="artisan-settings-options artisan-font-options">
+                  {[
+                    { value: "small", label: "Nhỏ", size: "14 px", sample: "Aa" },
+                    { value: "medium", label: "Vừa", size: "16 px", sample: "Aa" },
+                    { value: "large", label: "Lớn", size: "18 px", sample: "Aa" },
+                  ].map((option) => (
+                    <button
+                      className={draftSettings.fontSize === option.value ? "selected" : ""}
+                      type="button"
+                      key={option.value}
+                      aria-pressed={draftSettings.fontSize === option.value}
+                      onClick={() => setDraftSettings((current) => ({ ...current, fontSize: option.value }))}
+                    >
+                      <strong style={{ fontSize: option.size }}>{option.sample}</strong>
+                      <span>{option.label}</span>
+                      <small>{option.size}</small>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <section className="artisan-settings-group" aria-labelledby="artisan-theme-title">
+                <div className="artisan-settings-group-title">
+                  {draftSettings.theme === "light" ? <Sun size={18} /> : <Moon size={18} />}
+                  <div>
+                    <h3 id="artisan-theme-title">Chế độ giao diện</h3>
+                    <p>Chọn giao diện sáng hoặc tối.</p>
+                  </div>
+                </div>
+                <div className="artisan-settings-options artisan-theme-options">
+                  <button
+                    className={draftSettings.theme === "light" ? "selected" : ""}
+                    type="button"
+                    aria-pressed={draftSettings.theme === "light"}
+                    onClick={() => setDraftSettings((current) => ({ ...current, theme: "light" }))}
+                  >
+                    <Sun size={19} />
+                    <span>Sáng</span>
+                  </button>
+                  <button
+                    className={draftSettings.theme === "dark" ? "selected" : ""}
+                    type="button"
+                    aria-pressed={draftSettings.theme === "dark"}
+                    onClick={() => setDraftSettings((current) => ({ ...current, theme: "dark" }))}
+                  >
+                    <Moon size={19} />
+                    <span>Tối</span>
+                  </button>
+                </div>
+              </section>
+
+              {settingsError && <p className="artisan-settings-error" role="alert">{settingsError}</p>}
+              <footer className="artisan-settings-footer">
+                <button type="button" onClick={() => setIsSettingsOpen(false)}>Hủy</button>
+                <button className="artisan-settings-save" type="button" onClick={saveSettings}>Lưu cài đặt</button>
+              </footer>
+            </section>
+          </div>
         )}
       </div>
     </ArtisanToastProvider>

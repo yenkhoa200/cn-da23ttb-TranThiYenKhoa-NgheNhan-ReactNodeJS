@@ -545,7 +545,7 @@ function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© 2026 Tinh Hoa Việt · Gìn giữ tinh hoa nghề Việt.</span>
+        <span>· Gìn giữ tinh hoa nghề Việt.</span>
         <div>
           <a href="#home">Điều khoản sử dụng</a>
           <a href="#home">Chính sách bảo mật</a>

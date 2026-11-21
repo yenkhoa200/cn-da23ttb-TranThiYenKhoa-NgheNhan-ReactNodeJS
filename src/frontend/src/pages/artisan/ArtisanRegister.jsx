@@ -10,27 +10,76 @@ import {
   ShieldCheck,
   UserRound,
 } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../../styles/Login.css";
 import { ROUTES } from "../../routes/path.js";
+import {
+  getArtisanCraftOptions,
+  registerArtisan,
+} from "../../services/authService.js";
 
 export default function ArtisanRegister() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [crafts, setCrafts] = useState([]);
+  const [isLoadingCrafts, setIsLoadingCrafts] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    let active = true;
+    getArtisanCraftOptions()
+      .then((items) => {
+        if (active) setCrafts(items);
+      })
+      .catch((error) => {
+        if (active) setStatusMessage(error.message);
+      })
+      .finally(() => {
+        if (active) setIsLoadingCrafts(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (password !== confirmPassword) {
       setStatusMessage("Mật khẩu nhập lại chưa khớp.");
       return;
     }
 
-    // Chỉ kiểm tra dữ liệu giao diện; không lưu tài khoản khi API chưa có.
-    setStatusMessage("Thông tin hợp lệ. API đăng ký chưa được kết nối nên chưa tạo tài khoản.");
+    setStatusMessage("");
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData(event.currentTarget);
+      await registerArtisan({
+        name: formData.get("name"),
+        email: formData.get("email"),
+        phone: formData.get("phone"),
+        password,
+        craftId: formData.get("craftId"),
+      });
+      navigate(ROUTES.ARTISAN_LOGIN, {
+        replace: true,
+        state: {
+          notice: {
+            type: "success",
+            message: "Đăng ký thành công. Vui lòng đăng nhập bằng tài khoản nghệ nhân vừa tạo.",
+          },
+        },
+      });
+    } catch (error) {
+      setStatusMessage(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -100,7 +149,7 @@ export default function ArtisanRegister() {
                 <span>Họ và tên</span>
                 <div className="input-box">
                   <UserRound className="field-icon" size={15} aria-hidden="true" />
-                  <input type="text" autoComplete="name" placeholder="Nguyễn Văn A" required />
+                  <input name="name" type="text" autoComplete="name" placeholder="Nguyễn Văn A" required />
                 </div>
               </label>
 
@@ -108,7 +157,7 @@ export default function ArtisanRegister() {
                 <span>Email</span>
                 <div className="input-box">
                   <Mail className="field-icon" size={15} aria-hidden="true" />
-                  <input type="email" autoComplete="email" placeholder="example@gmail.com" required />
+                  <input name="email" type="email" autoComplete="email" placeholder="example@gmail.com" required />
                 </div>
               </label>
 
@@ -116,7 +165,7 @@ export default function ArtisanRegister() {
                 <span>Số điện thoại</span>
                 <div className="input-box">
                   <Phone className="field-icon" size={15} aria-hidden="true" />
-                  <input type="tel" autoComplete="tel" placeholder="0912 345 678" required />
+                  <input name="phone" type="tel" autoComplete="tel" placeholder="0912 345 678" required />
                 </div>
               </label>
 
@@ -124,14 +173,19 @@ export default function ArtisanRegister() {
                 <span>Nghề truyền thống đang theo đuổi</span>
                 <div className="input-box">
                   <Hammer className="field-icon" size={15} aria-hidden="true" />
-                  <select className="artisan-craft-select" defaultValue="" required>
-                    <option value="" disabled>Chọn ngành nghề truyền thống...</option>
-                    <option value="ceramics">Gốm sứ</option>
-                    <option value="weaving">Dệt may, thêu</option>
-                    <option value="woodwork">Mộc, chạm khắc gỗ</option>
-                    <option value="lacquerware">Sơn mài</option>
-                    <option value="basketry">Mây tre đan</option>
-                    <option value="other">Nghề truyền thống khác</option>
+                  <select
+                    className="artisan-craft-select"
+                    name="craftId"
+                    defaultValue=""
+                    disabled={isLoadingCrafts || !crafts.length}
+                    required
+                  >
+                    <option value="" disabled>
+                      {isLoadingCrafts ? "Đang tải danh sách nghề..." : "Chọn nghề truyền thống..."}
+                    </option>
+                    {crafts.map((craft) => (
+                      <option value={craft.id} key={craft.id}>{craft.name}</option>
+                    ))}
                   </select>
                 </div>
               </label>
@@ -184,8 +238,8 @@ export default function ArtisanRegister() {
                 </div>
               </label>
 
-              <button type="submit" className="submit-btn">
-                Đăng ký <ArrowRight size={16} />
+              <button type="submit" className="submit-btn" disabled={isSubmitting || isLoadingCrafts || !crafts.length}>
+                {isSubmitting ? "Đang tạo tài khoản..." : "Đăng ký"} <ArrowRight size={16} />
               </button>
             </form>
 

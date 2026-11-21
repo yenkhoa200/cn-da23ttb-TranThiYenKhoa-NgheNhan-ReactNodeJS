@@ -27,9 +27,19 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/artisan/crafts", require("./routes/artisanCraftRoutes"));
 app.use("/api/artisan/profile", require("./routes/artisanProfileRoutes"));
+app.use("/api/artisan/experiences", require("./routes/artisanExperienceRoutes"));
+app.use("/api/experiences", require("./routes/experienceRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/artisan/stories", require("./routes/artisanStoryRoutes"));
 
 // Xử lý lỗi
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Không tìm thấy API.",
+  });
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
 
@@ -76,9 +86,19 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/artisan/crafts", require("./routes/artisanCraftRoutes"));
 app.use("/api/artisan/profile", require("./routes/artisanProfileRoutes"));
+app.use("/api/artisan/experiences", require("./routes/artisanExperienceRoutes"));
+app.use("/api/experiences", require("./routes/experienceRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/artisan/stories", require("./routes/artisanStoryRoutes"));
 
 // Xử lý lỗi
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Không tìm thấy API.",
+  });
+});
+
 app.use((err, req, res, next) => {
   console.error(err);
 
@@ -89,12 +109,11 @@ app.use((err, req, res, next) => {
 
   res.status(status).json({
     success: false,
-    message:
-      status === 413
+    message: err.publicMessage || (status === 413
         ? "Tệp tải lên vượt quá dung lượng cho phép."
         : status === 400
           ? err.message
-          : "Lỗi máy chủ",
+          : "Lỗi máy chủ"),
   });
 });
 

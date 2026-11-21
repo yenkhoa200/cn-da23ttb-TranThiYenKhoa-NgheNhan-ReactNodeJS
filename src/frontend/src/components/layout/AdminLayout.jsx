@@ -135,7 +135,7 @@ export default function AdminLayout() {
 
         <div className="artisan-layout-content">
           <Outlet />
-          <footer className="artisan-layout-footer">© 2026 Tinh Hoa Việt</footer>
+          {/*<footer className="artisan-layout-footer">© 2026 Tinh Hoa Việt</footer>*/}
         </div>
       </div>
       {isSidebarOpen && (

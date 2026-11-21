@@ -11,6 +11,8 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logoImg from "../../assets/icons/logo_v1.png";
 import { ROUTES } from "../../routes/path.js";
+import productService from "../../services/productService.js";
+import artisanExperienceService from "../../services/artisanExperienceService.js";
 import "../../styles/TouristHome.css";
 import TouristLanding from "./TouristLanding.jsx";
 import TouristViews from "./TouristViews.jsx";
@@ -432,7 +434,6 @@ const mediaItems = [
   { title: "Nét đẹp nghề truyền thống", type: "Video", image: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=700&q=85" },
 ];
 
-const allItems = [...artisans, ...crafts, ...products, ...stories, ...activities];
 const navigation = [
   { label: "Trang chủ", to: ROUTES.TOURIST, view: "home" },
   { label: "Nghệ nhân", to: "/tourist/artisans", view: "artisans" },
@@ -463,6 +464,8 @@ export default function TouristHome() {
   const [query, setQuery] = useState("");
   const [searchType, setSearchType] = useState("Tất cả");
   const [mediaType, setMediaType] = useState("Tất cả");
+  const [databaseProducts, setDatabaseProducts] = useState([]);
+  const [databaseActivities, setDatabaseActivities] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState(() => readStorage("tourist-favorites", []));
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [rating, setRating] = useState(5);
@@ -486,6 +489,22 @@ export default function TouristHome() {
     };
   });
   const [profileDraft, setProfileDraft] = useState(profile);
+
+  useEffect(() => {
+    let ignore = false;
+    Promise.all([productService.getAll(), artisanExperienceService.listPublic()])
+      .then(([savedProducts, savedActivities]) => {
+        if (ignore) return;
+        setDatabaseProducts(savedProducts);
+        setDatabaseActivities(savedActivities);
+      })
+      .catch((error) => {
+        if (!ignore) setNotice(error.message);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     window.localStorage.setItem("tourist-favorites", JSON.stringify(favoriteIds));
@@ -518,7 +537,51 @@ export default function TouristHome() {
     };
   }, [headerPanel]);
 
-  const savedItems = useMemo(() => allItems.filter((item) => favoriteIds.includes(item.id)), [favoriteIds]);
+  const liveProducts = useMemo(() => databaseProducts.map((item) => {
+    const gallery = (item.media || [])
+      .filter((entry) => entry.type === "hinh_anh")
+      .map((entry) => entry.url);
+    const relatedCraft = item.craft
+      ? crafts.find((craft) => craft.category === item.craft)
+        || crafts.find((craft) => craft.title.toLocaleLowerCase("vi").includes(item.craft.toLocaleLowerCase("vi")))
+      : null;
+    const video = (item.media || []).find((entry) => entry.type === "video")?.url;
+    return {
+      id: `product-${item.id}`,
+      title: item.title,
+      category: item.category,
+      price: Number(item.price || 0),
+      description: item.description,
+      artisan: item.artisan,
+      craft: item.craft || item.category,
+      craftId: relatedCraft?.id,
+      image: gallery[0] || "",
+      gallery,
+      video,
+      material: item.material,
+      process: item.process,
+    };
+  }).filter((item) => item.image), [databaseProducts]);
+  const visibleProducts = useMemo(() => [...products, ...liveProducts], [liveProducts]);
+  const liveActivities = useMemo(() => databaseActivities
+    .map((item) => ({
+      id: `activity-${item.id}`,
+      title: item.title,
+      category: item.category || "Nghề truyền thống",
+      place: item.place,
+      duration: `${item.duration} phút`,
+      durationHours: Number(item.duration) / 60,
+      rating: "0",
+      reviews: 0,
+      maxParticipants: item.max_participants,
+      schedule: item.schedule,
+      minimumAge: item.requirements || "Không có yêu cầu đặc biệt",
+      image: item.image || activities[0]?.image,
+      description: item.description || "",
+    })), [databaseActivities]);
+  const visibleActivities = liveActivities.length ? liveActivities : activities;
+  const allItems = useMemo(() => [...artisans, ...crafts, ...visibleProducts, ...stories, ...visibleActivities], [visibleProducts, visibleActivities]);
+  const savedItems = useMemo(() => allItems.filter((item) => favoriteIds.includes(item.id)), [favoriteIds, allItems]);
   const showNotice = (message) => {
     setNotice(message);
     window.setTimeout(() => setNotice(""), 2600);
@@ -554,9 +617,9 @@ export default function TouristHome() {
   const data = {
     artisans,
     crafts,
-    products,
+    products: visibleProducts,
     stories,
-    activities,
+    activities: visibleActivities,
     mediaItems,
     allItems,
     savedItems,
@@ -741,7 +804,7 @@ export default function TouristHome() {
           </div>
         </div>
         <div className="tourist-footer-bottom">
-          <span>© 2026 Tinh Hoa Việt · Gìn giữ tinh hoa nghề Việt.</span>
+          <span>· Gìn giữ tinh hoa nghề Việt.</span>
           <span>Đồng hành cùng nghệ nhân và làng nghề Việt Nam.</span>
         </div>
       </footer>

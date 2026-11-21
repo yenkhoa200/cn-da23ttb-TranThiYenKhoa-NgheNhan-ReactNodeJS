@@ -16,6 +16,21 @@ import { ROUTES } from "../../routes/path.js";
 
 const formatPrice = (price) => `${Number(price || 0).toLocaleString("vi-VN")}₫`;
 
+function getYouTubeId(value) {
+  try {
+    const url = new URL(value);
+    if (url.hostname === "youtu.be") return url.pathname.slice(1).split("/")[0] || null;
+    if (["youtube.com", "www.youtube.com", "m.youtube.com"].includes(url.hostname)) {
+      return url.searchParams.get("v")
+        || (url.pathname.startsWith("/embed/") ? url.pathname.split("/")[2] : null)
+        || (url.pathname.startsWith("/shorts/") ? url.pathname.split("/")[2] : null);
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 export default function TouristProductDetail({ product, products, crafts, favoriteIds, onFavorite, onNotice }) {
   const [photo, setPhoto] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -122,6 +137,24 @@ export default function TouristProductDetail({ product, products, crafts, favori
           </div>
         </div>
       </section>
+
+      {product.video && (
+        <section className="tourist-product-video">
+          <h2>Video giới thiệu sản phẩm</h2>
+          {getYouTubeId(product.video) ? (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${getYouTubeId(product.video)}`}
+              title={`Video giới thiệu ${product.title}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <video src={product.video} controls preload="metadata">
+              Trình duyệt không hỗ trợ phát video.
+            </video>
+          )}
+        </section>
+      )}
 
       <section className="tourist-product-detail-content">
         <div className="tourist-product-information">

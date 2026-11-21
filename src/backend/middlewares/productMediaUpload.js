@@ -1,10 +1,5 @@
-const crypto = require("crypto");
-const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
-
-const uploadDirectory = path.resolve(__dirname, "..", "uploads", "products");
-fs.mkdirSync(uploadDirectory, { recursive: true });
 
 const allowedTypes = {
   ".jpg": { mimeType: "image/jpeg", mediaType: "hinh_anh" },
@@ -17,16 +12,8 @@ const allowedTypes = {
   ".pdf": { mimeType: "application/pdf", mediaType: "tai_lieu" },
 };
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, callback) => callback(null, uploadDirectory),
-  filename: (_req, file, callback) => {
-    const extension = path.extname(file.originalname).toLowerCase();
-    callback(null, `${crypto.randomUUID()}${extension}`);
-  },
-});
-
 const uploadProductMedia = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 50 * 1024 * 1024,
     files: 1,
