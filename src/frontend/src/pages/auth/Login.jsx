@@ -31,11 +31,15 @@ export default function Login({ initialAccountType = "visitor" }) {
         accountType,
       });
       saveAuthSession(session);
+      const returnPath = typeof location.state?.from?.pathname === "string"
+        && location.state.from.pathname.startsWith("/tourist")
+        ? location.state.from.pathname
+        : ROUTES.TOURIST;
       const destination = isAdmin
         ? ROUTES.ADMIN_DASHBOARD
         : isArtisan
           ? ROUTES.ARTISAN_DASHBOARD
-          : ROUTES.TOURIST;
+          : returnPath;
       navigate(destination, { replace: true });
     } catch (error) {
       setStatusMessage(error.message);

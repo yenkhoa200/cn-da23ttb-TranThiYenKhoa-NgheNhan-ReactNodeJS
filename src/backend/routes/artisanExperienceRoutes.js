@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const artisanExperienceController = require("../controllers/artisanExperienceController");
+const experienceBookingController = require("../controllers/experienceBookingController");
 const requireArtisan = require("../middlewares/requireArtisan");
 
 const allowedTypes = {
@@ -33,5 +34,7 @@ router.post("/", artisanExperienceController.create);
 router.put("/:id", artisanExperienceController.update);
 router.delete("/:id", artisanExperienceController.remove);
 router.post("/:id/media", upload.single("file"), artisanExperienceController.uploadImage);
+router.get("/bookings", experienceBookingController.listArtisan);
+router.patch("/bookings/:id/status", experienceBookingController.updateArtisanStatus);
 
 module.exports = router;

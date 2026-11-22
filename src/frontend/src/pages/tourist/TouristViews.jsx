@@ -35,6 +35,7 @@ const viewTitles = {
 };
 
 const itemRoute = (item) => {
+  if (item.id?.startsWith("traditional-craft-")) return `/tourist/traditional-craft/${item.id}`;
   if (item.name) return `/tourist/artisan/${item.id}`;
   if (item.id?.startsWith("craft-")) return `/tourist/craft/${item.id}`;
   if (item.id?.startsWith("product-")) return `/tourist/product/${item.id}`;
@@ -200,21 +201,25 @@ function DetailView({ item, products, activities, mediaItems, favoriteIds, onFav
   const activity = item.id?.startsWith("activity-");
   const craft = item.id?.startsWith("craft-");
   const product = item.id?.startsWith("product-");
+  const story = item.id?.startsWith("story-");
   const title = item.name || item.title;
   const isSaved = favoriteIds.includes(item.id);
-  const detailTabs = craft
-    ? ["Giới thiệu", "Quy trình", "Sản phẩm tiêu biểu"]
-    : artisan
-      ? ["Câu chuyện", "Sản phẩm", "Hoạt động", "Video"]
-      : ["Giới thiệu", "Câu chuyện", "Hình ảnh & video"];
+  let detailTabs;
+  if (story) detailTabs = ["Câu chuyện", "Hình ảnh & video"];
+  else if (craft) detailTabs = ["Giới thiệu", "Quy trình", "Sản phẩm tiêu biểu"];
+  else if (artisan) detailTabs = ["Câu chuyện", "Sản phẩm", "Hoạt động", "Video"];
+  else detailTabs = ["Giới thiệu", "Câu chuyện", "Hình ảnh & video"];
   const activeTab = detailTabs.includes(selectedTab) ? selectedTab : detailTabs[0];
-  const tabDescription = activeTab === "Quy trình"
-    ? "Từ khâu chọn nguyên liệu, tạo hình, hoàn thiện đến công đoạn nung, mỗi bước đều đòi hỏi kinh nghiệm và sự tỉ mỉ của người thợ."
-    : activeTab === "Câu chuyện"
-      ? item.description
-      : product
-        ? item.description
-        : "Tìm hiểu thêm về những kỹ thuật thủ công, câu chuyện của người thợ và giá trị văn hóa được gìn giữ tại làng nghề.";
+  let tabDescription;
+  if (activeTab === "Quy trình") {
+    tabDescription = "Từ khâu chọn nguyên liệu, tạo hình, hoàn thiện đến công đoạn nung, mỗi bước đều đòi hỏi kinh nghiệm và sự tỉ mỉ của người thợ.";
+  } else if (activeTab === "Câu chuyện") {
+    tabDescription = item.content || item.description;
+  } else if (product) {
+    tabDescription = item.description;
+  } else {
+    tabDescription = "Tìm hiểu thêm về những kỹ thuật thủ công, câu chuyện của người thợ và giá trị văn hóa được gìn giữ tại làng nghề.";
+  }
   const relatedProducts = products.filter((productItem) =>
     craft
       ? productItem.craftId === item.id
@@ -238,10 +243,11 @@ function DetailView({ item, products, activities, mediaItems, favoriteIds, onFav
         </div>
         <div className="tourist-detail-copy">
           <span className="tourist-eyebrow">{item.craft || item.category || (activity ? "TRẢI NGHIỆM VĂN HÓA" : "CÂU CHUYỆN VĂN HÓA")}</span>
-          <h1>{title}{artisan && <span className="tourist-verified-mark"><Check size={12} /></span>}</h1>
+          <h1>{title}{artisan && item.verified && <span className="tourist-verified-mark"><Check size={12} /></span>}</h1>
           {item.rating && <div className="tourist-rating"><Star size={14} fill="currentColor" /> {item.rating} <span>({item.reviews} đánh giá)</span></div>}
           {item.place && <p className="tourist-detail-meta"><MapPin size={15} /> {item.place}</p>}
           {item.duration && <p className="tourist-detail-meta"><Clock3 size={15} /> Thời lượng: {item.duration}</p>}
+          {story && item.artisan && <p className="tourist-detail-meta">Đăng bởi nghệ nhân {item.artisan}</p>}
           <p>{item.description}</p>
           <div className="tourist-detail-actions">
             <button type="button" className="tourist-primary-button" onClick={() => onFavorite(item)}><Heart size={15} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? "Đang theo dõi" : artisan ? "Theo dõi nghệ nhân" : "Lưu yêu thích"}</button>
@@ -260,6 +266,12 @@ function DetailView({ item, products, activities, mediaItems, favoriteIds, onFav
               <div className="tourist-related-activities">
                 {(relatedActivities.length ? relatedActivities : activities).slice(0, 2).map((activityItem) => <Link to={itemRoute(activityItem)} key={activityItem.id}><img src={activityItem.image} alt="" /><span><strong>{activityItem.title}</strong><small><MapPin size={12} /> {activityItem.place}</small></span><ArrowRight size={14} /></Link>)}
               </div>
+            ) : story && activeTab === "Hình ảnh & video" ? (
+              <div className="tourist-related-media">
+                {item.gallery?.map((image, index) => <img src={image} alt={`${title} ${index + 1}`} key={`${image}-${index}`} />)}
+                {item.video && <video src={item.video} controls aria-label={`Video về ${title}`} />}
+                {!item.gallery?.length && !item.video && <p>Chưa có hình ảnh hoặc video cho câu chuyện này.</p>}
+              </div>
             ) : activeTab === "Video" || activeTab === "Hình ảnh & video" ? (
               <div className="tourist-related-media">
                 {relatedMedia.slice(0, 3).map((mediaItem) => <Link to={itemRoute(mediaItem)} key={mediaItem.title}><img src={mediaItem.image} alt={mediaItem.title} />{mediaItem.type === "Video" && <span><Play size={14} fill="currentColor" /></span>}</Link>)}
@@ -267,6 +279,7 @@ function DetailView({ item, products, activities, mediaItems, favoriteIds, onFav
             ) : (
               <>
                 <p>{tabDescription}</p>
+                {story && item.culturalValue && <p>{item.culturalValue}</p>}
                 <div className="tourist-detail-facts">
                   <span><Check size={14} /> Thông tin được cộng đồng xác thực</span>
                   <span><MessageCircle size={14} /> Chia sẻ và đánh giá trải nghiệm</span>
@@ -347,7 +360,7 @@ function ReviewsView({ reviews, rating, onRating, reviewText, onReviewText, onSu
   );
 }
 
-export default function TouristViews({ view, data, favoriteIds, onFavorite, query, onQuery, searchType, onSearchType, mediaType, onMediaType, onOpenMedia, reviews, rating, onRating, reviewText, onReviewText, onSubmitReview, profile, profileDraft, onDraftChange, onSaveProfile, onNavigate, onNotice }) {
+export default function TouristViews({ view, data, favoriteIds, onFavorite, query, onQuery, searchType, onSearchType, mediaType, onMediaType, onOpenMedia, reviews, rating, onRating, reviewText, onReviewText, onSubmitReview, profile, profileDraft, onDraftChange, onSaveProfile, onNavigate, onNotice, onBooking }) {
   if (view === "stories") {
     return <TouristCulturePages stories={data.stories} artisans={data.artisans} crafts={data.crafts} products={data.products} activities={data.activities} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} />;
   }
@@ -360,14 +373,14 @@ export default function TouristViews({ view, data, favoriteIds, onFavorite, quer
   }
   if (view === "activity") {
     const activity = data.activities.find((item) => item.id === data.detailId);
-    if (activity) return <ActivityDetail item={activity} favoriteIds={favoriteIds} onFavorite={onFavorite} onNotice={onNotice} mediaItems={data.mediaItems} />;
+    if (activity) return <ActivityDetail item={activity} favoriteIds={favoriteIds} onFavorite={onFavorite} mediaItems={data.mediaItems} onBooking={onBooking} />;
   }
   if (view === "artisans") {
-    return <ArtisanListing artisans={data.artisans} crafts={data.crafts} products={data.products} stories={data.stories} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} />;
+    return <ArtisanListing artisans={data.artisans} crafts={data.crafts} traditionalCrafts={data.traditionalCrafts} products={data.products} stories={data.stories} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} />;
   }
   if (view === "artisan") {
     const artisan = data.artisans.find((item) => item.id === data.detailId);
-    if (artisan) return <ArtisanDetail artisan={artisan} products={data.products} activities={data.activities} favoriteIds={favoriteIds} onFavorite={onFavorite} onNotice={onNotice} />;
+    if (artisan) return <ArtisanDetail artisan={artisan} products={data.products} activities={data.activities} stories={data.stories} favoriteIds={favoriteIds} onFavorite={onFavorite} onNotice={onNotice} />;
   }
   if (view === "activities") {
     return <ActivityListing activities={data.activities} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} />;

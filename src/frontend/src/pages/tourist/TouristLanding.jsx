@@ -45,7 +45,9 @@ const heroSlides = [
 ];
 
 function HomeFeatureSection({ id, title, eyebrow, items, kind, link }) {
-  const routeForItem = (item) => `/tourist/${kind === "artisans" ? "artisan" : kind === "crafts" ? "craft" : kind === "products" ? "product" : kind === "stories" ? "story" : "activity"}/${item.id}`;
+  const routeForItem = (item) => kind === "traditional-crafts"
+    ? "/tourist/traditional-crafts"
+    : `/tourist/${kind === "artisans" ? "artisan" : kind === "crafts" ? "craft" : kind === "products" ? "product" : kind === "stories" ? "story" : "activity"}/${item.id}`;
 
   return (
     <section id={id} className={`tourist-section tourist-home-collection tourist-home-${kind}-section`}>
@@ -56,28 +58,32 @@ function HomeFeatureSection({ id, title, eyebrow, items, kind, link }) {
         </div>
         <Link className="tourist-more" to={link}>Xem tất cả <ArrowRight size={15} /></Link>
       </div>
-      <div className="tourist-home-feature-grid">
-        {items.slice(0, 3).map((item) => {
-          const itemTitle = item.name || item.title;
-          const subtitle = item.craft || item.category;
-          return (
-            <Link className="tourist-home-feature-card" to={routeForItem(item)} key={item.id}>
-              <div className="tourist-home-feature-image">
-                <img src={item.image} alt={itemTitle} loading="lazy" />
-                {item.category && <span>{item.category}</span>}
-              </div>
-              <div className="tourist-home-feature-copy">
-                {subtitle && <small>{subtitle}</small>}
-                <h3>{itemTitle}</h3>
-                {item.place && <p><MapPin size={14} /> {item.place}</p>}
-                {item.schedule && <p>{item.schedule} · {item.duration}</p>}
-                {item.description && <p className="tourist-home-feature-description">{item.description}</p>}
-                <span className="tourist-home-feature-link">Khám phá <ArrowRight size={14} /></span>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+      {items.length ? (
+        <div className="tourist-home-feature-grid">
+          {items.slice(0, 3).map((item) => {
+            const itemTitle = item.name || item.title;
+            const subtitle = item.craft || item.category;
+            return (
+              <Link className="tourist-home-feature-card" to={routeForItem(item)} key={item.id}>
+                <div className="tourist-home-feature-image">
+                  <img src={item.image} alt={itemTitle} loading="lazy" />
+                  {item.category && <span>{item.category}</span>}
+                </div>
+                <div className="tourist-home-feature-copy">
+                  {subtitle && <small>{subtitle}</small>}
+                  <h3>{itemTitle}</h3>
+                  {item.place && <p><MapPin size={14} /> {item.place}</p>}
+                  {item.schedule && <p>{item.schedule} · {item.duration}</p>}
+                  {item.description && <p className="tourist-home-feature-description">{item.description}</p>}
+                  <span className="tourist-home-feature-link">Khám phá <ArrowRight size={14} /></span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="tourist-empty">Chưa có nội dung được nghệ nhân đăng.</p>
+      )}
     </section>
   );
 }
@@ -158,23 +164,28 @@ export default function TouristLanding({ query, onQuery, onSearch, data }) {
           {[
             { label: "Nghệ nhân", icon: UserRound, to: "#tourist-home-artisans" },
             { label: "Làng nghề", icon: Compass, to: "#tourist-home-crafts" },
-            { label: "Nghề truyền thống", icon: BookOpen, to: "#tourist-home-traditional-crafts" },
+            { label: "Nghề truyền thống", icon: BookOpen, to: "/tourist/traditional-crafts" },
             { label: "Sản phẩm", icon: Bookmark, to: "#tourist-home-products" },
             { label: "Câu chuyện văn hóa", icon: Heart, to: "#tourist-home-stories" },
             { label: "Hoạt động trải nghiệm", icon: CalendarDays, to: "#tourist-home-activities" },
             
-          ].map(({ label, icon: Icon, to }) => (
-            <a className="tourist-category" href={to} key={label}>
-              <span className="tourist-category-icon"><Icon size={20} /></span>
-              <strong>{label}</strong>
-              <ArrowRight className="tourist-category-arrow" size={15} />
-            </a>
-          ))}
+          ].map(({ label, icon: Icon, to }) => {
+            const content = (
+              <>
+                <span className="tourist-category-icon"><Icon size={20} /></span>
+                <strong>{label}</strong>
+                <ArrowRight className="tourist-category-arrow" size={15} />
+              </>
+            );
+            return to.startsWith("#")
+              ? <a className="tourist-category" href={to} key={label}>{content}</a>
+              : <Link className="tourist-category" to={to} key={label}>{content}</Link>;
+          })}
         </section>
 
         <HomeFeatureSection id="tourist-home-artisans" title="Nghệ nhân nổi bật" eyebrow="Người gìn giữ tinh hoa" items={data.artisans} kind="artisans" link="/tourist/artisans" />
         <HomeFeatureSection id="tourist-home-crafts" title="Làng nghề truyền thống" eyebrow="Miền di sản" items={data.crafts} kind="crafts" link="/tourist/crafts" />
-        <HomeFeatureSection id="tourist-home-traditional-crafts" title="Nghề truyền thống" eyebrow="Miền di sản" items={data.crafts} kind="crafts" link="/tourist/crafts" />
+        <HomeFeatureSection id="tourist-home-traditional-crafts" title="Nghề truyền thống" eyebrow="Miền di sản" items={data.traditionalCrafts} kind="traditional-crafts" link="/tourist/traditional-crafts" />
         <HomeFeatureSection id="tourist-home-products" title="Sản phẩm thủ công" eyebrow="Từ đôi tay đến đời sống" items={data.products} kind="products" link="/tourist/products" />
         <HomeFeatureSection id="tourist-home-stories" title="Câu chuyện văn hóa" eyebrow="Tri thức được trao truyền" items={data.stories} kind="stories" link="/tourist/stories" />
         <HomeFeatureSection id="tourist-home-activities" title="Hoạt động trải nghiệm" eyebrow="Sống cùng văn hóa" items={data.activities} kind="activities" link="/tourist/activities" />

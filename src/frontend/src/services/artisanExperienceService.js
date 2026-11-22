@@ -27,6 +27,11 @@ const artisanExperienceService = {
   create: (data) => request("", { method: "POST", body: data }),
   update: (id, data) => request(`/${id}`, { method: "PUT", body: data }),
   remove: (id) => request(`/${id}`, { method: "DELETE" }),
+  listBookings: () => request("/bookings"),
+  updateBookingStatus: (id, status, reason = "") => request(`/bookings/${id}/status`, {
+    method: "PATCH",
+    body: { status, reason },
+  }),
   uploadImage(id, file) {
     const body = new FormData();
     body.append("file", file);

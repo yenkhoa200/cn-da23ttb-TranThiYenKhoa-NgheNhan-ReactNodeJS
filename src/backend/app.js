@@ -29,6 +29,8 @@ app.use("/api/artisan/crafts", require("./routes/artisanCraftRoutes"));
 app.use("/api/artisan/profile", require("./routes/artisanProfileRoutes"));
 app.use("/api/artisan/experiences", require("./routes/artisanExperienceRoutes"));
 app.use("/api/experiences", require("./routes/experienceRoutes"));
+app.use("/api/bookings", require("./routes/bookingRoutes"));
+app.use("/api/admin/experience-bookings", require("./routes/adminExperienceBookingRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/artisan/stories", require("./routes/artisanStoryRoutes"));
 
@@ -88,8 +90,10 @@ app.use("/api/artisan/crafts", require("./routes/artisanCraftRoutes"));
 app.use("/api/artisan/profile", require("./routes/artisanProfileRoutes"));
 app.use("/api/artisan/experiences", require("./routes/artisanExperienceRoutes"));
 app.use("/api/experiences", require("./routes/experienceRoutes"));
+app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/artisan/stories", require("./routes/artisanStoryRoutes"));
+app.use("/api/tourist", require("./routes/touristContentRoutes"));
 
 // Xử lý lỗi
 app.use("/api", (req, res) => {

@@ -16,7 +16,6 @@ import {
   Package,
   Phone,
   Play,
-  Quote,
   ShieldCheck,
   Star,
   Users,
@@ -91,11 +90,12 @@ function BookingCard({ artisan, saved, onFavorite, onNotice }) {
   );
 }
 
-function ArtisanTabs({ artisan, products, activities, gallery }) {
+function ArtisanTabs({ artisan, products, activities, stories, gallery }) {
   const [tab, setTab] = useState("Giới thiệu");
   const tabs = [["Giới thiệu", Users], ["Sản phẩm", Package], ["Câu chuyện & Giá trị văn hóa", BookOpen], ["Hoạt động trải nghiệm", CalendarDays], ["Hình ảnh & Video", Image]];
-  const matchedProducts = products.filter((product) => `${product.title} ${product.category}`.toLocaleLowerCase("vi").includes((artisan.product || artisan.craft).toLocaleLowerCase("vi").split(" ")[0]));
-  const relatedActivities = activities.slice(0, 3);
+  const matchedProducts = products.filter((product) => product.artisanId === artisan.id);
+  const relatedActivities = activities.filter((activity) => activity.artisanId === artisan.id).slice(0, 3);
+  const artisanStories = stories.filter((story) => story.artisanId === artisan.id);
   return (
     <section className="tourist-artisan-tabs-card">
       <div className="tourist-artisan-tabs" role="tablist" aria-label="Thông tin nghệ nhân">
@@ -106,8 +106,7 @@ function ArtisanTabs({ artisan, products, activities, gallery }) {
           <div className="tourist-artisan-introduction">
             <div>
               <h2><span aria-hidden="true">❧</span> Hành trình gìn giữ nghề</h2>
-              <p>{artisan.description} Sinh ra và lớn lên tại {artisan.place}, {artisan.name} đã gắn bó với nghề {artisan.craft.toLocaleLowerCase("vi")} từ khi còn nhỏ. Qua nhiều năm tháng, nghệ nhân luôn tâm huyết với việc bảo tồn và truyền dạy nghề truyền thống.</p>
-              <blockquote><Quote size={22} /><span>“Tôi mong muốn giữ gìn nghề truyền thống, để thế hệ sau vẫn còn được biết và tự hào về văn hóa Việt.”<small>— {artisan.name}</small></span></blockquote>
+              <p>{artisan.careerHistory || artisan.description || `${artisan.name} đang cập nhật thông tin giới thiệu.`}</p>
             </div>
             <div className="tourist-artisan-intro-gallery">
               <img src={gallery[1] || gallery[0]} alt={`Nghệ nhân ${artisan.name} đang làm nghề`} />
@@ -115,8 +114,8 @@ function ArtisanTabs({ artisan, products, activities, gallery }) {
             </div>
           </div>
         )}
-        {tab === "Sản phẩm" && <div className="tourist-artisan-products">{(matchedProducts.length ? matchedProducts : products.slice(0, 3)).map((product) => <Link to={`/tourist/product/${product.id}`} key={product.id}><img src={product.image} alt={product.title} /><span>{product.category}</span><strong>{product.title}</strong></Link>)}</div>}
-        {tab === "Câu chuyện & Giá trị văn hóa" && <div className="tourist-artisan-story"><BookOpen size={22} /><div><h2>Câu chuyện nghề {artisan.craft.toLocaleLowerCase("vi")}</h2><p>{artisan.description}</p><p>Từ tình yêu với nghề và sự kiên trì qua năm tháng, {artisan.name} mong muốn chia sẻ tri thức, kỹ thuật và cảm hứng gìn giữ nghề truyền thống cho thế hệ tiếp nối.</p></div></div>}
+        {tab === "Sản phẩm" && <div className="tourist-artisan-products">{matchedProducts.map((product) => <Link to={`/tourist/product/${product.id}`} key={product.id}><img src={product.image} alt={product.title} /><span>{product.category}</span><strong>{product.title}</strong></Link>)}{!matchedProducts.length && <p>Nghệ nhân chưa đăng sản phẩm.</p>}</div>}
+        {tab === "Câu chuyện & Giá trị văn hóa" && <div className="tourist-artisan-story"><BookOpen size={22} /><div><h2>Câu chuyện do nghệ nhân đăng</h2>{artisanStories.length ? artisanStories.map((story) => <Link to={`/tourist/story/${story.id}`} key={story.id}><strong>{story.title}</strong><p>{story.description}</p></Link>) : <p>Nghệ nhân chưa đăng câu chuyện văn hóa.</p>}</div></div>}
         {tab === "Hoạt động trải nghiệm" && <div className="tourist-artisan-related-activities">{relatedActivities.map((activity) => <Link to={`/tourist/activity/${activity.id}`} key={activity.id}><img src={activity.image} alt="" /><span><strong>{activity.title}</strong><small><MapPin size={13} /> {activity.place}</small><small><CalendarDays size={13} /> {activity.schedule}</small></span><ArrowRight size={15} /></Link>)}</div>}
         {tab === "Hình ảnh & Video" && <div className="tourist-artisan-media-gallery">{gallery.map((image, index) => <div key={`${image}-${index}`}><img src={image} alt={`Hình ảnh ${index + 1} về nghệ nhân ${artisan.name}`} />{index === 0 && <span><Play size={16} fill="currentColor" /></span>}</div>)}</div>}
       </div>
@@ -125,11 +124,9 @@ function ArtisanTabs({ artisan, products, activities, gallery }) {
 }
 
 function FeaturedProducts({ artisan, products }) {
-  const keyword = (artisan.product || artisan.craft).toLocaleLowerCase("vi").split(" ")[0];
-  const matchingProducts = products.filter((product) =>
-    `${product.title} ${product.category}`.toLocaleLowerCase("vi").includes(keyword),
-  );
-  const featuredProducts = (matchingProducts.length ? matchingProducts : products).slice(0, 5);
+  const featuredProducts = products
+    .filter((product) => product.artisanId === artisan.id)
+    .slice(0, 5);
 
   return (
     <section className="tourist-artisan-featured-products">
@@ -145,12 +142,14 @@ function FeaturedProducts({ artisan, products }) {
             <strong>{product.title}</strong>
           </Link>
         ))}
+        {!featuredProducts.length && <p>Nghệ nhân chưa đăng sản phẩm.</p>}
       </div>
     </section>
   );
 }
 
 function ReviewAndMap({ artisan, activities }) {
+  const artisanActivities = activities.filter((activity) => activity.artisanId === artisan.id);
   return (
     <div className="tourist-artisan-detail-aside">
       <section className="tourist-artisan-location-card">
@@ -161,22 +160,21 @@ function ReviewAndMap({ artisan, activities }) {
         </a>
         <p><MapPin size={14} /> {artisan.place}</p>
         <strong>Thông tin liên hệ</strong>
-        <a href={`tel:${(artisan.phone || "0900000000").replaceAll(" ", "")}`}><Phone size={14} /> {artisan.phone || "0900 000 000"}</a>
-        <a href="mailto:hello@tinhhoaviet.vn"><Mail size={14} /> hello@tinhhoaviet.vn</a>
+        {artisan.phone && <a href={`tel:${artisan.phone.replaceAll(" ", "")}`}><Phone size={14} /> {artisan.phone}</a>}
       </section>
       <section className="tourist-artisan-reviews-card">
         <h2><Star size={19} fill="currentColor" /> Đánh giá từ du khách</h2>
-        <div className="tourist-artisan-review-average"><strong>{artisan.rating || "4.8"}/5</strong><span>({artisan.reviews} đánh giá)</span></div>
-        {[["5 sao", "72%"], ["4 sao", "18%"], ["3 sao", "6%"], ["2 sao", "2%"], ["1 sao", "2%"]].map(([label, value]) => <div className="tourist-artisan-rating-bar" key={label}><span>{label}</span><i><b style={{ width: value }} /></i><small>{value}</small></div>)}
-        {[["L", "Lê Văn Tùng", "Trải nghiệm rất thú vị, nghệ nhân thân thiện và nhiệt tình."], ["N", "Nguyễn Thị Hạnh", "Được tìm hiểu câu chuyện nghề rất đáng nhớ."]].map(([initial, name, review]) => <article key={name}><span className="tourist-artisan-review-avatar">{initial}</span><div><b>{name}</b><small>★★★★★</small><p>{review}</p></div></article>)}
+        {artisan.rating
+          ? <div className="tourist-artisan-review-average"><strong>{artisan.rating}/5</strong><span>({artisan.reviews} đánh giá)</span></div>
+          : <p>Chưa có đánh giá được duyệt.</p>}
         <Link to="/tourist/reviews">Xem tất cả nhận xét <ArrowRight size={13} /></Link>
       </section>
-      {activities[0] && <Link className="tourist-artisan-activity-card" to={`/tourist/activity/${activities[0].id}`}><small>HOẠT ĐỘNG TRẢI NGHIỆM</small><b>{activities[0].title}</b><span>Khám phá cùng nghệ nhân <ArrowRight size={13} /></span><img src={activities[0].image} alt="" /></Link>}
+      {artisanActivities[0] && <Link className="tourist-artisan-activity-card" to={`/tourist/activity/${artisanActivities[0].id}`}><small>HOẠT ĐỘNG TRẢI NGHIỆM</small><b>{artisanActivities[0].title}</b><span>Khám phá cùng nghệ nhân <ArrowRight size={13} /></span><img src={artisanActivities[0].image} alt="" /></Link>}
     </div>
   );
 }
 
-export function ArtisanDetail({ artisan, products, activities, favoriteIds, onFavorite, onNotice }) {
+export function ArtisanDetail({ artisan, products, activities, stories, favoriteIds, onFavorite, onNotice }) {
   const [photo, setPhoto] = useState(2);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const saved = favoriteIds.includes(artisan.id);
@@ -194,16 +192,18 @@ export function ArtisanDetail({ artisan, products, activities, favoriteIds, onFa
         </div>
 
         <div className="tourist-artisan-profile">
-          <h1>{artisan.name} <BadgeCheck size={23} fill="currentColor" /></h1>
+          <h1>{artisan.name} {artisan.verified && <BadgeCheck size={23} fill="currentColor" />}</h1>
           <p className="tourist-artisan-craft-title">Nghệ nhân {artisan.craft.toLocaleLowerCase("vi")}</p>
-          <div className="tourist-artisan-rating"><span>{"★".repeat(Math.round(Number(artisan.rating) || 5))}</span><b>{artisan.rating || "4.8"}</b><small>({artisan.reviews} đánh giá)</small></div>
+          {artisan.rating
+            ? <div className="tourist-artisan-rating"><span>{"★".repeat(Math.round(Number(artisan.rating)))}</span><b>{artisan.rating}</b><small>({artisan.reviews} đánh giá)</small></div>
+            : <p className="tourist-artisan-rating">Chưa có đánh giá</p>}
           <div className="tourist-artisan-facts">
             <span><MapPin size={17} />{artisan.place}</span>
-            <span><Clock3 size={17} />{artisan.years || 20} năm kinh nghiệm</span>
-            <span><ShieldCheck size={17} />Đã xác minh nghệ nhân</span>
+            {artisan.years && <span><Clock3 size={17} />{artisan.years} năm kinh nghiệm</span>}
+            {artisan.verified && <span><ShieldCheck size={17} />Đã xác minh nghệ nhân</span>}
           </div>
           <p>
-            {artisan.description}
+            {artisan.description || "Nghệ nhân đang cập nhật thông tin giới thiệu."}
             {showFullDescription && ` Từ tình yêu với nghề và sự kiên trì qua năm tháng, ${artisan.name} mong muốn chia sẻ tri thức và truyền cảm hứng gìn giữ nghề truyền thống cho thế hệ tiếp nối. Những giá trị văn hóa ấy tiếp tục được trao truyền và lan tỏa đến cộng đồng.`}
           </p>
           <button type="button" className="tourist-artisan-more-link" aria-expanded={showFullDescription} onClick={() => setShowFullDescription((expanded) => !expanded)}>
@@ -215,7 +215,7 @@ export function ArtisanDetail({ artisan, products, activities, favoriteIds, onFa
       </section>
       <section className="tourist-artisan-detail-lower">
         <div className="tourist-artisan-detail-primary">
-          <ArtisanTabs artisan={artisan} products={products} activities={activities} gallery={gallery} />
+          <ArtisanTabs artisan={artisan} products={products} activities={activities} stories={stories} gallery={gallery} />
           <FeaturedProducts artisan={artisan} products={products} />
         </div>
         <ReviewAndMap artisan={artisan} activities={activities} />

@@ -13,15 +13,42 @@ import {
   Play,
   ShieldCheck,
   Star,
+  UserRound,
   Users,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../routes/path.js";
 
-export function ActivityDetail({ item, favoriteIds, onFavorite, onNotice, mediaItems }) {
+export function ActivityDetail({ item, favoriteIds, onFavorite, mediaItems, onBooking }) {
   const [activePhoto, setActivePhoto] = useState(0);
   const [activeTab, setActiveTab] = useState("Giới thiệu");
   const [participants, setParticipants] = useState(1);
+  const [startTime, setStartTime] = useState("08:00");
+  const [contactName, setContactName] = useState(() => {
+    try {
+      return JSON.parse(window.localStorage.getItem("auth-user") || "null")?.name || "";
+    } catch {
+      return "";
+    }
+  });
+  const [contactEmail, setContactEmail] = useState(() => {
+    try {
+      return JSON.parse(window.localStorage.getItem("auth-user") || "null")?.email || "";
+    } catch {
+      return "";
+    }
+  });
+  const [contactPhone, setContactPhone] = useState(() => {
+    try {
+      return JSON.parse(window.localStorage.getItem("auth-user") || "null")?.phone || "";
+    } catch {
+      return "";
+    }
+  });
+  const [note, setNote] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const today = new Date();
+  const minDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   const [date, setDate] = useState(() => {
     const defaultDate = new Date();
     defaultDate.setDate(defaultDate.getDate() + 3);
@@ -37,9 +64,22 @@ export function ActivityDetail({ item, favoriteIds, onFavorite, onNotice, mediaI
     "Mang về sản phẩm do chính tay mình làm",
   ];
 
-  const submitBooking = (event) => {
+  const submitBooking = async (event) => {
     event.preventDefault();
-    onNotice(`Đã nhận đăng ký ${participants} người cho ngày ${date}. Chúng tôi sẽ liên hệ xác nhận.`);
+    setIsSubmitting(true);
+    try {
+      await onBooking({
+        experienceDate: date,
+        startTime,
+        participants,
+        contactName,
+        contactEmail,
+        contactPhone,
+        note,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -102,6 +142,7 @@ export function ActivityDetail({ item, favoriteIds, onFavorite, onNotice, mediaI
 
           <div className="tourist-activity-detail-facts">
             <div><MapPin size={18} /><span><strong>Địa điểm</strong><small>{item.place}</small></span></div>
+            {item.artisan && <div><UserRound size={18} /><span><strong>Nghệ nhân tổ chức</strong><small>{item.artisan}</small></span></div>}
             <div><Clock3 size={18} /><span><strong>Thời lượng</strong><small>{item.duration || "2 giờ"}</small></span></div>
             <div><Users size={18} /><span><strong>Số người tối đa</strong><small>{maxParticipants} người</small></span></div>
             <div><CalendarCheck size={18} /><span><strong>Thời gian tổ chức</strong><small>{item.schedule || "Thứ 7, Chủ nhật hằng tuần"}</small></span></div>
@@ -118,14 +159,26 @@ export function ActivityDetail({ item, favoriteIds, onFavorite, onNotice, mediaI
           <h2>Đặt lịch tham gia</h2>
           <form onSubmit={submitBooking}>
             <label htmlFor="activity-date"><CalendarDays size={16} /> Chọn ngày tham gia</label>
-            <input id="activity-date" type="date" min={new Date().toISOString().slice(0, 10)} value={date} onChange={(event) => setDate(event.target.value)} required />
+            <input id="activity-date" type="date" min={minDate} value={date} onChange={(event) => setDate(event.target.value)} required />
+            <label htmlFor="activity-start-time"><Clock3 size={16} /> Giờ bắt đầu</label>
+            <input id="activity-start-time" type="time" value={startTime} onChange={(event) => setStartTime(event.target.value)} required />
+            <label htmlFor="booking-contact-name">Tên người liên hệ</label>
+            <input id="booking-contact-name" type="text" value={contactName} onChange={(event) => setContactName(event.target.value)} maxLength={100} required />
+            <label htmlFor="booking-contact-phone">Số điện thoại</label>
+            <input id="booking-contact-phone" type="tel" value={contactPhone} onChange={(event) => setContactPhone(event.target.value)} maxLength={30} required />
+            <label htmlFor="booking-contact-email">Email liên hệ</label>
+            <input id="booking-contact-email" type="email" value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} maxLength={255} required />
+            <label htmlFor="booking-note">Ghi chú (không bắt buộc)</label>
+            <textarea id="booking-note" value={note} onChange={(event) => setNote(event.target.value)} maxLength={2000} rows={3} />
             <span className="tourist-activity-booking-label"><Users size={17} /> Số lượng người</span>
             <div className="tourist-activity-quantity">
               <button type="button" aria-label="Giảm số người" disabled={participants <= 1} onClick={() => setParticipants((current) => Math.max(1, current - 1))}>−</button>
               <output aria-live="polite">{participants}</output>
               <button type="button" aria-label="Tăng số người" disabled={participants >= maxParticipants} onClick={() => setParticipants((current) => Math.min(maxParticipants, current + 1))}>+</button>
             </div>
-            <button type="submit" className="tourist-activity-booking-submit"><CalendarDays size={16} /> Đăng ký ngay</button>
+            <button type="submit" className="tourist-activity-booking-submit" disabled={isSubmitting}>
+              <CalendarDays size={16} /> {isSubmitting ? "Đang gửi..." : "Đặt lịch trải nghiệm"}
+            </button>
           </form>
           <div className="tourist-activity-booking-note"><Info size={16} /><span>Miễn phí hủy trước 24h<br />trước sự kiện</span></div>
           <div className="tourist-activity-booking-art" aria-hidden="true">⌂</div>

@@ -15,55 +15,53 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
-import {
-  DEFAULT_ARTISAN_EXPERIENCES,
-  readArtisanExperiences,
-} from "../../services/artisanExperienceStorage.js";
+import artisanExperienceService from "../../services/artisanExperienceService.js";
+import { getProfileImageUrl } from "../../services/artisanProfileService.js";
 import "../../styles/ArtisanRegistrationsPage.css";
-
-const demoRegistrations = {
-  1: [
-    { id: "b-101", name: "Nguyễn Minh Anh", email: "minhanh@gmail.com", phone: "0912 345 678", registeredAt: "2026-10-25T14:30", participants: 2, status: "confirmed" },
-    { id: "b-102", name: "Trần Hoàng Nam", email: "hoangnam@gmail.com", phone: "0987 123 456", registeredAt: "2026-10-26T09:10", participants: 1, status: "confirmed" },
-    { id: "b-103", name: "Lê Thu Hà", email: "thuha@gmail.com", phone: "0903 456 789", registeredAt: "2026-10-27T16:20", participants: 1, status: "confirmed" },
-    { id: "b-104", name: "Phạm Quốc Bảo", email: "quocbao@gmail.com", phone: "0938 765 432", registeredAt: "2026-10-28T11:45", participants: 1, status: "pending" },
-    { id: "b-105", name: "Hoàng Bảo Ngọc", email: "baongoc@gmail.com", phone: "0905 221 436", registeredAt: "2026-10-29T08:30", participants: 1, status: "confirmed" },
-    { id: "b-106", name: "Vũ Khánh Linh", email: "khanhlinh@gmail.com", phone: "0986 445 112", registeredAt: "2026-10-30T13:15", participants: 1, status: "confirmed" },
-    { id: "b-107", name: "Đỗ Tuấn Kiệt", email: "tuankiet@gmail.com", phone: "0914 328 672", registeredAt: "2026-10-31T10:00", participants: 1, status: "confirmed" },
-    { id: "b-108", name: "Bùi Thanh Trúc", email: "thanhtruc@gmail.com", phone: "0971 553 019", registeredAt: "2026-11-01T17:20", participants: 1, status: "confirmed" },
-  ],
-  2: [
-    { id: "b-201", name: "Đỗ Ngọc Mai", email: "ngocmai@gmail.com", phone: "0911 228 899", registeredAt: "2026-10-29T15:40", participants: 2, status: "confirmed" },
-    { id: "b-202", name: "Vũ Đức Minh", email: "ducminh@gmail.com", phone: "0964 331 221", registeredAt: "2026-10-30T12:15", participants: 1, status: "confirmed" },
-    { id: "b-203", name: "Nguyễn Khánh Linh", email: "khanhlinh@gmail.com", phone: "0908 442 118", registeredAt: "2026-11-01T09:20", participants: 3, status: "pending" },
-    { id: "b-204", name: "Bùi Thanh Tùng", email: "thanhtung@gmail.com", phone: "0977 582 139", registeredAt: "2026-11-02T18:05", participants: 2, status: "confirmed" },
-  ],
-  3: [
-    { id: "b-301", name: "Hoàng Yến Nhi", email: "yennhi@gmail.com", phone: "0906 756 221", registeredAt: "2026-11-04T08:25", participants: 3, status: "confirmed" },
-    { id: "b-302", name: "Trần Gia Huy", email: "giahuy@gmail.com", phone: "0982 390 881", registeredAt: "2026-11-05T15:45", participants: 2, status: "pending" },
-    { id: "b-303", name: "Phan Bảo Ngọc", email: "baongoc@gmail.com", phone: "0915 663 240", registeredAt: "2026-11-06T10:30", participants: 2, status: "confirmed" },
-    { id: "b-304", name: "Lý Nhật Vy", email: "nhatvy@gmail.com", phone: "0932 178 544", registeredAt: "2026-11-07T14:10", participants: 2, status: "confirmed" },
-    { id: "b-305", name: "Đặng Hoài Phương", email: "hoaiphuong@gmail.com", phone: "0968 227 316", registeredAt: "2026-11-08T11:20", participants: 3, status: "confirmed" },
-  ],
-  4: [
-    { id: "b-401", name: "Mai Tuấn Kiệt", email: "tuankiet@gmail.com", phone: "0918 435 772", registeredAt: "2026-11-10T09:00", participants: 2, status: "confirmed" },
-    { id: "b-402", name: "Ngô Thùy Dương", email: "thuyduong@gmail.com", phone: "0907 663 229", registeredAt: "2026-11-11T13:35", participants: 1, status: "pending" },
-    { id: "b-403", name: "Đinh Anh Khoa", email: "anhkhoa@gmail.com", phone: "0975 113 908", registeredAt: "2026-11-12T16:50", participants: 3, status: "confirmed" },
-  ],
-};
 
 const bookingStatusLabels = {
   confirmed: "Đã xác nhận",
   pending: "Chờ xác nhận",
+  rejected: "Đã từ chối",
+  cancelled: "Đã hủy",
+  completed: "Đã hoàn thành",
 };
 
-function getBookings(activityId, registrations = demoRegistrations) {
-  return (registrations[activityId] || []).filter((booking) => booking.status !== "rejected");
+function getBookings(activityId, registrations) {
+  return registrations[activityId] || [];
 }
 
-function getParticipantCount(activityId, registrations = demoRegistrations) {
+function getParticipantCount(activityId, registrations) {
   return getBookings(activityId, registrations)
+    .filter((booking) => ["pending", "confirmed"].includes(booking.status))
     .reduce((total, booking) => total + booking.participants, 0);
+}
+
+function groupBookings(bookings) {
+  return bookings.reduce((groups, booking) => {
+    const activityId = String(booking.activity_id);
+    if (!groups[activityId]) groups[activityId] = [];
+    groups[activityId].push({
+      id: String(booking.id),
+      image: booking.image ? getProfileImageUrl(booking.image) : "",
+      name: booking.contact_name,
+      email: booking.contact_email,
+      phone: booking.contact_phone,
+      registeredAt: booking.requested_at,
+      experienceDate: booking.experience_date,
+      startTime: booking.start_time,
+      endTime: booking.end_time,
+      participants: Number(booking.participants),
+      status: booking.status,
+      rejectionReason: booking.rejection_reason,
+    });
+    return groups;
+  }, {});
+}
+
+function bookingHasEnded(booking) {
+  if (!booking.experienceDate || !booking.endTime) return false;
+  return new Date(`${String(booking.experienceDate).slice(0, 10)}T${booking.endTime}:00`) < new Date();
 }
 
 function getScheduleStatus(schedule) {
@@ -121,13 +119,16 @@ function RegistrationDetailView({
   const [showPendingOnly, setShowPendingOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const allBookings = getBookings(activity.id, registrations);
-  const pendingCount = allBookings.filter((booking) => booking.status === "pending").length;
+  const pendingCount = allBookings.filter((booking) => booking.status === "pending"
+    || (booking.status === "confirmed" && bookingHasEnded(booking))).length;
   const visibleBookings = showPendingOnly
-    ? allBookings.filter((booking) => booking.status === "pending")
+    ? allBookings.filter((booking) => booking.status === "pending"
+      || (booking.status === "confirmed" && bookingHasEnded(booking)))
     : allBookings;
   const pageSize = 8;
   const pageCount = Math.max(1, Math.ceil(visibleBookings.length / pageSize));
-  const pageBookings = visibleBookings.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const displayPage = Math.min(currentPage, pageCount);
+  const pageBookings = visibleBookings.slice((displayPage - 1) * pageSize, displayPage * pageSize);
   const participantCount = visibleBookings.reduce(
     (total, booking) => total + booking.participants,
     0,
@@ -136,10 +137,6 @@ function RegistrationDetailView({
     (total, booking) => total + booking.participants,
     0,
   );
-  useEffect(() => {
-    setCurrentPage((page) => Math.min(page, pageCount));
-  }, [pageCount]);
-
   const schedule = formatSchedule(activity.schedule);
   const scheduleStatus = getScheduleStatus(activity.schedule);
   const gallery = [
@@ -220,7 +217,7 @@ function RegistrationDetailView({
               aria-pressed={showPendingOnly}
               onClick={changePendingFilter}
             >
-              {showPendingOnly ? "Tất cả đăng ký" : "Danh sách chờ xác nhận"}
+              {showPendingOnly ? "Tất cả đăng ký" : "Danh sách cần xử lý"}
               {!showPendingOnly && <span>{pendingCount}</span>}
             </button>
           </header>
@@ -262,20 +259,32 @@ function RegistrationDetailView({
                         {showPendingOnly && (
                           <td>
                             <div className="registration-review-actions">
-                              <button
-                                className="registration-confirm-button"
-                                type="button"
-                                onClick={() => onStatusChange(activity.id, booking.id, "confirmed")}
-                              >
-                                <Check size={14} /> Xác nhận
-                              </button>
-                              <button
-                                className="registration-reject-button"
-                                type="button"
-                                onClick={() => onStatusChange(activity.id, booking.id, "rejected")}
-                              >
-                                <X size={14} /> Từ chối
-                              </button>
+                              {booking.status === "pending" ? (
+                                <>
+                                  <button
+                                    className="registration-confirm-button"
+                                    type="button"
+                                    onClick={() => onStatusChange(booking.id, "confirmed")}
+                                  >
+                                    <Check size={14} /> Xác nhận
+                                  </button>
+                                  <button
+                                    className="registration-reject-button"
+                                    type="button"
+                                    onClick={() => onStatusChange(booking.id, "rejected")}
+                                  >
+                                    <X size={14} /> Từ chối
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  className="registration-confirm-button"
+                                  type="button"
+                                  onClick={() => onStatusChange(booking.id, "completed")}
+                                >
+                                  <Check size={14} /> Ghi nhận hoàn thành
+                                </button>
+                              )}
                             </div>
                           </td>
                         )}
@@ -298,16 +307,16 @@ function RegistrationDetailView({
               <button
                 type="button"
                 aria-label="Trang trước"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={displayPage === 1}
+                onClick={() => setCurrentPage(Math.max(1, displayPage - 1))}
               >
                 <ChevronRight size={16} />
               </button>
               {Array.from({ length: pageCount }, (_, index) => index + 1).map((page) => (
                 <button
                   type="button"
-                  className={page === currentPage ? "active" : ""}
-                  aria-current={page === currentPage ? "page" : undefined}
+                  className={page === displayPage ? "active" : ""}
+                  aria-current={page === displayPage ? "page" : undefined}
                   key={page}
                   onClick={() => setCurrentPage(page)}
                 >
@@ -317,8 +326,8 @@ function RegistrationDetailView({
               <button
                 type="button"
                 aria-label="Trang sau"
-                disabled={currentPage === pageCount}
-                onClick={() => setCurrentPage((page) => Math.min(pageCount, page + 1))}
+                disabled={displayPage === pageCount}
+                onClick={() => setCurrentPage(Math.min(pageCount, displayPage + 1))}
               >
                 <ChevronRight size={16} />
               </button>
@@ -341,13 +350,46 @@ function RegistrationDetailView({
 
 export default function ArtisanRegistrationsPage() {
   const notify = useArtisanToast();
-  const [activities] = useState(() => readArtisanExperiences(DEFAULT_ARTISAN_EXPERIENCES));
-  const [registrations, setRegistrations] = useState(demoRegistrations);
+  const [activities, setActivities] = useState([]);
+  const [registrations, setRegistrations] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataError, setDataError] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
   const [calendarView, setCalendarView] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      artisanExperienceService.list(),
+      artisanExperienceService.listBookings(),
+    ])
+      .then(([savedActivities, savedBookings]) => {
+        if (!active) return;
+        const groupedBookings = groupBookings(savedBookings);
+        setActivities(savedActivities.map((activity) => ({
+          ...activity,
+          id: String(activity.id),
+          craft: activity.craft || activity.category || "",
+          duration: `${activity.duration} phút`,
+          image: activity.image
+            ? getProfileImageUrl(activity.image)
+            : groupedBookings[String(activity.id)]?.find((booking) => booking.image)?.image || "",
+        })));
+        setRegistrations(groupedBookings);
+      })
+      .catch((error) => {
+        if (active) setDataError(error.message);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const stats = useMemo(() => {
     const totalParticipants = activities.reduce(
@@ -398,18 +440,46 @@ export default function ArtisanRegistrationsPage() {
       .sort((a, b) => new Date(a.schedule) - new Date(b.schedule));
   }, [activities, registrations, search, statusFilter, timeFilter]);
 
-  const handleRegistrationStatusChange = (activityId, bookingId, status) => {
-    if (status === "rejected" && !window.confirm("Bạn có chắc muốn từ chối đăng ký này không?")) {
+  const handleRegistrationStatusChange = async (bookingId, status) => {
+    let reason = "";
+    if (status === "rejected") {
+      if (!window.confirm("Bạn có chắc muốn từ chối đăng ký này không?")) return;
+      const enteredReason = window.prompt("Lý do từ chối (không bắt buộc):");
+      if (enteredReason === null) return;
+      reason = enteredReason;
+    }
+
+    try {
+      await artisanExperienceService.updateBookingStatus(bookingId, status, reason);
+    } catch (error) {
+      notify(error.message, "error");
       return;
     }
 
-    setRegistrations((current) => ({
-      ...current,
-      [activityId]: (current[activityId] || []).map((booking) => (
-        booking.id === bookingId ? { ...booking, status } : booking
-      )),
-    }));
-    notify(status === "confirmed" ? "Đã xác nhận đăng ký." : "Đã từ chối đăng ký.");
+    setRegistrations((current) => Object.fromEntries(
+      Object.entries(current).map(([activityId, bookings]) => [
+        activityId,
+        bookings.map((booking) => booking.id === String(bookingId)
+          ? {
+            ...booking,
+            status,
+            rejectionReason: status === "rejected" ? reason : null,
+          }
+          : booking),
+      ]),
+    ));
+
+    try {
+      const savedBookings = await artisanExperienceService.listBookings();
+      setRegistrations(groupBookings(savedBookings));
+      notify(status === "confirmed"
+        ? "Đã xác nhận đăng ký."
+        : status === "completed"
+          ? "Đã ghi nhận hoạt động hoàn thành."
+          : "Đã từ chối đăng ký.");
+    } catch (error) {
+      notify(`Đã cập nhật trạng thái nhưng không thể tải lại danh sách: ${error.message}`, "error");
+    }
   };
 
   if (selectedActivity) {
@@ -457,6 +527,8 @@ export default function ArtisanRegistrationsPage() {
           <div><span>Sắp diễn ra</span><strong>{stats.upcoming}</strong></div>
         </article>
       </section>
+      {dataError && <p className="registrations-load-error" role="alert">{dataError}</p>}
+      {isLoading && <p className="registrations-load-error" role="status">Đang tải dữ liệu đăng ký...</p>}
 
       <section className="registrations-toolbar" aria-label="Tìm kiếm và lọc đăng ký">
         <label className="registrations-search">

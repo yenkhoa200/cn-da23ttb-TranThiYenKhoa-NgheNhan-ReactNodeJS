@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+
 const routeFor = (artisan) => `/tourist/artisan/${artisan.id}`;
 
 function ArtisanHero() {
@@ -35,7 +36,9 @@ function ArtisanCard({ artisan, favoriteIds, onFavorite }) {
   return (
     <article className="tourist-artisan-card">
       <Link to={routeFor(artisan)} className="tourist-artisan-card-image">
-        <img src={artisan.image} alt={artisan.name} loading="lazy" />
+        {artisan.image
+          ? <img src={artisan.image} alt={artisan.name} loading="lazy" />
+          : <span className="tourist-artisan-card-placeholder" aria-hidden="true"><Users size={28} /></span>}
       </Link>
       <button
         type="button"
@@ -47,12 +50,14 @@ function ArtisanCard({ artisan, favoriteIds, onFavorite }) {
       </button>
       <div className="tourist-artisan-card-body">
         <Link className="tourist-artisan-card-name" to={routeFor(artisan)}>
-          {artisan.name}<BadgeCheck size={14} fill="currentColor" />
+          {artisan.name}{artisan.verified && <BadgeCheck size={14} fill="currentColor" />}
         </Link>
         <span><Users size={13} /> Nghề: {artisan.craft}</span>
         <span><MapPin size={13} /> {artisan.place}</span>
         <div className="tourist-artisan-card-bottom">
-          <small><Star size={14} fill="currentColor" /> {artisan.rating} <i>({artisan.reviews} đánh giá)</i></small>
+          {artisan.rating
+            ? <small><Star size={14} fill="currentColor" /> {artisan.rating} <i>({artisan.reviews} đánh giá)</i></small>
+            : <small>Chưa có đánh giá</small>}
           <Link to={routeFor(artisan)}>Xem chi tiết <ArrowRight size={13} /></Link>
         </div>
       </div>
@@ -60,10 +65,10 @@ function ArtisanCard({ artisan, favoriteIds, onFavorite }) {
   );
 }
 
-function DiscoverMore({ crafts, products, stories }) {
+function DiscoverMore({ crafts, traditionalCrafts, products, stories }) {
   const entries = [
     { title: "Làng nghề Việt Nam", image: crafts[0]?.image, href: "/tourist/crafts", action: "Tìm hiểu ngay" },
-    { title: "Nghề truyền thống nổi bật", image: crafts[1]?.image || crafts[0]?.image, href: "/tourist/crafts", action: "Khám phá" },
+    { title: "Nghề truyền thống nổi bật", image: traditionalCrafts[0]?.image, href: "/tourist/traditional-crafts", action: "Khám phá" },
     { title: "Giá trị văn hóa qua bàn tay nghệ nhân", image: products[0]?.image || stories[0]?.image, href: "/tourist/stories", action: "Đọc ngay" },
   ].filter((entry) => entry.image);
   return (
@@ -80,7 +85,7 @@ function DiscoverMore({ crafts, products, stories }) {
   );
 }
 
-export function ArtisanListing({ artisans, crafts, products, stories, favoriteIds, onFavorite, query, onQuery }) {
+export function ArtisanListing({ artisans, crafts, traditionalCrafts, products, stories, favoriteIds, onFavorite, query, onQuery }) {
   const [craft, setCraft] = useState("Nghề truyền thống");
   const [place, setPlace] = useState("Địa phương");
   const [sort, setSort] = useState("Sắp xếp");
@@ -122,7 +127,7 @@ export function ArtisanListing({ artisans, crafts, products, stories, favoriteId
             {filtered.length ? <div className="tourist-artisans-grid">{filtered.map((item) => <ArtisanCard key={item.id} artisan={item} favoriteIds={favoriteIds} onFavorite={onFavorite} />)}</div> : <p className="tourist-empty">Không tìm thấy nghệ nhân phù hợp. Hãy thử từ khóa hoặc bộ lọc khác.</p>}
             {filtered.length > 0 && <nav className="tourist-artisans-pagination" aria-label="Phân trang nghệ nhân"><button type="button" aria-label="Trang trước" disabled><ArrowLeft size={15} /></button><button type="button" className="active" aria-current="page">1</button><button type="button" disabled>2</button><button type="button" disabled>3</button><button type="button" aria-label="Trang sau" disabled><ArrowRight size={15} /></button></nav>}
           </section>
-          <DiscoverMore crafts={crafts} products={products} stories={stories} />
+          <DiscoverMore crafts={crafts} traditionalCrafts={traditionalCrafts} products={products} stories={stories} />
         </div>
       </div>
     </div>

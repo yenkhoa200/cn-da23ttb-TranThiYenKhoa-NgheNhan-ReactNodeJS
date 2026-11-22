@@ -68,7 +68,9 @@ const artisanExperienceController = {
   async listPublic(req, res, next) {
     try {
       const result = await pool.query(
-        `SELECT hd.ma_hd AS id, hd.ten_hd AS title, nt.ten_nghe AS category,
+        `SELECT hd.ma_hd AS id, hd.ma_nn AS artisan_id,
+                hd.ten_hd AS title, nt.ten_nghe AS category,
+                tk.ho_ten AS artisan,
                 hd.mo_ta_hd AS description, hd.dia_diem_to_chuc AS place,
                 hd.thoi_luong_phut AS duration, hd.sl_tham_gia_max AS max_participants,
                 hd.thoi_gian_to_chuc AS schedule,
@@ -79,9 +81,21 @@ const artisanExperienceController = {
                   WHERE pt.ma_hd = hd.ma_hd AND pt.loai_tu_lieu = 'hinh_anh'
                   ORDER BY pt.ngay_tai_len DESC, pt.ma_pt DESC
                   LIMIT 1
-                ) AS image
+                ) AS image,
+                coalesce((
+                  SELECT json_agg(json_build_object(
+                    'id', pt.ma_pt,
+                    'type', pt.loai_tu_lieu,
+                    'url', pt.duong_dan_tep,
+                    'caption', pt.chu_thich
+                  ) ORDER BY pt.ngay_tai_len DESC, pt.ma_pt DESC)
+                  FROM da_phuong_tien pt
+                  WHERE pt.ma_hd = hd.ma_hd
+                ), '[]'::json) AS media
          FROM hoat_dong_trai_nghiem hd
-         JOIN tai_khoan tk ON tk.ma_tk = hd.ma_nn AND tk.trang_thai_tk = 'hoat_dong'
+         JOIN tai_khoan tk ON tk.ma_tk = hd.ma_nn
+           AND tk.vai_tro = 'nghe_nhan'
+           AND tk.trang_thai_tk = 'hoat_dong'
          LEFT JOIN nghe_truyen_thong nt ON nt.ma_nghe = hd.ma_nghe
          WHERE hd.trang_thai_hd = 'dang_mo'
          ORDER BY hd.ngay_tao DESC, hd.ma_hd DESC`

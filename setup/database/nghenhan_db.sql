@@ -224,6 +224,41 @@ CREATE TABLE dat_lich_trai_nghiem (
     CONSTRAINT ck_dl_trang_thai CHECK (trang_thai_dl IN
         ('cho_xac_nhan', 'da_xac_nhan', 'bi_tu_choi', 'da_huy', 'hoan_thanh'))
 );
+ALTER TABLE dat_lich_trai_nghiem
+    ADD COLUMN IF NOT EXISTS ten_lien_he VARCHAR(100),
+    ADD COLUMN IF NOT EXISTS email_lien_he VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS sdt_lien_he VARCHAR(30),
+    ADD COLUMN IF NOT EXISTS ly_do_tu_choi TEXT,
+    ADD COLUMN IF NOT EXISTS ly_do_huy TEXT;
+
+
+-- =====================================================================
+-- 5..1 LỊCH SỬ ĐẶT LỊCH TRẢI NGHIỆM
+-- =====================================================================
+CREATE TABLE lich_su_dat_lich_trai_nghiem (
+    ma_lsd          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ma_dl           BIGINT NOT NULL REFERENCES dat_lich_trai_nghiem (ma_dl) ON DELETE CASCADE,
+    trang_thai_cu   VARCHAR(20),
+    trang_thai_moi  VARCHAR(20) NOT NULL,
+    ma_tk_thay_doi  BIGINT REFERENCES tai_khoan (ma_tk) ON DELETE SET NULL,
+    ly_do           TEXT,
+    thoi_diem       TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT ck_lsd_trang_thai_cu CHECK (
+        trang_thai_cu IS NULL OR trang_thai_cu IN
+        ('cho_xac_nhan', 'da_xac_nhan', 'bi_tu_choi', 'da_huy', 'hoan_thanh')
+    ),
+    CONSTRAINT ck_lsd_trang_thai_moi CHECK (trang_thai_moi IN
+        ('cho_xac_nhan', 'da_xac_nhan', 'bi_tu_choi', 'da_huy', 'hoan_thanh'))
+);
+
+-- =========================================================
+-- 3. TẠO INDEX TĂNG TỐC ĐỘ TRUY VẤN
+-- =========================================================
+CREATE INDEX ix_dl_tk_ngay ON dat_lich_trai_nghiem (ma_tk, ngay_dl DESC);
+CREATE INDEX ix_dl_hd_ngay_trang_thai ON dat_lich_trai_nghiem
+    (ma_hd, ngay_trai_nghiem, trang_thai_dl);
+CREATE INDEX ix_lsd_dl_thoi_diem ON lich_su_dat_lich_trai_nghiem (ma_dl, thoi_diem);
+
 
 -- =====================================================================
 -- 6. YÊU THÍCH & ĐÁNH GIÁ (mỗi bản ghi trỏ tới đúng MỘT đối tượng)

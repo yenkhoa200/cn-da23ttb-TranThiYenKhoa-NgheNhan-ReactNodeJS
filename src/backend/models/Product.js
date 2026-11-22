@@ -22,7 +22,11 @@ const Product = {
        FROM san_pham sp
        JOIN tai_khoan tk ON tk.ma_tk = sp.ma_nn
        LEFT JOIN nghe_truyen_thong nt ON nt.ma_nghe = sp.ma_nghe
-       WHERE ($1::boolean = false OR sp.trang_thai_hien_thi = 'da_dang')
+       WHERE ($1::boolean = false OR (
+               sp.trang_thai_hien_thi = 'da_dang'
+               AND tk.vai_tro = 'nghe_nhan'
+               AND tk.trang_thai_tk = 'hoat_dong'
+             ))
          AND ($2::bigint IS NULL OR sp.ma_nn = $2)
        ORDER BY sp.ngay_dang DESC, sp.ma_sp DESC`,
       [publicOnly, artisanId]
@@ -53,7 +57,11 @@ const Product = {
        JOIN tai_khoan tk ON tk.ma_tk = sp.ma_nn
        LEFT JOIN nghe_truyen_thong nt ON nt.ma_nghe = sp.ma_nghe
        WHERE sp.ma_sp = $1
-         AND ($2::boolean = false OR sp.trang_thai_hien_thi = 'da_dang')
+         AND ($2::boolean = false OR (
+               sp.trang_thai_hien_thi = 'da_dang'
+               AND tk.vai_tro = 'nghe_nhan'
+               AND tk.trang_thai_tk = 'hoat_dong'
+             ))
          AND ($3::bigint IS NULL OR sp.ma_nn = $3)`,
       [id, publicOnly, artisanId]
     );

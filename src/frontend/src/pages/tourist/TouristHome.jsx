@@ -1,23 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Bell,
-  ChevronDown,
-  Heart,
-  LogOut,
-  Search,
-  UserRound,
-  X,
-} from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import logoImg from "../../assets/icons/logo_v1.png";
+import { X } from "lucide-react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../../routes/path.js";
+import logoImg from "../../assets/icons/logo_v1.png";
 import productService from "../../services/productService.js";
 import artisanExperienceService from "../../services/artisanExperienceService.js";
-import "../../styles/TouristHome.css";
+import { getProfileImageUrl } from "../../services/artisanProfileService.js";
+import experienceBookingService from "../../services/experienceBookingService.js";
+import touristContentService from "../../services/touristContentService.js";
+import TouristLayout from "../../components/layout/TouristLayout.jsx";
 import TouristLanding from "./TouristLanding.jsx";
+import TouristBookingHistory from "./TouristBookingHistory.jsx";
 import TouristViews from "./TouristViews.jsx";
 import TouristVillagePages from "./TouristVillagePages.jsx";
 import TouristVillageDetail from "./TouristVillageDetail.jsx";
+import TouristTraditionalCrafts from "./TouristTraditionalCrafts.jsx";
+import TouristTraditionalCraftDetail from "./TouristTraditionalCraftDetail.jsx";
 
 const artisans = [
   {
@@ -434,16 +432,6 @@ const mediaItems = [
   { title: "Nét đẹp nghề truyền thống", type: "Video", image: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=700&q=85" },
 ];
 
-const navigation = [
-  { label: "Trang chủ", to: ROUTES.TOURIST, view: "home" },
-  { label: "Nghệ nhân", to: "/tourist/artisans", view: "artisans" },
-  { label: "Làng nghề", to: "/tourist/crafts", view: "crafts" },
-  { label: "Nghề truyền thống", to: "/tourist/crafts", view: "crafts" },
-  { label: "Sản phẩm", to: "/tourist/products", view: "products" },
-  { label: "Văn hóa", to: "/tourist/stories", view: "stories" },
-  { label: "Hoạt động trải nghiệm", to: "/tourist/activities", view: "activities" },
-];
-
 function readStorage(key, fallback) {
   try {
     const saved = window.localStorage.getItem(key);
@@ -453,11 +441,13 @@ function readStorage(key, fallback) {
   }
 }
 
+function publicMediaUrl(url) {
+  return url ? getProfileImageUrl(url) : "";
+}
+
 export default function TouristHome() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [headerPanel, setHeaderPanel] = useState("");
-  const headerActionsRef = useRef(null);
   const segments = location.pathname.split("/").filter(Boolean);
   const view = segments[1] || "home";
   const detailId = segments[2] || "";
@@ -466,11 +456,26 @@ export default function TouristHome() {
   const [mediaType, setMediaType] = useState("Tất cả");
   const [databaseProducts, setDatabaseProducts] = useState([]);
   const [databaseActivities, setDatabaseActivities] = useState([]);
+  const [databaseArtisans, setDatabaseArtisans] = useState([]);
+  const [databaseStories, setDatabaseStories] = useState([]);
+  const [databaseTraditionalCrafts, setDatabaseTraditionalCrafts] = useState([]);
+  const [databaseLoaded, setDatabaseLoaded] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState(() => readStorage("tourist-favorites", []));
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [rating, setRating] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [reviews, setReviews] = useState(() => readStorage("tourist-reviews", []));
+  const [authUser, setAuthUser] = useState(() => readStorage("auth-user", null));
+  const [bookingNotifications, setBookingNotifications] = useState(() => {
+    const scope = authUser?.id || authUser?.email || "guest";
+    const notifications = readStorage(`tourist-booking-notifications:${scope}`, []);
+    return {
+      scope: String(scope),
+      items: Array.isArray(notifications) ? notifications : [],
+    };
+  });
+  const [bookingNotificationError, setBookingNotificationError] = useState("");
+  const seenBookingEventsRef = useRef(null);
   const [notice, setNotice] = useState("");
   const [profile, setProfile] = useState(() => {
     const savedProfile = readStorage("tourist-profile", {});
@@ -492,14 +497,28 @@ export default function TouristHome() {
 
   useEffect(() => {
     let ignore = false;
-    Promise.all([productService.getAll(), artisanExperienceService.listPublic()])
-      .then(([savedProducts, savedActivities]) => {
+    Promise.allSettled([
+      productService.getAll(),
+      artisanExperienceService.listPublic(),
+      touristContentService.getArtisans(),
+      touristContentService.getStories(),
+      touristContentService.getTraditionalCrafts(),
+    ]).then((results) => {
         if (ignore) return;
-        setDatabaseProducts(savedProducts);
-        setDatabaseActivities(savedActivities);
-      })
-      .catch((error) => {
-        if (!ignore) setNotice(error.message);
+        const [productsResult, activitiesResult, artisansResult, storiesResult, craftsResult] = results;
+        const errors = [];
+        if (productsResult.status === "fulfilled") setDatabaseProducts(productsResult.value);
+        else errors.push(productsResult.reason.message);
+        if (activitiesResult.status === "fulfilled") setDatabaseActivities(activitiesResult.value);
+        else errors.push(activitiesResult.reason.message);
+        if (artisansResult.status === "fulfilled") setDatabaseArtisans(artisansResult.value);
+        else errors.push(artisansResult.reason.message);
+        if (storiesResult.status === "fulfilled") setDatabaseStories(storiesResult.value);
+        else errors.push(storiesResult.reason.message);
+        if (craftsResult.status === "fulfilled") setDatabaseTraditionalCrafts(craftsResult.value);
+        else errors.push(craftsResult.reason.message);
+        setDatabaseLoaded(true);
+        if (errors.length) setNotice(errors.join(" "));
       });
     return () => {
       ignore = true;
@@ -518,29 +537,11 @@ export default function TouristHome() {
     window.localStorage.setItem("tourist-profile", JSON.stringify(profile));
   }, [profile]);
 
-  useEffect(() => {
-    if (!headerPanel) return undefined;
-
-    const closeHeaderPanel = (event) => {
-      if (event.type === "keydown" && event.key === "Escape") {
-        setHeaderPanel("");
-      } else if (event.type === "pointerdown" && !headerActionsRef.current?.contains(event.target)) {
-        setHeaderPanel("");
-      }
-    };
-
-    document.addEventListener("pointerdown", closeHeaderPanel);
-    document.addEventListener("keydown", closeHeaderPanel);
-    return () => {
-      document.removeEventListener("pointerdown", closeHeaderPanel);
-      document.removeEventListener("keydown", closeHeaderPanel);
-    };
-  }, [headerPanel]);
-
   const liveProducts = useMemo(() => databaseProducts.map((item) => {
     const gallery = (item.media || [])
       .filter((entry) => entry.type === "hinh_anh")
-      .map((entry) => entry.url);
+      .map((entry) => publicMediaUrl(entry.url))
+      .filter(Boolean);
     const relatedCraft = item.craft
       ? crafts.find((craft) => craft.category === item.craft)
         || crafts.find((craft) => craft.title.toLocaleLowerCase("vi").includes(item.craft.toLocaleLowerCase("vi")))
@@ -555,36 +556,248 @@ export default function TouristHome() {
       artisan: item.artisan,
       craft: item.craft || item.category,
       craftId: relatedCraft?.id,
-      image: gallery[0] || "",
+      image: gallery[0] || logoImg,
       gallery,
       video,
       material: item.material,
       process: item.process,
+      artisanId: `artisan-${item.artisan_id}`,
     };
-  }).filter((item) => item.image), [databaseProducts]);
-  const visibleProducts = useMemo(() => [...products, ...liveProducts], [liveProducts]);
+  }), [databaseProducts]);
+  const visibleProducts = databaseLoaded ? liveProducts : products;
   const liveActivities = useMemo(() => databaseActivities
-    .map((item) => ({
-      id: `activity-${item.id}`,
+    .map((item) => {
+      const gallery = (item.media || [])
+        .filter((entry) => entry.type === "hinh_anh")
+        .map((entry) => publicMediaUrl(entry.url))
+        .filter(Boolean);
+      return {
+        id: `activity-${item.id}`,
+        title: item.title,
+        category: item.category || "Nghề truyền thống",
+        artisan: item.artisan || "",
+        artisanId: `artisan-${item.artisan_id}`,
+        place: item.place,
+        duration: `${item.duration} phút`,
+        durationHours: Number(item.duration) / 60,
+        maxParticipants: item.max_participants,
+        schedule: item.schedule,
+        minimumAge: item.requirements || "Không có yêu cầu đặc biệt",
+        image: publicMediaUrl(item.image) || gallery[0] || logoImg,
+        gallery,
+        description: item.description || "",
+      };
+    }), [databaseActivities]);
+  const visibleActivities = databaseLoaded ? liveActivities : activities;
+  const liveArtisans = useMemo(() => databaseArtisans.map((item) => {
+    const gallery = (item.media || [])
+      .filter((entry) => entry.type === "hinh_anh")
+      .map((entry) => publicMediaUrl(entry.url))
+      .filter(Boolean);
+    const images = [...new Set([publicMediaUrl(item.image), ...gallery].filter(Boolean))];
+    return {
+      id: `artisan-${item.id}`,
+      name: item.name,
+      craft: item.craft || "Nghề truyền thống",
+      place: item.place || "Đang cập nhật địa điểm",
+      rating: item.rating,
+      reviews: Number(item.reviews || 0),
+      years: item.years,
+      careerHistory: item.career_history,
+      craftVillageDescription: item.craft_village_description,
+      experienceDescription: item.experience_description,
+      product: item.craft || "Nghề truyền thống",
+      image: images[0] || logoImg,
+      gallery: images,
+      description: item.description,
+      verified: item.verified,
+    };
+  }), [databaseArtisans]);
+  const visibleArtisans = databaseLoaded ? liveArtisans : artisans;
+  const liveStories = useMemo(() => databaseStories.map((item) => {
+    const media = item.media || [];
+    const gallery = media
+      .filter((entry) => entry.type === "hinh_anh")
+      .map((entry) => publicMediaUrl(entry.url))
+      .filter(Boolean);
+    const categoryMap = {
+      cau_chuyen: "Câu chuyện làng nghề",
+      kien_thuc: "Tri thức văn hóa",
+      phong_tuc: "Phong tục và tập quán",
+      ky_thuat: "Nghề truyền thống",
+      khac: "Giá trị văn hóa",
+    };
+    return {
+      id: `story-${item.id}`,
+      category: categoryMap[item.category] || "Giá trị văn hóa",
       title: item.title,
-      category: item.category || "Nghề truyền thống",
-      place: item.place,
-      duration: `${item.duration} phút`,
-      durationHours: Number(item.duration) / 60,
-      rating: "0",
-      reviews: 0,
-      maxParticipants: item.max_participants,
-      schedule: item.schedule,
-      minimumAge: item.requirements || "Không có yêu cầu đặc biệt",
-      image: item.image || activities[0]?.image,
-      description: item.description || "",
-    })), [databaseActivities]);
-  const visibleActivities = liveActivities.length ? liveActivities : activities;
-  const allItems = useMemo(() => [...artisans, ...crafts, ...visibleProducts, ...stories, ...visibleActivities], [visibleProducts, visibleActivities]);
+      image: gallery[0] || publicMediaUrl(item.artisan_image) || logoImg,
+      gallery,
+      description: item.description || item.content || "",
+      content: item.content,
+      culturalValue: item.cultural_value,
+      artisan: item.artisan,
+      artisanId: `artisan-${item.artisan_id}`,
+      video: media.find((entry) => entry.type === "video")?.url,
+    };
+  }), [databaseStories]);
+  const visibleStories = databaseLoaded ? liveStories : stories;
+  const visibleTraditionalCrafts = databaseTraditionalCrafts.map((item) => ({
+    id: `traditional-craft-${item.id}`,
+    name: item.name,
+    description: item.description || "",
+    origin: item.origin || "",
+    technique: item.technique || "",
+    culturalValue: item.cultural_value || "",
+    image: publicMediaUrl(item.image) || logoImg,
+    villages: item.villages || "",
+    artisanCount: Number(item.artisan_count || 0),
+    activityCount: Number(item.activity_count || 0),
+  }));
+  const liveMediaItems = useMemo(() => [
+    ...databaseArtisans.flatMap((item) => (item.media || [])
+      .filter((entry) => ["hinh_anh", "video"].includes(entry.type))
+      .map((entry) => ({
+        id: `artisan-media-${entry.id}`,
+        title: entry.caption || item.name,
+        type: entry.type === "video" ? "Video" : "Hình ảnh",
+        image: entry.type === "hinh_anh" ? publicMediaUrl(entry.url) : publicMediaUrl(item.image) || logoImg,
+        videoUrl: entry.type === "video" ? publicMediaUrl(entry.url) : "",
+      }))),
+    ...databaseStories.flatMap((item) => (item.media || [])
+      .filter((entry) => ["hinh_anh", "video"].includes(entry.type))
+      .map((entry) => ({
+        id: `story-media-${entry.id}`,
+        title: entry.caption || item.title,
+        type: entry.type === "video" ? "Video" : "Hình ảnh",
+        image: entry.type === "hinh_anh" ? publicMediaUrl(entry.url) : publicMediaUrl(item.artisan_image) || logoImg,
+        videoUrl: entry.type === "video" ? publicMediaUrl(entry.url) : "",
+      }))),
+    ...databaseProducts.flatMap((item) => (item.media || [])
+      .filter((entry) => ["hinh_anh", "video"].includes(entry.type))
+      .map((entry) => ({
+        id: `product-media-${entry.id}`,
+        title: entry.caption || item.title,
+        type: entry.type === "video" ? "Video" : "Hình ảnh",
+        image: entry.type === "hinh_anh" ? publicMediaUrl(entry.url) : logoImg,
+        videoUrl: entry.type === "video" ? publicMediaUrl(entry.url) : "",
+      }))),
+    ...databaseActivities.flatMap((item) => (item.media || [])
+      .filter((entry) => ["hinh_anh", "video"].includes(entry.type))
+      .map((entry) => ({
+        id: `activity-media-${entry.id}`,
+        title: entry.caption || item.title,
+        type: entry.type === "video" ? "Video" : "Hình ảnh",
+        image: entry.type === "hinh_anh" ? publicMediaUrl(entry.url) : publicMediaUrl(item.image) || logoImg,
+        videoUrl: entry.type === "video" ? publicMediaUrl(entry.url) : "",
+      }))),
+  ], [databaseActivities, databaseArtisans, databaseProducts, databaseStories]);
+  const visibleMediaItems = databaseLoaded ? liveMediaItems : mediaItems;
+  const allItems = useMemo(
+    () => [...visibleArtisans, ...crafts, ...visibleTraditionalCrafts, ...visibleProducts, ...visibleStories, ...visibleActivities],
+    [visibleArtisans, visibleTraditionalCrafts, visibleProducts, visibleStories, visibleActivities],
+  );
   const savedItems = useMemo(() => allItems.filter((item) => favoriteIds.includes(item.id)), [favoriteIds, allItems]);
   const showNotice = (message) => {
     setNotice(message);
     window.setTimeout(() => setNotice(""), 2600);
+  };
+  const isTourist = Boolean(window.localStorage.getItem("auth-token"))
+    && ["DU_KHACH", "du_khach"].includes(String(authUser?.role || "").toUpperCase());
+  const notificationScope = authUser?.id || authUser?.email || "guest";
+  const notificationStorageKey = `tourist-booking-notifications:${notificationScope}`;
+  const seenBookingEventsKey = `tourist-booking-events-seen:${notificationScope}`;
+
+  useEffect(() => {
+    if (!isTourist) {
+      seenBookingEventsRef.current = null;
+      return undefined;
+    }
+
+    let active = true;
+    const savedNotifications = readStorage(notificationStorageKey, []);
+    const savedEventIds = readStorage(seenBookingEventsKey, null);
+    seenBookingEventsRef.current = Array.isArray(savedEventIds) ? new Set(savedEventIds) : null;
+
+    const pollBookingNotifications = async () => {
+      try {
+        const bookings = await experienceBookingService.listMine();
+        if (!active) return;
+        const scope = String(notificationScope);
+        const storedNotifications = Array.isArray(savedNotifications) ? savedNotifications : [];
+        setBookingNotifications((current) => current.scope === scope
+          ? current
+          : { scope, items: storedNotifications });
+
+        const statusMessages = {
+          confirmed: "Nghệ nhân đã xác nhận lịch đặt",
+          rejected: "Nghệ nhân đã từ chối yêu cầu đặt lịch",
+          cancelled: "Lịch đặt trải nghiệm đã bị hủy",
+          completed: "Hoạt động trải nghiệm đã được ghi nhận hoàn thành",
+        };
+        const events = bookings.flatMap((booking) => (booking.status_history || [])
+          .filter((event) => statusMessages[event.status])
+          .map((event) => ({
+            id: `${booking.id}:${event.status}:${event.changedAt}`,
+            bookingId: String(booking.id),
+            activityTitle: booking.activity_title,
+            status: event.status,
+            changedAt: event.changedAt,
+            message: `${statusMessages[event.status]}: ${booking.activity_title}.`,
+            reason: event.reason || "",
+          })));
+        const currentIds = events.map((event) => event.id);
+        const seenIds = seenBookingEventsRef.current;
+        if (seenIds === null) {
+          seenBookingEventsRef.current = new Set(currentIds);
+          window.localStorage.setItem(seenBookingEventsKey, JSON.stringify(currentIds));
+          setBookingNotificationError("");
+          return;
+        }
+
+        const newEvents = events.filter((event) => !seenIds.has(event.id));
+        const nextSeenIds = new Set([...seenIds, ...currentIds]);
+        seenBookingEventsRef.current = nextSeenIds;
+        window.localStorage.setItem(seenBookingEventsKey, JSON.stringify([...nextSeenIds]));
+        setBookingNotificationError("");
+
+        if (newEvents.length) {
+          setBookingNotifications((current) => {
+            const currentItems = current.scope === scope ? current.items : storedNotifications;
+            const existingIds = new Set(currentItems.map((item) => item.id));
+            const added = newEvents
+              .filter((event) => !existingIds.has(event.id))
+              .map((event) => ({ ...event, read: false }));
+            const updated = [...added.reverse(), ...currentItems].slice(0, 20);
+            window.localStorage.setItem(notificationStorageKey, JSON.stringify(updated));
+            return { scope, items: updated };
+          });
+          setNotice(newEvents[newEvents.length - 1].message);
+          window.setTimeout(() => setNotice(""), 2600);
+        }
+      } catch (error) {
+        if (active) setBookingNotificationError(error.message);
+      }
+    };
+
+    pollBookingNotifications();
+    const intervalId = window.setInterval(pollBookingNotifications, 15000);
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+    };
+  }, [isTourist, notificationScope, notificationStorageKey, seenBookingEventsKey]);
+
+  const markBookingNotificationsRead = () => {
+    setBookingNotifications((current) => {
+      const savedItems = readStorage(notificationStorageKey, []);
+      const currentItems = current.scope === String(notificationScope)
+        ? current.items
+        : Array.isArray(savedItems) ? savedItems : [];
+      const updated = currentItems.map((item) => ({ ...item, read: true }));
+      window.localStorage.setItem(notificationStorageKey, JSON.stringify(updated));
+      return { scope: String(notificationScope), items: updated };
+    });
   };
 
   const toggleFavorite = (item) => {
@@ -608,6 +821,23 @@ export default function TouristHome() {
     showNotice("Thông tin cá nhân đã được cập nhật.");
   };
 
+  const submitActivityBooking = async (booking) => {
+    if (!isTourist) {
+      navigate(ROUTES.LOGIN, {
+        state: { from: { pathname: location.pathname }, accountType: "visitor" },
+      });
+      return;
+    }
+
+    try {
+      await experienceBookingService.create(detailId, booking);
+      showNotice("Đã gửi yêu cầu đặt lịch. Nghệ nhân sẽ sớm phản hồi.");
+      navigate(ROUTES.TOURIST_BOOKINGS);
+    } catch (error) {
+      showNotice(error.message);
+    }
+  };
+
   const submitSearch = (event) => {
     event.preventDefault();
     setSearchType("Tất cả");
@@ -615,12 +845,13 @@ export default function TouristHome() {
   };
 
   const data = {
-    artisans,
+    artisans: visibleArtisans,
     crafts,
+    traditionalCrafts: visibleTraditionalCrafts,
     products: visibleProducts,
-    stories,
+    stories: visibleStories,
     activities: visibleActivities,
-    mediaItems,
+    mediaItems: visibleMediaItems,
     allItems,
     savedItems,
     detailId,
@@ -628,98 +859,45 @@ export default function TouristHome() {
 
   const goToView = (destination) => navigate(`/tourist/${destination}`);
   const activeView = view;
-  const initials = (profile.name || "Du khách")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(-2)
-    .map((part) => part[0])
-    .join("")
-    .toLocaleUpperCase("vi");
   const logout = () => {
     window.localStorage.removeItem("auth-token");
     window.localStorage.removeItem("auth-user");
+    setAuthUser(null);
     navigate(ROUTES.HOME);
   };
 
   return (
-    <div className={`tourist-page${view === "home" ? " tourist-home-shell" : ""}`} id="top">
-      <header className="tourist-header">
-        <Link className="tourist-brand" to={ROUTES.TOURIST} aria-label="Tinh Hoa Việt - Trang chủ">
-          <img src={logoImg} alt="" className="tourist-brand-logo" />
-          <span><strong>Tinh Hoa Việt</strong><small>Nền tảng di sản - Tinh hoa tương lai</small></span>
-        </Link>
-        <nav className="tourist-nav" aria-label="Điều hướng chính">
-          {navigation.map((item) => {
-            const isCurrent =
-              view === item.view
-              || (view === "artisan" && item.view === "artisans")
-              || (view === "craft" && item.view === "crafts")
-              || (view === "product" && item.view === "products");
-
-            return (
-              <Link
-                className={isCurrent ? "is-current" : ""}
-                to={item.to}
-                key={item.label}
-                aria-current={isCurrent ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="tourist-header-actions" ref={headerActionsRef}>
-          <Link className="tourist-icon-button" to="/tourist/search" aria-label="Tìm kiếm"><Search size={18} /></Link>
-          <Link className="tourist-icon-button tourist-saved-shortcut" to="/tourist/favorites" aria-label={`Nội dung yêu thích${favoriteIds.length ? `, ${favoriteIds.length} mục đã lưu` : ""}`}><Heart size={18} />{favoriteIds.length > 0 && <span className="tourist-favorite-count">{favoriteIds.length}</span>}</Link>
-          <div className="tourist-header-popover-wrap">
-            <button
-              className="tourist-icon-button"
-              type="button"
-              aria-label="Thông báo"
-              aria-expanded={headerPanel === "notifications"}
-              onClick={() => setHeaderPanel(headerPanel === "notifications" ? "" : "notifications")}
-            >
-              <Bell size={18} />
-            </button>
-            {headerPanel === "notifications" && (
-              <section className="tourist-header-popover tourist-notification-popover" aria-label="Thông báo">
-                <strong>Thông báo</strong>
-                <p>Bạn chưa có thông báo mới.</p>
-                <Link to="/tourist/activities" onClick={() => setHeaderPanel("")}>Khám phá hoạt động trải nghiệm</Link>
+    <TouristLayout
+      view={view}
+      isTourist={isTourist}
+      favoriteIds={favoriteIds}
+      profile={profile}
+      onLogout={logout}
+      notifications={isTourist && bookingNotifications.scope === String(notificationScope) ? bookingNotifications.items : []}
+      notificationError={isTourist ? bookingNotificationError : ""}
+      onNotificationsRead={markBookingNotificationsRead}
+      overlays={(
+        <>
+          {notice && <div className="tourist-toast" role="status">{notice}</div>}
+          {selectedMedia && (
+            <div className="tourist-modal-backdrop" role="presentation" onClick={() => setSelectedMedia(null)}>
+              <section className="tourist-detail-modal tourist-media-modal" role="dialog" aria-modal="true" aria-labelledby="tourist-modal-title" onClick={(event) => event.stopPropagation()}>
+                <button type="button" className="tourist-modal-close" onClick={() => setSelectedMedia(null)} aria-label="Đóng"><X size={19} /></button>
+                {selectedMedia.videoUrl
+                  ? <video className="tourist-modal-image" src={selectedMedia.videoUrl} controls />
+                  : <img className="tourist-modal-image" src={selectedMedia.image} alt="" />}
+                <div className="tourist-modal-content"><span className="tourist-eyebrow">{selectedMedia.type}</span><h2 id="tourist-modal-title">{selectedMedia.title}</h2><p>{selectedMedia.description}</p></div>
               </section>
-            )}
-          </div>
-          <div className="tourist-header-popover-wrap">
-            <button
-              className="tourist-account-button"
-              type="button"
-              aria-label="Mở menu tài khoản"
-              aria-expanded={headerPanel === "account"}
-              onClick={() => setHeaderPanel(headerPanel === "account" ? "" : "account")}
-            >
-              <span className="tourist-avatar">{initials || <UserRound size={17} />}</span>
-              <ChevronDown size={14} />
-            </button>
-            {headerPanel === "account" && (
-              <section className="tourist-header-popover tourist-account-popover" aria-label="Menu tài khoản">
-                <div className="tourist-account-summary">
-                  <strong>{profile.name}</strong>
-                  <span>{profile.email}</span>
-                </div>
-                <Link to="/tourist/profile" onClick={() => setHeaderPanel("")}>
-                  <UserRound size={16} /> Thông tin cá nhân
-                </Link>
-                <button type="button" onClick={logout}>
-                  <LogOut size={16} /> Đăng xuất
-                </button>
-              </section>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <main className="tourist-main">
-        {view === "home" ? (
+            </div>
+          )}
+        </>
+      )}
+    >
+        {view === "bookings" ? (
+          isTourist
+            ? <div className="tourist-content tourist-view-content"><TouristBookingHistory /></div>
+            : <Navigate to={ROUTES.LOGIN} replace state={{ from: { pathname: ROUTES.TOURIST_BOOKINGS }, accountType: "visitor" }} />
+        ) : view === "home" ? (
           <TouristLanding
             query={query}
             onQuery={setQuery}
@@ -733,6 +911,22 @@ export default function TouristHome() {
             onFavorite={toggleFavorite}
             query={query}
             onQuery={setQuery}
+          />
+        ) : view === "traditional-crafts" ? (
+          <TouristTraditionalCrafts
+            crafts={visibleTraditionalCrafts}
+            query={query}
+            onQuery={setQuery}
+            loading={!databaseLoaded}
+            favoriteIds={favoriteIds}
+            onFavorite={toggleFavorite}
+          />
+        ) : view === "traditional-craft" ? (
+          <TouristTraditionalCraftDetail
+            craft={visibleTraditionalCrafts.find((item) => item.id === detailId)}
+            favoriteIds={favoriteIds}
+            onFavorite={toggleFavorite}
+            onNotice={showNotice}
           />
         ) : view === "craft" ? (
           <TouristVillageDetail
@@ -757,7 +951,7 @@ export default function TouristHome() {
               onSearchType={setSearchType}
               mediaType={mediaType}
               onMediaType={setMediaType}
-              onOpenMedia={(item) => setSelectedMedia({ ...item, description: `Khoảnh khắc ${item.title.toLocaleLowerCase("vi")} trong không gian làng nghề Việt.` })}
+              onOpenMedia={(item) => setSelectedMedia({ ...item, description: item.description || "" })}
               reviews={reviews}
               rating={rating}
               onRating={setRating}
@@ -770,56 +964,10 @@ export default function TouristHome() {
               onSaveProfile={saveProfile}
               onNavigate={goToView}
               onNotice={showNotice}
+              onBooking={submitActivityBooking}
             />
           </div>
         )}
-      </main>
-
-      <footer className="tourist-footer">
-        <div className="tourist-footer-main">
-          <div className="tourist-footer-brand">
-            <Link className="tourist-brand" to={ROUTES.TOURIST}>
-              <img src={logoImg} alt="" className="tourist-brand-logo" />
-              <span><strong>Tinh Hoa Việt</strong><small>Nền tảng di sản - Tinh hoa tương lai</small></span>
-            </Link>
-            <p>Hành trình kết nối những giá trị văn hóa và nghề truyền thống, để tinh hoa Việt tiếp tục được gìn giữ và lan tỏa.</p>
-          </div>
-          <div className="tourist-footer-column">
-            <strong>Khám phá</strong>
-            <Link to="/tourist/crafts">Làng nghề Việt</Link>
-            <Link to="/tourist/artisans">Nghệ nhân</Link>
-            <Link to="/tourist/products">Sản phẩm thủ công</Link>
-          </div>
-          <div className="tourist-footer-column">
-            <strong>Dành cho du khách</strong>
-            <Link to="/tourist/activities">Hoạt động trải nghiệm</Link>
-            <Link to="/tourist/stories">Câu chuyện văn hóa</Link>
-            <Link to="/tourist/favorites">Nội dung yêu thích</Link>
-          </div>
-          <div className="tourist-footer-column">
-            <strong>Tài khoản</strong>
-            <Link to="/tourist/profile">Thông tin cá nhân</Link>
-            <Link to="/tourist/search">Tìm kiếm</Link>
-            <Link to={ROUTES.HOME}>Trang khách vãng lai</Link>
-          </div>
-        </div>
-        <div className="tourist-footer-bottom">
-          <span>· Gìn giữ tinh hoa nghề Việt.</span>
-          <span>Đồng hành cùng nghệ nhân và làng nghề Việt Nam.</span>
-        </div>
-      </footer>
-
-      {notice && <div className="tourist-toast" role="status">{notice}</div>}
-
-      {selectedMedia && (
-        <div className="tourist-modal-backdrop" role="presentation" onClick={() => setSelectedMedia(null)}>
-          <section className="tourist-detail-modal tourist-media-modal" role="dialog" aria-modal="true" aria-labelledby="tourist-modal-title" onClick={(event) => event.stopPropagation()}>
-            <button type="button" className="tourist-modal-close" onClick={() => setSelectedMedia(null)} aria-label="Đóng"><X size={19} /></button>
-            <img className="tourist-modal-image" src={selectedMedia.image} alt="" />
-            <div className="tourist-modal-content"><span className="tourist-eyebrow">{selectedMedia.type}</span><h2 id="tourist-modal-title">{selectedMedia.title}</h2><p>{selectedMedia.description}</p></div>
-          </section>
-        </div>
-      )}
-    </div>
+    </TouristLayout>
   );
 }
