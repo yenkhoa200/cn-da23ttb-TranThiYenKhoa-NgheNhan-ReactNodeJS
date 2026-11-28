@@ -4,15 +4,17 @@ import {
   ChevronDown,
   Clock3,
   Eye,
+  ImagePlus,
   MapPin,
   Pencil,
   Plus,
   Search,
   Trash2,
+  Upload,
   UsersRound,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
@@ -37,6 +39,65 @@ function formatSchedule(value) {
   return `${time} - ${day}`;
 }
 
+function parseDescription(description = "") {
+  const marker = "Nội dung trải nghiệm:\n";
+  const index = description.indexOf(marker);
+  if (index === -1) {
+    const trimmed = description.trim();
+    const legacyMarker = trimmed.indexOf("Nội dung trải nghiệm:");
+    if (legacyMarker === -1) return { summary: trimmed, details: "" };
+    return {
+      summary: trimmed.slice(0, legacyMarker).trim(),
+      details: trimmed.slice(legacyMarker + "Nội dung trải nghiệm:".length).replace(/^[:\s]+/, "").trim(),
+    };
+  }
+  return {
+    summary: description.slice(0, index).trim(),
+    details: description.slice(index + marker.length).trim(),
+  };
+}
+
+function parseRequirements(requirements = "") {
+  const result = { requirements: "", preparation: "", notes: "" };
+  const text = String(requirements || "").trim();
+  if (!text) return result;
+
+  const sectionMatchers = [
+    ["requirements", /^Yêu cầu tham gia\s*:/i],
+    ["preparation", /^Vật liệu cần chuẩn bị\s*:/i],
+    ["notes", /^Lưu ý\s*:/i],
+  ];
+
+  let activeSection = null;
+  let foundSection = false;
+  text.split("\n").forEach((line) => {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) return;
+
+    const matcher = sectionMatchers.find(([, pattern]) => pattern.test(trimmedLine));
+    if (matcher) {
+      foundSection = true;
+      activeSection = matcher[0];
+      const value = trimmedLine.replace(matcher[1], "").trim();
+      if (value) {
+        result[activeSection] = result[activeSection]
+          ? `${result[activeSection]}\n${value}`
+          : value;
+      }
+      return;
+    }
+
+    if (activeSection) {
+      result[activeSection] = result[activeSection]
+        ? `${result[activeSection]}\n${trimmedLine}`
+        : trimmedLine;
+    }
+  });
+
+  if (!foundSection) result.requirements = text;
+  return result;
+}
+
 export default function ExperienceManagerPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -48,6 +109,10 @@ export default function ExperienceManagerPage() {
   const [craftFilter, setCraftFilter] = useState("all");
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
+  const [editImageFile, setEditImageFile] = useState(null);
+  const [editImagePreview, setEditImagePreview] = useState("");
+  const [editOriginalImage, setEditOriginalImage] = useState("");
+  const editImageInputRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -96,24 +161,57 @@ export default function ExperienceManagerPage() {
   }, [activities, craftFilter, search, statusFilter]);
 
   const openEdit = (activity) => {
+    const parsedDescription = parseDescription(activity.description);
+    const parsedRequirements = parseRequirements(activity.requirements);
     setForm({
       ...activity,
       schedule: activity.schedule,
       capacity: String(activity.capacity),
       duration: String(activity.duration),
+      description: parsedDescription.summary,
+      details: parsedDescription.details,
+      requirements: parsedRequirements.requirements,
+      preparation: parsedRequirements.preparation,
+      notes: parsedRequirements.notes,
     });
+    setEditImageFile(null);
+    setEditImagePreview(activity.image || "");
+    setEditOriginalImage(activity.image || "");
     setModal({ type: "form", activityId: activity.id });
+  };
+
+  const handleEditImage = (file) => {
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      notify("Vui lòng chọn ảnh JPG, PNG hoặc WEBP.", "error");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      notify("Ảnh cần có dung lượng tối đa 2 MB.", "error");
+      return;
+    }
+    setEditImageFile(file);
+    setEditImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const description = [
+      form.description.trim(),
+      form.details.trim() && `Nội dung trải nghiệm:\n${form.details.trim()}`,
+    ].filter(Boolean).join("\n\n");
+    const requirements = [
+      form.requirements.trim() && `Yêu cầu tham gia: ${form.requirements.trim()}`,
+      form.preparation.trim() && `Vật liệu cần chuẩn bị: ${form.preparation.trim()}`,
+      form.notes.trim() && `Lưu ý: ${form.notes.trim()}`,
+    ].filter(Boolean).join("\n");
     const savedActivity = {
       craftId: form.craft_id,
       title: form.title.trim(),
-      description: form.description || "",
+      description,
       location: form.location.trim(),
       schedule: form.schedule || "",
-      requirements: form.requirements || "",
+      requirements,
       status: form.status,
       duration: Number(form.duration),
       capacity: Number(form.capacity),
@@ -121,8 +219,13 @@ export default function ExperienceManagerPage() {
 
     try {
       const saved = await artisanExperienceService.update(modal.activityId, savedActivity);
+      let updated = saved;
+      if (editImageFile) {
+        await artisanExperienceService.uploadImage(saved.id, editImageFile);
+        updated = { ...saved, image: editImagePreview };
+      }
       setActivities((current) => current.map((activity) => (
-        activity.id === saved.id ? { ...activity, ...saved, craft: activity.craft } : activity
+        activity.id === updated.id ? { ...activity, ...updated, craft: activity.craft } : activity
       )));
       setModal(null);
       notify("Đã cập nhật hoạt động.");
@@ -248,10 +351,22 @@ export default function ExperienceManagerPage() {
                   <span className="experience-craft">{activity.craft}</span>
                   <h3>{activity.title}</h3>
                   <div className="experience-meta">
-                    <span><MapPin size={13} />{activity.location}</span>
-                    <span><CalendarDays size={13} />{formatSchedule(activity.schedule)}</span>
-                    <span><Clock3 size={13} />{activity.duration} phút</span>
-                    <span><UsersRound size={13} />Tối đa {activity.capacity} người</span>
+                    <span>
+                      <MapPin size={16} />
+                      <span className="experience-meta-copy"><small>Địa điểm</small><strong>{activity.location}</strong></span>
+                    </span>
+                    <span>
+                      <CalendarDays size={16} />
+                      <span className="experience-meta-copy"><small>Ngày & giờ</small><strong>{formatSchedule(activity.schedule)}</strong></span>
+                    </span>
+                    <span>
+                      <Clock3 size={16} />
+                      <span className="experience-meta-copy"><small>Thời lượng</small><strong>{activity.duration} phút</strong></span>
+                    </span>
+                    <span>
+                      <UsersRound size={16} />
+                      <span className="experience-meta-copy"><small>Số lượng tối đa</small><strong>{activity.capacity} người</strong></span>
+                    </span>
                   </div>
                   <div className="experience-card-actions">
                     <button type="button" onClick={() => setModal({ type: "detail", activity })}>
@@ -353,14 +468,84 @@ export default function ExperienceManagerPage() {
                   />
                 </label>
               </div>
-              <p>Ảnh hoạt động được lưu cùng hoạt động; tải ảnh mới khi tạo hoạt động.</p>
+              <div className="experience-edit-image">
+                <span>Ảnh hoạt động</span>
+                {editImagePreview && (
+                  <img src={editImagePreview} alt={form.title || "Ảnh hoạt động"} />
+                )}
+                <div className="experience-edit-image-actions">
+                  <button
+                    type="button"
+                    className="experience-cancel-button"
+                    onClick={() => editImageInputRef.current?.click()}
+                  >
+                    <ImagePlus size={14} /> Thay ảnh
+                  </button>
+                  {editImageFile && (
+                    <button
+                      type="button"
+                      className="experience-cancel-button"
+                      onClick={() => {
+                        setEditImageFile(null);
+                        setEditImagePreview(editOriginalImage);
+                      }}
+                    >
+                      <X size={14} /> Hủy thay ảnh
+                    </button>
+                  )}
+                  <input
+                    ref={editImageInputRef}
+                    className="experience-file-input"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(event) => handleEditImage(event.target.files?.[0])}
+                  />
+                </div>
+                <small>JPG, PNG hoặc WEBP · Tối đa 2 MB.</small>
+              </div>
               <label>
-                Mô tả
+                Mô tả hoạt động
                 <textarea
                   rows={3}
                   value={form.description}
                   onChange={(event) => setForm({ ...form, description: event.target.value })}
-                  placeholder="Mô tả nội dung trải nghiệm..."
+                  placeholder="Mô tả tổng quan hoạt động..."
+                />
+              </label>
+              <label>
+                Nội dung trải nghiệm
+                <textarea
+                  rows={3}
+                  value={form.details}
+                  onChange={(event) => setForm({ ...form, details: event.target.value })}
+                  placeholder="Các bước và trình tự trải nghiệm..."
+                />
+              </label>
+              <label>
+                Yêu cầu tham gia
+                <textarea
+                  rows={2}
+                  value={form.requirements}
+                  onChange={(event) => setForm({ ...form, requirements: event.target.value })}
+                  placeholder="Độ tuổi, sức khỏe hoặc kinh nghiệm..."
+                />
+              </label>
+              <label>
+                Vật liệu cần chuẩn bị
+                <textarea
+                  rows={2}
+                  value={form.preparation}
+                  onChange={(event) => setForm({ ...form, preparation: event.target.value })}
+                  placeholder="Vật liệu xưởng cung cấp hoặc khách mang theo..."
+                />
+              </label>
+              <label>
+                Lưu ý cho du khách
+                <textarea
+                  rows={2}
+                  value={form.notes}
+                  onChange={(event) => setForm({ ...form, notes: event.target.value })}
+                  placeholder="Trang phục, an toàn và các lưu ý..."
                 />
               </label>
               <label>
@@ -402,12 +587,59 @@ export default function ExperienceManagerPage() {
               </button>
             </div>
             <img src={modal.activity.image} alt={modal.activity.title} />
-            <p>{modal.activity.description}</p>
-            <div className="experience-detail-meta">
-              <span><MapPin size={14} />{modal.activity.location}</span>
-              <span><CalendarDays size={14} />{formatSchedule(modal.activity.schedule)}</span>
-              <span><Clock3 size={14} />{modal.activity.duration}</span>
-              <span><UsersRound size={14} />Tối đa {modal.activity.capacity} người</span>
+            <div className="experience-form experience-detail-fields">
+              <div className="experience-detail-field">
+                <span>Tên hoạt động</span>
+                <strong>{modal.activity.title}</strong>
+              </div>
+              <div className="experience-form-row">
+                <div className="experience-detail-field">
+                  <span>Nghề truyền thống</span>
+                  <strong>{modal.activity.craft}</strong>
+                </div>
+                <div className="experience-detail-field">
+                  <span>Sức chứa tối đa</span>
+                  <strong>{modal.activity.capacity} người</strong>
+                </div>
+              </div>
+              <div className="experience-detail-field">
+                <span>Địa điểm</span>
+                <strong>{modal.activity.location}</strong>
+              </div>
+              <div className="experience-form-row">
+                <div className="experience-detail-field">
+                  <span>Thời gian</span>
+                  <strong>{formatSchedule(modal.activity.schedule)}</strong>
+                </div>
+                <div className="experience-detail-field">
+                  <span>Thời lượng</span>
+                  <strong>{modal.activity.duration} phút</strong>
+                </div>
+              </div>
+              <div className="experience-detail-field">
+                <span>Mô tả hoạt động</span>
+                <p>{parseDescription(modal.activity.description).summary || "Chưa có mô tả."}</p>
+              </div>
+              <div className="experience-detail-field">
+                <span>Nội dung trải nghiệm</span>
+                <p>{parseDescription(modal.activity.description).details || "Chưa có nội dung trải nghiệm."}</p>
+              </div>
+              <div className="experience-detail-field">
+                <span>Yêu cầu tham gia</span>
+                <p>{parseRequirements(modal.activity.requirements).requirements || "Không có yêu cầu đặc biệt."}</p>
+              </div>
+              <div className="experience-detail-field">
+                <span>Vật liệu cần chuẩn bị</span>
+                <p>{parseRequirements(modal.activity.requirements).preparation || "Xưởng sẽ cung cấp thông tin khi xác nhận."}</p>
+              </div>
+              <div className="experience-detail-field">
+                <span>Lưu ý cho du khách</span>
+                <p>{parseRequirements(modal.activity.requirements).notes || "Không có lưu ý bổ sung."}</p>
+              </div>
+              <div className="experience-detail-field">
+                <span>Trạng thái</span>
+                <strong>{statusLabels[modal.activity.status]}</strong>
+              </div>
             </div>
             <div className="experience-form-actions">
               <button className="experience-cancel-button" type="button" onClick={() => setModal(null)}>Đóng</button>

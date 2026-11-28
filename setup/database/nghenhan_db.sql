@@ -147,7 +147,7 @@ CREATE TABLE nd_van_hoa (
     loai_nd         VARCHAR(30)  NOT NULL DEFAULT 'cau_chuyen',
     tom_tat         TEXT,
     noi_dung_chi_tiet TEXT NOT NULL,
-    y_nghia_van_hoa TEXT,
+    /*y_nghia_van_hoa TEXT,*/
     ngay_dang       TIMESTAMPTZ NOT NULL DEFAULT now(),
     ngay_cap_nhat   TIMESTAMPTZ NOT NULL DEFAULT now(),
     trang_thai_kiem_duyet VARCHAR(20) NOT NULL DEFAULT 'nhap',
@@ -161,6 +161,7 @@ CREATE TABLE nd_van_hoa (
 ALTER TABLE nd_van_hoa
 ALTER COLUMN trang_thai_kiem_duyet
 SET DEFAULT 'da_dang';
+
 
 CREATE TABLE hoat_dong_trai_nghiem (
     ma_hd            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -286,7 +287,7 @@ CREATE TABLE danh_gia (
     ma_dg        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ma_tk        BIGINT NOT NULL REFERENCES tai_khoan (ma_tk) ON DELETE CASCADE,  -- "viết"
     diem_danh_gia SMALLINT NOT NULL CHECK (diem_danh_gia BETWEEN 1 AND 5),
-    noi_dung_danh_gia TEXT,
+    c TEXT,
     ngay_danh_gia TIMESTAMPTZ NOT NULL DEFAULT now(),
     trang_thai_kiem_duyet VARCHAR(20) NOT NULL DEFAULT 'cho_duyet',
     ma_quan_tri_duyet BIGINT REFERENCES tai_khoan (ma_tk) ON DELETE SET NULL,
@@ -814,9 +815,3 @@ SELECT * FROM da_phuong_tien ORDER BY 1;
 SELECT * FROM dat_lich_trai_nghiem ORDER BY 1;
 SELECT * FROM yeu_thich ORDER BY 1;
 SELECT * FROM danh_gia ORDER BY 1;
-
-
-SELECT column_name, data_type
-FROM information_schema.columns
-WHERE table_name = 'san_pham'
-ORDER BY ordinal_position;

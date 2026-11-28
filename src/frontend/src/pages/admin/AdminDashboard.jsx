@@ -30,6 +30,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { adminNavigation, AdminHeader, AdminSidebar } from "../../components/common/AdminNar.jsx";
 import productService from "../../services/productService.js";
+import artisanProfileService from "../../services/artisanProfileService.js";
 import "../../styles/AdminDashboard.css";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -410,6 +411,50 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    if (pageKey !== "artisans") return undefined;
+    let ignore = false;
+    artisanProfileService.getAdminArtisans()
+      .then((items) => {
+        if (ignore) return;
+        setRecords((current) => ({
+          ...current,
+          artisans: items.map((item) => {
+            const statusLabels = {
+              da_xac_minh: "Đã xác minh",
+              cho_xac_minh: "Chờ xác minh",
+              tu_choi: "Từ chối",
+              chua_xac_minh: "Chưa gửi",
+            };
+            const documents = Array.isArray(item.tai_lieu) ? item.tai_lieu : [];
+            const firstImage = documents.find((document) => document.type === "hinh_anh");
+            return {
+              id: Number(item.id),
+              name: item.ho_ten || "Nghệ nhân",
+              email: item.email || "",
+              phone: item.sdt || "",
+              craft: item.nghe_truyen_thong || "",
+              village: item.lang_nghe || "",
+              location: item.dia_chi || "",
+              experience: `${item.so_nam_kn || 0} năm`,
+              bio: item.gioi_thieu || "",
+              journey: item.qua_trinh_lam_nghe || "",
+              verification: statusLabels[item.trang_thai_xac_minh] || "Chưa gửi",
+              status: "Hoạt động",
+              image: firstImage?.url || item.anh_dai_dien || "",
+              documents,
+            };
+          }),
+        }));
+      })
+      .catch((error) => {
+        if (!ignore) notify(error.message);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [pageKey]);
+
+  useEffect(() => {
     if (pageKey !== "products") return undefined;
     let ignore = false;
     productService.getAdminAll()
@@ -565,8 +610,21 @@ export default function AdminDashboard() {
   const confirmDelete = (pageName, record) => setModal({ type: "confirm", action: "delete", title: "Xác nhận xóa nội dung", pageKey: pageName, record, message: `Bạn có chắc muốn xóa “${record.name || record.visitor || record.email}”? Thao tác này chỉ tác động lên dữ liệu mẫu của phiên hiện tại.`, confirmLabel: "Xóa nội dung" });
   const confirmModalAction = () => {
     const { pageKey: targetKey, record } = modal;
-    if (modal.action === "verify") return updateRecord(targetKey, record, { verification: "Đã xác minh" }, `Đã xác minh nghệ nhân ${record.name}.`);
-    if (modal.action === "reject") return updateRecord(targetKey, record, { verification: "Từ chối" }, `Đã từ chối xác minh hồ sơ ${record.name}.`);
+    if (modal.action === "verify" || modal.action === "reject") {
+      const status = modal.action === "verify" ? "da_xac_minh" : "tu_choi";
+      const message = modal.action === "verify"
+        ? `Đã xác minh nghệ nhân ${record.name}.`
+        : `Đã từ chối xác minh hồ sơ ${record.name}.`;
+      artisanProfileService.updateVerificationStatus(record.id, status)
+        .then(() => updateRecord(
+          targetKey,
+          record,
+          { verification: modal.action === "verify" ? "Đã xác minh" : "Từ chối" },
+          message
+        ))
+        .catch((error) => notify(error.message));
+      return;
+    }
     if (modal.action === "clear") return updateRecord(targetKey, record, { status: "Không vi phạm" }, "Đã đóng báo cáo: nội dung không vi phạm.");
     if (modal.action === "toggle") {
       if (targetKey === "accounts") return updateRecord(targetKey, record, { status: record.status === "Bị khóa" ? "Hoạt động" : "Bị khóa" }, record.status === "Bị khóa" ? "Đã mở khóa tài khoản." : "Đã khóa tài khoản.");

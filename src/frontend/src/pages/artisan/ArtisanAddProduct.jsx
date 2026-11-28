@@ -42,6 +42,10 @@ export default function ArtisanAddProduct() {
   const [videoPreview, setVideoPreview] = useState("");
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [productTab, setProductTab] = useState("published");
+  const [viewingPublishedId, setViewingPublishedId] = useState(null);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [deletingProductId, setDeletingProductId] = useState(null);
   const notify = useArtisanToast();
 
   async function loadProducts() {
@@ -146,6 +150,7 @@ export default function ArtisanAddProduct() {
       setMedia(await productService.getMedia(id));
       notify(publish ? "Đã lưu và đăng sản phẩm. Du khách có thể xem ngay." : "Đã lưu bản nháp sản phẩm.");
       await loadProducts();
+      setProductTab(publish ? "published" : "draft");
     } catch (error) {
       notify(error.message, "error");
     } finally {
@@ -154,14 +159,23 @@ export default function ArtisanAddProduct() {
   }
 
   async function deleteProduct(product) {
-    if (!window.confirm(`Xóa sản phẩm “${product.title}”?`)) return;
+    setProductToDelete(product);
+  }
+
+  async function confirmDeleteProduct() {
+    if (!productToDelete) return;
+    const product = productToDelete;
+    setDeletingProductId(product.id);
     try {
       await productService.delete(product.id);
       if (editingId === product.id) resetForm();
+      setProductToDelete(null);
       await loadProducts();
       notify("Đã xóa sản phẩm.");
     } catch (error) {
       notify(error.message, "error");
+    } finally {
+      setDeletingProductId(null);
     }
   }
 
@@ -180,6 +194,7 @@ export default function ArtisanAddProduct() {
       });
       await loadProducts();
       notify("Đã đăng sản phẩm. Du khách có thể xem ngay.");
+      setProductTab("published");
     } catch (error) {
       notify(error.message, "error");
     }
@@ -199,6 +214,7 @@ export default function ArtisanAddProduct() {
   const imageMedia = media.filter((item) => item.loai_tu_lieu === "hinh_anh" || item.type === "hinh_anh");
   const videoMedia = media.find((item) => item.loai_tu_lieu === "video" || item.type === "video");
   const drafts = products.filter((item) => item.status === "nhap");
+  const publishedProducts = products.filter((item) => item.status === "da_dang");
 
   return (
     <main className="product-content">
@@ -331,19 +347,75 @@ export default function ArtisanAddProduct() {
       </div>
 
       <section className="product-card product-drafts">
-        <div className="card-step-header"><div className="step-number">4</div><h2>Sản phẩm của tôi</h2></div>
-        {products.length === 0 ? <p className="product-empty">Chưa có sản phẩm nào được lưu.</p> : (
+        <div className="card-step-header">
+          <div className="step-number">4</div>
+          <h2>Sản phẩm của tôi</h2>
+        </div>
+        <div className="product-tabs" role="tablist" aria-label="Trạng thái sản phẩm">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={productTab === "published"}
+            className={productTab === "published" ? "active" : ""}
+            onClick={() => setProductTab("published")}
+          >
+            Sản phẩm đã đăng <span>{publishedProducts.length}</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={productTab === "draft"}
+            className={productTab === "draft" ? "active" : ""}
+            onClick={() => setProductTab("draft")}
+          >
+            Sản phẩm lưu nháp <span>{drafts.length}</span>
+          </button>
+        </div>
+
+        {productTab === "published" ? (
+          publishedProducts.length === 0 ? (
+            <p className="product-empty">Chưa có sản phẩm đã đăng.</p>
+          ) : (
+            <div className="product-draft-list">
+              {publishedProducts.map((item) => (
+                <article className="product-draft-row" key={item.id}>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <span>{item.category} · {Number(item.price || 0).toLocaleString("vi-VN")} đ</span>
+                    <small>Đang hiển thị</small>
+                  </div>
+                  {viewingPublishedId === item.id && (
+                    <div className="published-product-preview">
+                      <p>{item.description || "Chưa có mô tả sản phẩm."}</p>
+                      {(item.media || []).filter((entry) => entry.type === "hinh_anh").map((entry) => (
+                        <img src={entry.url} alt={entry.caption || item.title} key={entry.id || entry.ma_pt} />
+                      ))}
+                    </div>
+                  )}
+                  <div className="product-draft-actions">
+                    <button type="button" onClick={() => setViewingPublishedId((current) => current === item.id ? null : item.id)}>
+                      {viewingPublishedId === item.id ? "Thu gọn" : "Xem"}
+                    </button>
+                    <button type="button" className="product-draft-delete" onClick={() => deleteProduct(item)}>Xóa</button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )
+        ) : drafts.length === 0 ? (
+          <p className="product-empty">Chưa có sản phẩm lưu nháp.</p>
+        ) : (
           <div className="product-draft-list">
-            {products.map((item) => (
+            {drafts.map((item) => (
               <article className="product-draft-row" key={item.id}>
                 <div>
                   <strong>{item.title}</strong>
                   <span>{item.category} · {Number(item.price || 0).toLocaleString("vi-VN")} đ</span>
-                  <small>{item.status === "nhap" ? "Bản nháp" : item.status === "da_dang" ? "Đang hiển thị" : item.status}</small>
+                  <small>Bản nháp</small>
                 </div>
                 <div className="product-draft-actions">
-                  <button type="button" onClick={() => editProduct(item)}>Xem / sửa</button>
-                  {item.status === "nhap" && <button type="button" className="product-draft-publish" onClick={() => publishDraft(item)}>Đăng sản phẩm</button>}
+                  <button type="button" onClick={() => editProduct(item)}>Xem / Sửa</button>
+                  <button type="button" className="product-draft-publish" onClick={() => publishDraft(item)}>Đăng sản phẩm</button>
                   <button type="button" className="product-draft-delete" onClick={() => deleteProduct(item)}>Xóa</button>
                 </div>
               </article>
@@ -351,6 +423,49 @@ export default function ArtisanAddProduct() {
           </div>
         )}
       </section>
+
+      {productToDelete && (
+        <div
+          className="artisan-product-confirm-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deletingProductId) setProductToDelete(null);
+          }}
+        >
+          <section
+            className="artisan-product-confirm-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="artisan-product-confirm-title"
+            aria-describedby="artisan-product-confirm-description"
+          >
+            <span className="artisan-product-confirm-icon">🗑</span>
+            <h2 id="artisan-product-confirm-title">Xác nhận xóa sản phẩm</h2>
+            <p id="artisan-product-confirm-description">
+              Bạn có muốn xóa <strong>“{productToDelete.title}”</strong> không?
+            </p>
+            <p className="artisan-product-confirm-warning">
+              Sản phẩm và các hình ảnh, video gắn kèm sẽ bị gỡ khỏi hồ sơ nghệ nhân.
+            </p>
+            <div className="artisan-product-confirm-actions">
+              <button
+                type="button"
+                disabled={Boolean(deletingProductId)}
+                onClick={() => setProductToDelete(null)}
+              >
+                Hủy
+              </button>
+              <button
+                className="artisan-product-confirm-delete"
+                type="button"
+                disabled={Boolean(deletingProductId)}
+                onClick={confirmDeleteProduct}
+              >
+                {deletingProductId ? "Đang xóa..." : "Xóa sản phẩm"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

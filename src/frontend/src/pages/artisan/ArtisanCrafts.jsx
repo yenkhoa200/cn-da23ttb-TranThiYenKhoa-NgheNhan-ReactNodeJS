@@ -16,7 +16,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import artisanCraftService from "../../services/artisanCraftService.js";
-import { getProfileImageUrl } from "../../services/artisanProfileService.js";
+import artisanProfileService, { getProfileImageUrl } from "../../services/artisanProfileService.js";
 import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
 import "../../styles/ArtisanCraft.css";
@@ -31,8 +31,12 @@ export default function ArtisanCrafts() {
   const [crafts, setCrafts] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const [selectedId, setSelectedId] = useState("");
   const [startYear, setStartYear] = useState("");
+  const [craftName, setCraftName] = useState("");
+  const [careerJourney, setCareerJourney] = useState("");
+  const [craftDescription, setCraftDescription] = useState("");
+  const [originProcess, setOriginProcess] = useState("");
+  const [culturalValue, setCulturalValue] = useState("");
   const [expandedId, setExpandedId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,9 +46,14 @@ export default function ArtisanCrafts() {
 
   useEffect(() => {
     let active = true;
-    artisanCraftService.getAll()
-      .then((data) => {
-        if (active) setCrafts(data);
+    Promise.all([
+      artisanCraftService.getAll(),
+      artisanProfileService.getProfile(),
+    ])
+      .then(([data, profile]) => {
+        if (!active) return;
+        setCrafts(data);
+        setCraftName(profile.nghe_truyen_thong || "");
       })
       .catch((error) => {
         if (active) notify(error.message, "error");
@@ -58,7 +67,6 @@ export default function ArtisanCrafts() {
     };
   }, [notify]);
 
-  const availableCrafts = useMemo(() => crafts.filter((craft) => !craft.selected), [crafts]);
   const selectedCrafts = useMemo(() => crafts.filter((craft) => craft.selected), [crafts]);
   const filteredCrafts = useMemo(() => {
     const query = search.trim().toLocaleLowerCase("vi");
@@ -82,22 +90,32 @@ export default function ArtisanCrafts() {
 
   const handleSelect = async (event) => {
     event.preventDefault();
-    if (!selectedId) {
-      notify("Hãy chọn một nghề truyền thống trong danh mục.", "error");
+    if (!craftName.trim()) {
+      notify("Hãy nhập tên nghề truyền thống của nghệ nhân.", "error");
       craftSelectRef.current?.focus();
       return;
     }
 
     setIsSaving(true);
     try {
-      const result = await artisanCraftService.select(selectedId, startYear);
-      setCrafts((current) => current.map((craft) => (
-        String(craft.id) === String(selectedId)
-          ? { ...craft, selected: true, start_year: result.start_year ?? craft.start_year ?? null }
-          : craft
-      )));
-      setSelectedId("");
+      await artisanCraftService.create({
+        name: craftName,
+        startYear,
+        careerJourney,
+        description: craftDescription,
+        originProcess,
+        culturalValue,
+      });
+      const latestCrafts = await artisanCraftService.getAll();
+      setCrafts(latestCrafts);
+      setFilter("all");
+      setSearch("");
+      setCurrentPage(1);
       setStartYear("");
+      setCareerJourney("");
+      setCraftDescription("");
+      setOriginProcess("");
+      setCulturalValue("");
       notify("Đã thêm nghề vào hồ sơ cá nhân.");
     } catch (error) {
       notify(error.message, "error");
@@ -207,6 +225,7 @@ export default function ArtisanCrafts() {
                     </div>
                     {expandedId === String(craft.id) && (
                       <div className="artisan-craft-details">
+                        {craft.career_journey && <p><strong>Quá trình làm nghề:</strong> {craft.career_journey}</p>}
                         {craft.origin && <p><strong>Nguồn gốc:</strong> {craft.origin}</p>}
                         {craft.technique && <p><strong>Kỹ thuật và quy trình:</strong> {craft.technique}</p>}
                         {craft.cultural_value && <p><strong>Giá trị văn hóa, gìn giữ và phát triển:</strong> {craft.cultural_value}</p>}
@@ -270,24 +289,22 @@ export default function ArtisanCrafts() {
         <aside className="artisan-craft-select-panel">
           <div className="artisan-craft-select-heading">
             <Sprout size={18} />
-            <h2>Chọn nghề truyền thống</h2>
+            <h2>Thêm nghề vào hồ sơ</h2>
           </div>
-          <p>Chọn nghề bạn đang thực hành hoặc gìn giữ để thêm vào hồ sơ cá nhân.</p>
+          <p>Điền đầy đủ thông tin nghề truyền thống mà bạn đang thực hành hoặc gìn giữ.</p>
           <form onSubmit={handleSelect}>
-            <label className="artisan-craft-select-label" htmlFor="craft-select">Nghề trong danh mục <span>*</span></label>
-            <select
+            <label className="artisan-craft-select-label" htmlFor="craft-name">Tên nghề của nghệ nhân <span>*</span></label>
+            <input
               ref={craftSelectRef}
-              id="craft-select"
+              id="craft-name"
+              type="text"
+              maxLength={150}
               aria-required="true"
-              value={selectedId}
-              onChange={(event) => setSelectedId(event.target.value)}
-              disabled={!availableCrafts.length || isSaving}
-            >
-              <option value="" disabled>Chọn nghề truyền thống...</option>
-              {availableCrafts.map((craft) => (
-                <option key={craft.id} value={craft.id}>{craft.name}</option>
-              ))}
-            </select>
+              value={craftName}
+              readOnly
+              placeholder="Chưa điền nghề trong Hồ sơ cá nhân"
+              disabled={isSaving}
+            />
             <label className="artisan-craft-select-label" htmlFor="craft-start-year">Năm bắt đầu gắn bó</label>
             <input
               id="craft-start-year"
@@ -297,15 +314,52 @@ export default function ArtisanCrafts() {
               placeholder="Ví dụ: 1995"
               value={startYear}
               onChange={(event) => setStartYear(event.target.value)}
-              disabled={!availableCrafts.length || isSaving}
+              disabled={isSaving}
             />
-            <button type="submit" disabled={!availableCrafts.length || isSaving}>
+            <label className="artisan-craft-select-label" htmlFor="craft-journey">Quá trình làm nghề</label>
+            <textarea
+              id="craft-journey"
+              rows={3}
+              maxLength={10000}
+              value={careerJourney}
+              onChange={(event) => setCareerJourney(event.target.value)}
+              placeholder="Kể về hành trình học nghề, tiếp nối và truyền nghề..."
+              disabled={isSaving}
+            />
+            <label className="artisan-craft-select-label" htmlFor="craft-description">Mô tả nghề</label>
+            <textarea
+              id="craft-description"
+              rows={3}
+              maxLength={10000}
+              value={craftDescription}
+              onChange={(event) => setCraftDescription(event.target.value)}
+              placeholder="Mô tả nét đặc trưng của nghề..."
+              disabled={isSaving}
+            />
+            <label className="artisan-craft-select-label" htmlFor="craft-origin-process">Nguồn gốc - kỹ thuật và quy trình thực hiện</label>
+            <textarea
+              id="craft-origin-process"
+              rows={4}
+              maxLength={10000}
+              value={originProcess}
+              onChange={(event) => setOriginProcess(event.target.value)}
+              placeholder="Trình bày nguồn gốc, kỹ thuật và từng bước thực hiện..."
+              disabled={isSaving}
+            />
+            <label className="artisan-craft-select-label" htmlFor="craft-cultural-value">Giá trị văn hóa</label>
+            <textarea
+              id="craft-cultural-value"
+              rows={3}
+              maxLength={10000}
+              value={culturalValue}
+              onChange={(event) => setCulturalValue(event.target.value)}
+              placeholder="Chia sẻ giá trị văn hóa, ý nghĩa và cách gìn giữ..."
+              disabled={isSaving}
+            />
+            <button type="submit" disabled={isSaving || !craftName.trim()}>
               <Plus size={16} />{isSaving ? "Đang lưu..." : "Thêm vào hồ sơ"}
             </button>
           </form>
-          {!availableCrafts.length && !isLoading && (
-            <p className="artisan-craft-all-selected">Bạn đã lựa chọn tất cả nghề trong danh mục.</p>
-          )}
           <div className="artisan-craft-preservation-note">
             <BookOpen size={16} />
             <span>Kỹ thuật, nguồn gốc và giá trị gìn giữ được lấy từ danh mục nghề. Câu chuyện riêng của bạn có thể cập nhật tại <Link to={ROUTES.ARTISAN_PROFILE}>Hồ sơ cá nhân</Link>.</span>

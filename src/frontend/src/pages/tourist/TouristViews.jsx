@@ -6,9 +6,11 @@ import {
   Check,
   Clock3,
   Heart,
+  Link2,
   MapPin,
   MessageCircle,
   Play,
+  Share2,
   Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -17,7 +19,7 @@ import { ArtisanDetail } from "./TouristArtisanDetail.jsx";
 import { ArtisanListing } from "./TouristArtisanPages.jsx";
 import { ActivityDetail } from "./TouristExperienceDetail.jsx";
 import { ActivityListing } from "./TouristExperiencePages.jsx";
-import TouristCulturePages from "./TouristCulturePages.jsx";
+import TouristCulturePage, { findCultureRelatedItems } from "./TouristCulturePage.jsx";
 import TouristProductDetail from "./TouristProductDetail.jsx";
 import TouristProductPages from "./TouristProductPages.jsx";
 
@@ -189,7 +191,7 @@ function ListingView({ view, data, favoriteIds, onFavorite, query, onQuery, sear
   );
 }
 
-function DetailView({ item, products, activities, mediaItems, favoriteIds, onFavorite, onReview }) {
+function DetailView({ item, products, activities, artisans, crafts, stories, mediaItems, favoriteIds, onFavorite, onReview }) {
   const [selectedTab, setSelectedTab] = useState("");
   if (!item) {
     return <div className="tourist-view"><PageHeading title="Không tìm thấy nội dung" description="Nội dung có thể đã bị gỡ hoặc đường dẫn không chính xác." /><Link className="tourist-primary-button" to={ROUTES.TOURIST}>Về trang chủ</Link></div>;
@@ -229,9 +231,50 @@ function DetailView({ item, products, activities, mediaItems, favoriteIds, onFav
     `${activityItem.title} ${activityItem.place}`.toLocaleLowerCase("vi")
       .includes(item.craft?.replace("Nghệ nhân ", "").toLocaleLowerCase("vi").split(" ")[0] || item.category?.toLocaleLowerCase("vi").split(" ")[0] || ""),
   );
+  const relatedStoryContent = story ? [
+    ...findCultureRelatedItems(item, stories.filter((storyItem) => storyItem.id !== item.id))
+      .slice(0, 3)
+      .map((relatedItem) => ({ item: relatedItem, label: "Câu chuyện văn hóa" })),
+    ...findCultureRelatedItems(item, artisans).slice(0, 2)
+      .map((relatedItem) => ({ item: relatedItem, label: "Nghệ nhân" })),
+    ...findCultureRelatedItems(item, crafts).slice(0, 2)
+      .map((relatedItem) => ({ item: relatedItem, label: "Làng nghề" })),
+    ...findCultureRelatedItems(item, products).slice(0, 2)
+      .map((relatedItem) => ({ item: relatedItem, label: "Sản phẩm thủ công" })),
+    ...findCultureRelatedItems(item, activities).slice(0, 2)
+      .map((relatedItem) => ({ item: relatedItem, label: "Hoạt động trải nghiệm" })),
+  ] : [];
   const relatedMedia = mediaItems.filter((mediaItem) =>
     activeTab === "Video" ? mediaItem.type === "Video" : true,
   );
+
+  const shareStory = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text: item.description || "", url: window.location.href });
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+        onReview("Đã sao chép liên kết câu chuyện.");
+      } else {
+        onReview("Trình duyệt chưa hỗ trợ chia sẻ liên kết.");
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") onReview("Không thể chia sẻ câu chuyện lúc này.");
+    }
+  };
+
+  const copyStoryLink = async () => {
+    try {
+      if (!navigator.clipboard?.writeText) {
+        onReview("Trình duyệt chưa hỗ trợ sao chép liên kết.");
+        return;
+      }
+      await navigator.clipboard.writeText(window.location.href);
+      onReview("Đã sao chép liên kết câu chuyện.");
+    } catch {
+      onReview("Không thể sao chép liên kết câu chuyện.");
+    }
+  };
 
   return (
     <div className="tourist-view">
@@ -249,8 +292,22 @@ function DetailView({ item, products, activities, mediaItems, favoriteIds, onFav
           {item.duration && <p className="tourist-detail-meta"><Clock3 size={15} /> Thời lượng: {item.duration}</p>}
           {story && item.artisan && <p className="tourist-detail-meta">Đăng bởi nghệ nhân {item.artisan}</p>}
           <p>{item.description}</p>
+          {story && (
+            <div className="tourist-story-detail-tools">
+              <Link to="/tourist/stories"><ArrowLeft size={14} /> Quay lại danh sách câu chuyện</Link>
+              <button type="button" onClick={shareStory}><Share2 size={14} /> Chia sẻ</button>
+              <button type="button" onClick={copyStoryLink}><Link2 size={14} /> Sao chép liên kết</button>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Chia sẻ Facebook
+              </a>
+            </div>
+          )}
           <div className="tourist-detail-actions">
-            <button type="button" className="tourist-primary-button" onClick={() => onFavorite(item)}><Heart size={15} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? "Đang theo dõi" : artisan ? "Theo dõi nghệ nhân" : "Lưu yêu thích"}</button>
+            <button type="button" className="tourist-primary-button" onClick={() => onFavorite(item)}><Heart size={15} fill={isSaved ? "currentColor" : "none"} /> {isSaved ? (story ? "Đã lưu câu chuyện" : "Đang theo dõi") : story ? "Lưu câu chuyện" : artisan ? "Theo dõi nghệ nhân" : "Lưu yêu thích"}</button>
             {activity && <button type="button" className="tourist-secondary-button" onClick={() => onReview("Đăng ký trải nghiệm thành công! Chúng tôi sẽ liên hệ xác nhận.")}><CalendarDays size={15} /> Đăng ký trải nghiệm</button>}
           </div>
           <div className="tourist-detail-tabs">
@@ -289,6 +346,29 @@ function DetailView({ item, products, activities, mediaItems, favoriteIds, onFav
           </div>
         </div>
       </section>
+      {story && (
+        <section className="tourist-story-related" aria-labelledby="tourist-story-related-title">
+          <div>
+            <span className="tourist-eyebrow">TIẾP TỤC KHÁM PHÁ</span>
+            <h2 id="tourist-story-related-title">Nội dung liên quan</h2>
+          </div>
+          {relatedStoryContent.length ? (
+            <div className="tourist-story-related-grid">
+              {relatedStoryContent.map(({ item: relatedItem, label }) => (
+                <Link to={itemRoute(relatedItem)} key={`${label}-${relatedItem.id}`} className="tourist-story-related-card">
+                  <img src={relatedItem.image} alt="" loading="lazy" />
+                  <span>{label}</span>
+                  <strong>{relatedItem.name || relatedItem.title}</strong>
+                  <small>{relatedItem.description || relatedItem.category || relatedItem.place}</small>
+                  <ArrowRight size={15} />
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="tourist-story-related-empty">Nội dung liên quan sẽ được cập nhật khi có dữ liệu phù hợp.</p>
+          )}
+        </section>
+      )}
       <section className="tourist-detail-review">
         <div><span className="tourist-eyebrow">CẢM NHẬN CỦA DU KHÁCH</span><h2>Đánh giá & nhận xét</h2><p>Chia sẻ trải nghiệm của bạn với cộng đồng.</p></div>
         <Link className="tourist-primary-button" to="/tourist/reviews">Viết đánh giá <ArrowRight size={14} /></Link>
@@ -304,12 +384,22 @@ function craftDataImage(item) {
 }
 
 function ProfileView({ profile, profileDraft, onDraftChange, onSave, onNavigate }) {
+  const initials = (profile.name || "Du khách")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(-2)
+    .map((part) => part[0])
+    .join("")
+    .toLocaleUpperCase("vi");
+
   return (
     <div className="tourist-view">
       <PageHeading title="Thông tin cá nhân" description="Quản lý hồ sơ và các hoạt động khám phá của bạn." />
       <div className="tourist-profile-layout">
         <aside className="tourist-profile-sidebar">
-          <div className="tourist-profile-avatar">YK</div>
+          <div className="tourist-profile-avatar">
+            {profile.avatarUrl ? <img src={profile.avatarUrl} alt={`Ảnh đại diện ${profile.name}`} /> : initials || <UserRound size={24} />}
+          </div>
           <strong>{profile.name}</strong>
           <span>Du khách · Thành viên từ 2025</span>
           <button type="button" className="active"><Check size={14} /> Thông tin cá nhân</button>
@@ -362,7 +452,7 @@ function ReviewsView({ reviews, rating, onRating, reviewText, onReviewText, onSu
 
 export default function TouristViews({ view, data, favoriteIds, onFavorite, query, onQuery, searchType, onSearchType, mediaType, onMediaType, onOpenMedia, reviews, rating, onRating, reviewText, onReviewText, onSubmitReview, profile, profileDraft, onDraftChange, onSaveProfile, onNavigate, onNotice, onBooking }) {
   if (view === "stories") {
-    return <TouristCulturePages stories={data.stories} artisans={data.artisans} crafts={data.crafts} products={data.products} activities={data.activities} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} />;
+    return <TouristCulturePage stories={data.stories} artisans={data.artisans} crafts={data.crafts} products={data.products} activities={data.activities} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} />;
   }
   if (view === "products") {
     return <TouristProductPages products={data.products} crafts={data.crafts} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} />;
@@ -395,7 +485,7 @@ export default function TouristViews({ view, data, favoriteIds, onFavorite, quer
     const item = [...data.allItems, ...data.mediaItems].find((candidate) =>
       candidate.id === data.detailId || candidate.title === decodeURIComponent(data.detailId || ""),
     );
-    return <DetailView item={item} products={data.products} activities={data.activities} mediaItems={data.mediaItems} favoriteIds={favoriteIds} onFavorite={onFavorite} onReview={onNotice} />;
+    return <DetailView item={item} products={data.products} activities={data.activities} artisans={data.artisans} crafts={data.crafts} stories={data.stories} mediaItems={data.mediaItems} favoriteIds={favoriteIds} onFavorite={onFavorite} onReview={onNotice} />;
   }
   return <ListingView view={view} data={data} favoriteIds={favoriteIds} onFavorite={onFavorite} query={query} onQuery={onQuery} searchType={searchType} onSearchType={onSearchType} mediaType={mediaType} onMediaType={onMediaType} onOpenMedia={onOpenMedia} />;
 }

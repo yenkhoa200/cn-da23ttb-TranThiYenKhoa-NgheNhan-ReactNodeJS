@@ -23,6 +23,10 @@ async function request(path, { method = "GET", body } = {}) {
 
 const artisanCraftService = {
   getAll: () => request(""),
+  create: (data) => request("/custom", {
+    method: "POST",
+    body: data,
+  }),
   select: (id, startYear) => request(`/${id}/select`, {
     method: "POST",
     body: { startYear },

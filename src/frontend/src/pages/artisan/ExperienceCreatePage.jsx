@@ -130,9 +130,11 @@ export default function ExperienceCreatePage() {
       form.preparation.trim() && `Vật liệu cần chuẩn bị: ${form.preparation.trim()}`,
       form.notes.trim() && `Lưu ý: ${form.notes.trim()}`,
     ].filter(Boolean).join("\n");
+    const selectedCraft = crafts.find((craft) => craft.name === form.craft.trim());
     const activity = {
       title: form.title.trim(),
-      craftId: Number(form.craft),
+      craftId: selectedCraft?.id || null,
+      craftName: selectedCraft ? "" : form.craft.trim(),
       location: form.location.trim(),
       schedule: form.date && form.time ? `${form.date}T${form.time}` : "",
       duration: Number(form.duration),
@@ -205,11 +207,18 @@ export default function ExperienceCreatePage() {
               </label>
               <label className="experience-field">
                 Nghề truyền thống liên quan <span>*</span>
-                <select required value={form.craft} onChange={updateForm("craft")}>
-                <option value="" disabled>Chọn nghề trong hồ sơ của bạn</option>
-                {crafts.map((craft) => <option key={craft.id} value={craft.id}>{craft.name}</option>)}
-                </select>
-                {crafts.length === 0 && <small>Hãy thêm nghề truyền thống vào hồ sơ trước khi tạo hoạt động.</small>}
+                <input
+                  required
+                  list="experience-craft-options"
+                  value={form.craft}
+                  onChange={updateForm("craft")}
+                  placeholder="Chọn nghề có sẵn hoặc nhập nghề của bạn"
+                  maxLength={150}
+                />
+                <datalist id="experience-craft-options">
+                  {crafts.map((craft) => <option key={craft.id} value={craft.name} />)}
+                </datalist>
+                <small>Có thể chọn một nghề trong danh sách hoặc tự nhập nghề riêng.</small>
               </label>
               <label className="experience-field">
                 Mô tả hoạt động <span>*</span>
@@ -418,10 +427,10 @@ export default function ExperienceCreatePage() {
             <p><Info size={14} /> Lưu để hiển thị với du khách. Chọn lưu bản nháp nếu bạn muốn hoàn thiện nội dung sau.</p>
             <div>
               <Link className="experience-cancel-button" to={ROUTES.ARTISAN_EXPERIENCES}>Hủy</Link>
-              <button className="experience-cancel-button" type="submit" value="draft" formNoValidate disabled={isSaving || crafts.length === 0}>
+              <button className="experience-cancel-button" type="submit" value="draft" formNoValidate disabled={isSaving}>
                 Lưu bản nháp
               </button>
-              <button className="experience-primary-button" type="submit" value="published" disabled={isSaving || crafts.length === 0}>
+              <button className="experience-primary-button" type="submit" value="published" disabled={isSaving}>
                 <Upload size={13} /> Lưu
               </button>
             </div>

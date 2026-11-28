@@ -1,16 +1,18 @@
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
+  ArrowDownUp,
   Building2,
   CalendarDays,
   ChevronDown,
   Compass,
+  Filter,
   Heart,
   MapPin,
-  Search,
   Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SearchFilterBar from "../../components/common/SearchFilterBar.jsx";
 
 const villageRoute = (village) => `/tourist/craft/${village.id}`;
 
@@ -75,7 +77,7 @@ export default function TouristVillagePages({ crafts, favoriteIds, onFavorite, q
         && (category === "Nghề truyền thống" || village.category === category),
     );
     if (sort === "Đánh giá cao") filtered = [...filtered].sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
-    if (sort === "Tên A–Z") filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title, "vi"));
+    if (sort === "Tên A-Z") filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title, "vi"));
     return filtered;
   }, [category, crafts, place, query, sort]);
   const pageSize = 6;
@@ -97,26 +99,45 @@ export default function TouristVillagePages({ crafts, favoriteIds, onFavorite, q
       </section>
 
       <div className="tourist-villages-main">
-        <div className="tourist-villages-toolbar">
-          <label className="tourist-villages-search">
-            <Search size={18} />
-            <input
-              value={query}
-              onChange={(event) => {
-                onQuery(event.target.value);
-                setPage(1);
-              }}
-              placeholder="Tìm kiếm làng nghề (ví dụ: gốm Bát Tràng, lụa Vạn Phúc...)"
-              aria-label="Tìm kiếm làng nghề"
-            />
-            {query && <button type="button" aria-label="Xóa tìm kiếm" onClick={() => onQuery("")}>×</button>}
-          </label>
-          <div className="tourist-villages-filters">
-            <label><MapPin size={15} /><select aria-label="Lọc theo địa điểm" value={place} onChange={(event) => { setPlace(event.target.value); setPage(1); }}><option>Tất cả địa điểm</option>{locations.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown size={14} /></label>
-            <label><CalendarDays size={15} /><select aria-label="Lọc theo nghề" value={category} onChange={(event) => { setCategory(event.target.value); setPage(1); }}><option>Nghề truyền thống</option>{categories.map((item) => <option key={item}>{item}</option>)}</select><ChevronDown size={14} /></label>
-            <label><Compass size={15} /><select aria-label="Sắp xếp làng nghề" value={sort} onChange={(event) => setSort(event.target.value)}><option>Mặc định</option><option>Đánh giá cao</option><option>Tên A–Z</option></select><ChevronDown size={14} /></label>
+        <SearchFilterBar
+          value={query}
+          onChange={(value) => {
+            onQuery(value);
+            setPage(1);
+          }}
+          onClear={() => onQuery("")}
+          placeholder="Tìm kiếm làng nghề (ví dụ: gốm Bát Tràng, lụa Vạn Phúc...)"
+          searchLabel="Tìm kiếm làng nghề"
+          ToggleIcon={Filter}
+        >
+          <div className="tourist-villages-filters tourist-artisans-selects">
+            <label className={place !== "Tất cả địa điểm" ? "has-selection" : ""}>
+              <MapPin className="tourist-artisans-option-icon" size={16} />
+              <select aria-label="Lọc theo địa điểm" value={place} onChange={(event) => { setPlace(event.target.value); setPage(1); }}>
+                <option>Tất cả địa điểm</option>
+                {locations.map((item) => <option key={item}>{item}</option>)}
+              </select>
+              <ChevronDown size={14} />
+            </label>
+            <label className={category !== "Nghề truyền thống" ? "has-selection" : ""}>
+              <CalendarDays className="tourist-artisans-option-icon" size={16} />
+              <select aria-label="Lọc theo nghề" value={category} onChange={(event) => { setCategory(event.target.value); setPage(1); }}>
+                <option>Nghề truyền thống</option>
+                {categories.map((item) => <option key={item}>{item}</option>)}
+              </select>
+              <ChevronDown size={14} />
+            </label>
+            <label className={sort !== "Mặc định" ? "has-selection" : ""}>
+              <ArrowDownUp className="tourist-artisans-option-icon" size={16} />
+              <select aria-label="Sắp xếp làng nghề" value={sort} onChange={(event) => setSort(event.target.value)}>
+                <option>Sắp xếp</option>
+                <option>Đánh giá cao</option>
+                <option>Tên A-Z</option>
+              </select>
+              <ChevronDown size={14} />
+            </label>
           </div>
-        </div>
+        </SearchFilterBar>
 
         <div className="tourist-villages-layout">
           <div>

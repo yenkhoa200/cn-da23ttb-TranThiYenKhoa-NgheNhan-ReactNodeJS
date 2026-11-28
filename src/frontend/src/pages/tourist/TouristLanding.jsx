@@ -12,6 +12,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SearchFilterBar from "../../components/common/SearchFilterBar.jsx";
 
 const heroSlides = [
   {

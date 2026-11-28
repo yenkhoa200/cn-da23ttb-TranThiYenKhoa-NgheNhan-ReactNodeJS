@@ -445,6 +445,22 @@ function publicMediaUrl(url) {
   return url ? getProfileImageUrl(url) : "";
 }
 
+function touristProfileStorageKey(account) {
+  const accountId = account?.id || account?.email;
+  return `tourist-profile:${accountId || "guest"}`;
+}
+
+function getTouristProfile(account) {
+  const savedProfile = account ? readStorage(touristProfileStorageKey(account), {}) : {};
+  return {
+    name: account?.name || "Du khách",
+    email: account?.email || "",
+    phone: account?.phone || "",
+    ...savedProfile,
+    avatarUrl: publicMediaUrl(account?.avatarUrl),
+  };
+}
+
 export default function TouristHome() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -477,22 +493,7 @@ export default function TouristHome() {
   const [bookingNotificationError, setBookingNotificationError] = useState("");
   const seenBookingEventsRef = useRef(null);
   const [notice, setNotice] = useState("");
-  const [profile, setProfile] = useState(() => {
-    const savedProfile = readStorage("tourist-profile", {});
-    const account = readStorage("auth-user", null);
-
-    return {
-      name: "Trần Thị Yến Khoa",
-      email: "khoatty@gmail.com",
-      phone: "0987 654 321",
-      ...savedProfile,
-      ...(account?.role === "DU_KHACH" ? {
-        name: account.name,
-        email: account.email,
-        phone: account.phone,
-      } : {}),
-    };
-  });
+  const [profile, setProfile] = useState(() => getTouristProfile(authUser));
   const [profileDraft, setProfileDraft] = useState(profile);
 
   useEffect(() => {
@@ -534,8 +535,8 @@ export default function TouristHome() {
   }, [reviews]);
 
   useEffect(() => {
-    window.localStorage.setItem("tourist-profile", JSON.stringify(profile));
-  }, [profile]);
+    window.localStorage.setItem(touristProfileStorageKey(authUser), JSON.stringify(profile));
+  }, [authUser, profile]);
 
   const liveProducts = useMemo(() => databaseProducts.map((item) => {
     const gallery = (item.media || [])
@@ -638,6 +639,9 @@ export default function TouristHome() {
       culturalValue: item.cultural_value,
       artisan: item.artisan,
       artisanId: `artisan-${item.artisan_id}`,
+      createdAt: item.created_at || item.createdAt || "",
+      viewCount: Number(item.view_count || item.views || 0),
+      featured: Boolean(item.featured || item.is_featured),
       video: media.find((entry) => entry.type === "video")?.url,
     };
   }), [databaseStories]);
@@ -817,7 +821,18 @@ export default function TouristHome() {
 
   const saveProfile = (event) => {
     event.preventDefault();
-    setProfile(profileDraft);
+    const updatedProfile = { ...profileDraft, avatarUrl: profile.avatarUrl };
+    setProfile(updatedProfile);
+    if (authUser) {
+      const updatedUser = {
+        ...authUser,
+        name: updatedProfile.name,
+        email: updatedProfile.email,
+        phone: updatedProfile.phone,
+      };
+      window.localStorage.setItem("auth-user", JSON.stringify(updatedUser));
+      setAuthUser(updatedUser);
+    }
     showNotice("Thông tin cá nhân đã được cập nhật.");
   };
 
@@ -939,7 +954,7 @@ export default function TouristHome() {
             onNotice={showNotice}
           />
         ) : (
-          <div className={`tourist-content tourist-view-content${view === "activities" ? " tourist-activities-content" : ""}${view === "activity" ? " tourist-activity-detail-content" : ""}${view === "artisans" ? " tourist-artisans-content" : ""}${view === "artisan" ? " tourist-artisan-detail-content" : ""}${["products", "product"].includes(view) ? " tourist-product-content" : ""}`}>
+          <div className={`tourist-content tourist-view-content${view === "activities" ? " tourist-activities-content" : ""}${view === "activity" ? " tourist-activity-detail-content" : ""}${view === "artisans" ? " tourist-artisans-content" : ""}${view === "artisan" ? " tourist-artisan-detail-content" : ""}${["products", "product"].includes(view) ? " tourist-product-content" : ""}${view === "stories" ? " tourist-culture-content" : ""}`}>
             <TouristViews
               view={activeView}
               data={data}

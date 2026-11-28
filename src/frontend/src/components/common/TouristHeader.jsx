@@ -5,6 +5,7 @@ import {
   ChevronDown,
   Heart,
   LogOut,
+  Settings,
   UserRound,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -30,6 +31,7 @@ export default function TouristHeader({
   notifications = [],
   notificationError = "",
   onNotificationsRead,
+  onOpenSettings,
 }) {
   const [headerPanel, setHeaderPanel] = useState("");
   const headerActionsRef = useRef(null);
@@ -74,7 +76,8 @@ export default function TouristHeader({
             || (view === "artisan" && item.view === "artisans")
             || (view === "craft" && item.view === "crafts")
             || (view === "traditional-craft" && item.view === "traditional-crafts")
-            || (view === "product" && item.view === "products");
+            || (view === "product" && item.view === "products")
+            || (view === "story" && item.view === "stories");
 
           return (
             <Link
@@ -167,7 +170,11 @@ export default function TouristHeader({
             aria-expanded={headerPanel === "account"}
             onClick={() => setHeaderPanel(headerPanel === "account" ? "" : "account")}
           >
-            <span className="tourist-avatar">{initials || <UserRound size={17} />}</span>
+            <span className="tourist-avatar">
+              {profile.avatarUrl
+                ? <img src={profile.avatarUrl} alt="" />
+                : initials || <UserRound size={17} />}
+            </span>
             <ChevronDown size={14} />
           </button>
           {headerPanel === "account" && (
@@ -179,6 +186,15 @@ export default function TouristHeader({
               <Link to="/tourist/profile" onClick={() => setHeaderPanel("")}>
                 <UserRound size={16} /> Thông tin cá nhân
               </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setHeaderPanel("");
+                  onOpenSettings?.();
+                }}
+              >
+                <Settings size={16} /> Cài đặt giao diện
+              </button>
               <button type="button" onClick={onLogout}>
                 <LogOut size={16} /> Đăng xuất
               </button>

@@ -7,10 +7,10 @@ import {
   Clock3,
   Heart,
   MapPin,
-  Search,
   Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SearchFilterBar from "../../components/common/SearchFilterBar.jsx";
 
 const activityRoute = (activity) => `/tourist/activity/${activity.id}`;
 
@@ -48,21 +48,15 @@ export function ActivityListing({ activities, favoriteIds, onFavorite, query, on
       </section>
 
       <div className="tourist-activities-main">
-        <div className="tourist-activities-toolbar">
-          <form className="tourist-activities-search" onSubmit={(event) => event.preventDefault()}>
-            <Search size={18} aria-hidden="true" />
-            <input
-              value={query}
-              onChange={(event) => onQuery(event.target.value)}
-              placeholder="Tìm kiếm hoạt động trải nghiệm..."
-              aria-label="Tìm kiếm hoạt động trải nghiệm"
-            />
-            {query && <button type="button" onClick={() => onQuery("")} aria-label="Xóa từ khóa">×</button>}
-            <button type="submit">Tìm kiếm</button>
-          </form>
-
-          <div className="tourist-activities-selects">
-            <label>
+        <SearchFilterBar
+          value={query}
+          onChange={onQuery}
+          onClear={() => onQuery("")}
+          placeholder="Tìm kiếm hoạt động trải nghiệm..."
+          searchLabel="Tìm kiếm hoạt động trải nghiệm"
+        >
+          <div className="tourist-activities-selects tourist-artisans-selects">
+            <label className={category !== "Tất cả loại hình" ? "has-selection" : ""}>
               <span className="tourist-activities-select-icon">✿</span>
               <select aria-label="Lọc theo loại hình" value={category} onChange={(event) => setCategory(event.target.value)}>
                 <option>Tất cả loại hình</option>
@@ -70,16 +64,16 @@ export function ActivityListing({ activities, favoriteIds, onFavorite, query, on
               </select>
               <ChevronDown size={14} aria-hidden="true" />
             </label>
-            <label>
-              <MapPin size={16} aria-hidden="true" />
+            <label className={place !== "Tất cả địa điểm" ? "has-selection" : ""}>
+              <MapPin className="tourist-artisans-option-icon" size={16} aria-hidden="true" />
               <select aria-label="Lọc theo địa điểm" value={place} onChange={(event) => setPlace(event.target.value)}>
                 <option>Tất cả địa điểm</option>
                 {places.map((option) => <option key={option}>{option}</option>)}
               </select>
               <ChevronDown size={14} aria-hidden="true" />
             </label>
-            <label>
-              <CalendarDays size={16} aria-hidden="true" />
+            <label className={duration !== "Thời gian" ? "has-selection" : ""}>
+              <CalendarDays className="tourist-artisans-option-icon" size={16} aria-hidden="true" />
               <select aria-label="Lọc theo thời lượng" value={duration} onChange={(event) => setDuration(event.target.value)}>
                 <option>Thời gian</option>
                 <option>Dưới 2 giờ</option>
@@ -88,7 +82,7 @@ export function ActivityListing({ activities, favoriteIds, onFavorite, query, on
               <ChevronDown size={14} aria-hidden="true" />
             </label>
           </div>
-        </div>
+        </SearchFilterBar>
 
         <div className="tourist-activities-layout">
           <section className="tourist-activities-results" aria-label="Danh sách hoạt động trải nghiệm">

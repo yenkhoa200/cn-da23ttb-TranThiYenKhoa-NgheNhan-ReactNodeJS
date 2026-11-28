@@ -77,6 +77,23 @@ async function usesLegacySchema(queryable = pool) {
   return Boolean(rows[0]?.accounts && !rows[0]?.tai_khoan);
 }
 
+async function ensureLegacyProfileColumns(queryable = pool) {
+  await queryable.query(
+    `ALTER TABLE artisans
+       ADD COLUMN IF NOT EXISTS craft_village_description TEXT,
+       ADD COLUMN IF NOT EXISTS experience_description TEXT`
+  );
+}
+
+async function ensureCurrentProfileColumns(queryable = pool) {
+  await queryable.query(
+    `ALTER TABLE nghe_nhan
+       ADD COLUMN IF NOT EXISTS gioi_tinh VARCHAR(10),
+       ADD COLUMN IF NOT EXISTS lang_nghe_mo_ta TEXT,
+       ADD COLUMN IF NOT EXISTS hoat_dong_trai_nghiem_mo_ta TEXT`
+  );
+}
+
 function profileQuery(isLegacySchema) {
   if (isLegacySchema) {
     return `SELECT a.account_id AS ma_tk, a.full_name AS ho_ten, a.email,
@@ -86,8 +103,8 @@ function profileQuery(isLegacySchema) {
                    ar.address AS dia_chi, ar.introduction AS gioi_thieu,
                    ar.years_of_experience AS so_nam_kn,
                    ar.craft_background AS qua_trinh_lam_nghe,
-                   ''::text AS lang_nghe_mo_ta,
-                   ''::text AS hoat_dong_trai_nghiem_mo_ta,
+                   coalesce(ar.craft_village_description, '') AS lang_nghe_mo_ta,
+                   coalesce(ar.experience_description, '') AS hoat_dong_trai_nghiem_mo_ta,
                    coalesce((
                      SELECT string_agg(DISTINCT tc.craft_name, ', ')
                      FROM artisan_crafts ac
@@ -150,6 +167,8 @@ const artisanProfileController = {
   async getProfile(req, res, next) {
     try {
       const isLegacySchema = await usesLegacySchema();
+      if (isLegacySchema) await ensureLegacyProfileColumns();
+      else await ensureCurrentProfileColumns();
       const result = await pool.query(profileQuery(isLegacySchema), [req.user.id]);
 
       if (!result.rowCount) {
@@ -173,6 +192,12 @@ const artisanProfileController = {
     const careerHistory = typeof req.body.careerHistory === "string" ? req.body.careerHistory.trim() : "";
     const craftVillageDescription = typeof req.body.craftVillageDescription === "string"
       ? req.body.craftVillageDescription.trim()
+      : "";
+    const craftVillageName = typeof req.body.craftVillageName === "string"
+      ? req.body.craftVillageName.trim()
+      : "";
+    const craftName = typeof req.body.craftName === "string"
+      ? req.body.craftName.trim()
       : "";
     const experienceDescription = typeof req.body.experienceDescription === "string"
       ? req.body.experienceDescription.trim()
@@ -207,6 +232,8 @@ const artisanProfileController = {
       || introduction.length > 10000
       || careerHistory.length > 10000
       || craftVillageDescription.length > 1000
+      || craftVillageName.length > 150
+      || craftName.length > 150
       || experienceDescription.length > 10000
     ) {
       return res.status(400).json({ success: false, message: "Một hoặc nhiều thông tin vượt quá độ dài cho phép." });
@@ -220,6 +247,8 @@ const artisanProfileController = {
     try {
       await client.query("BEGIN");
       const isLegacySchema = await usesLegacySchema(client);
+      if (isLegacySchema) await ensureLegacyProfileColumns(client);
+      else await ensureCurrentProfileColumns(client);
 
       const accountResult = isLegacySchema
         ? await client.query(
@@ -244,14 +273,27 @@ const artisanProfileController = {
 
       if (isLegacySchema) {
         await client.query(
-          `INSERT INTO artisans (artisan_id, address, introduction, years_of_experience, craft_background)
-           VALUES ($1, $2, $3, $4, $5)
+          `INSERT INTO artisans (
+             artisan_id, address, introduction, years_of_experience, craft_background,
+             craft_village_description, experience_description
+           )
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
            ON CONFLICT (artisan_id) DO UPDATE SET
              address = EXCLUDED.address,
              introduction = EXCLUDED.introduction,
              years_of_experience = EXCLUDED.years_of_experience,
-             craft_background = EXCLUDED.craft_background`,
-          [req.user.id, address || null, introduction || null, years, careerHistory || null]
+             craft_background = EXCLUDED.craft_background,
+             craft_village_description = EXCLUDED.craft_village_description,
+             experience_description = EXCLUDED.experience_description`,
+          [
+            req.user.id,
+            address || null,
+            introduction || null,
+            years,
+            careerHistory || null,
+            craftVillageDescription || null,
+            experienceDescription || null,
+          ]
         );
       } else {
         await client.query(
@@ -281,6 +323,97 @@ const artisanProfileController = {
             experienceDescription || null,
           ]
         );
+      }
+
+      if (isLegacySchema) {
+        if (craftVillageName) {
+          await client.query(
+            `INSERT INTO craft_villages (craft_village_name, location)
+             VALUES ($1, $2)
+             ON CONFLICT (craft_village_name) DO UPDATE SET
+               location = coalesce(EXCLUDED.location, craft_villages.location)
+             RETURNING craft_village_id`,
+            [craftVillageName, address || null]
+          ).then(async ({ rows }) => {
+            if (rows[0]?.craft_village_id) {
+              await client.query(
+                `INSERT INTO artisan_craft_villages (artisan_id, craft_village_id)
+                 VALUES ($1, $2)
+                 ON CONFLICT (artisan_id, craft_village_id) DO NOTHING`,
+                [req.user.id, rows[0].craft_village_id]
+              );
+            }
+          });
+        }
+        if (craftName) {
+          await client.query(
+            `INSERT INTO traditional_crafts (craft_name)
+             VALUES ($1)
+             ON CONFLICT (craft_name) DO UPDATE SET craft_name = EXCLUDED.craft_name
+             RETURNING craft_id`,
+            [craftName]
+          ).then(async ({ rows }) => {
+            if (rows[0]?.craft_id) {
+              await client.query(
+                `INSERT INTO artisan_crafts (artisan_id, craft_id)
+                 VALUES ($1, $2)
+                 ON CONFLICT (artisan_id, craft_id) DO NOTHING`,
+                [req.user.id, rows[0].craft_id]
+              );
+            }
+          });
+        }
+      } else {
+        let villageId = null;
+        let craftId = null;
+
+        if (craftVillageName) {
+          const province = (address || "Chưa cập nhật").slice(0, 100);
+          const villageResult = await client.query(
+            `INSERT INTO lang_nghe (ten_ln, dia_chi_ln, tinh_thanh_pho)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (ten_ln, tinh_thanh_pho) DO UPDATE SET
+               dia_chi_ln = coalesce(EXCLUDED.dia_chi_ln, lang_nghe.dia_chi_ln)
+             RETURNING ma_ln`,
+            [craftVillageName, address || null, province]
+          );
+          villageId = villageResult.rows[0]?.ma_ln || null;
+          if (villageId) {
+            await client.query(
+              `INSERT INTO nghe_nhan_lang_nghe (ma_nn, ma_ln)
+               VALUES ($1, $2)
+               ON CONFLICT (ma_nn, ma_ln) DO NOTHING`,
+              [req.user.id, villageId]
+            );
+          }
+        }
+
+        if (craftName) {
+          const craftResult = await client.query(
+            `INSERT INTO nghe_truyen_thong (ten_nghe)
+             VALUES ($1)
+             ON CONFLICT (ten_nghe) DO UPDATE SET ten_nghe = EXCLUDED.ten_nghe
+             RETURNING ma_nghe`,
+            [craftName]
+          );
+          craftId = craftResult.rows[0]?.ma_nghe || null;
+          if (craftId) {
+            await client.query(
+              `INSERT INTO nghe_nhan_nghe (ma_nn, ma_nghe)
+               VALUES ($1, $2)
+               ON CONFLICT (ma_nn, ma_nghe) DO NOTHING`,
+              [req.user.id, craftId]
+            );
+            if (villageId) {
+              await client.query(
+                `INSERT INTO lang_nghe_nghe (ma_ln, ma_nghe)
+                 VALUES ($1, $2)
+                 ON CONFLICT (ma_ln, ma_nghe) DO NOTHING`,
+                [villageId, craftId]
+              );
+            }
+          }
+        }
       }
 
       await client.query("COMMIT");
@@ -366,16 +499,196 @@ const artisanProfileController = {
 
   async getImages(req, res, next) {
     try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `SELECT media_id AS ma_pt, file_url AS url, caption, uploaded_at
+           FROM media_files
+           WHERE uploaded_by_account_id = $1 AND media_type = 'hinh_anh'
+           ORDER BY uploaded_at DESC, media_id DESC`,
+          [req.user.id]
+        )
+        : await pool.query(
+          `SELECT ma_pt, duong_dan_tep AS url, chu_thich AS caption,
+                  ngay_tai_len AS uploaded_at
+           FROM da_phuong_tien
+           WHERE ma_nn = $1 AND loai_tu_lieu = 'hinh_anh'
+           ORDER BY ngay_tai_len DESC, ma_pt DESC`,
+          [req.user.id]
+        );
+
+      return res.status(200).json({ success: true, data: result.rows });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async getProofs(req, res, next) {
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      if (isLegacySchema) {
+        const result = await pool.query(
+          `SELECT media_id AS ma_pt, file_url AS url, caption,
+                  media_type AS loai_minh_chung, uploaded_at
+           FROM media_files
+           WHERE uploaded_by_account_id = $1
+             AND media_type IN ('minh_chung_file', 'minh_chung_link')
+           ORDER BY uploaded_at DESC, media_id DESC`,
+          [req.user.id]
+        );
+        return res.status(200).json({
+          success: true,
+          data: result.rows.map((row) => ({
+            ...row,
+            loai_minh_chung: row.loai_minh_chung === "minh_chung_link" ? "link" : "file",
+          })),
+        });
+      }
+
       const result = await pool.query(
         `SELECT ma_pt, duong_dan_tep AS url, chu_thich AS caption,
+                CASE loai_tu_lieu
+                  WHEN 'minh_chung_link' THEN 'link'
+                  ELSE 'file'
+                END AS loai_minh_chung,
                 ngay_tai_len AS uploaded_at
          FROM da_phuong_tien
-         WHERE ma_nn = $1 AND loai_tu_lieu = 'hinh_anh'
+         WHERE ma_nn = $1 AND loai_tu_lieu IN ('minh_chung_file', 'minh_chung_link')
          ORDER BY ngay_tai_len DESC, ma_pt DESC`,
         [req.user.id]
       );
-
       return res.status(200).json({ success: true, data: result.rows });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async uploadProofFile(req, res, next) {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Vui lòng chọn tệp minh chứng." });
+    }
+
+    const caption = typeof req.body.caption === "string" ? req.body.caption.trim() : "";
+    if (caption.length > 500) {
+      return res.status(400).json({ success: false, message: "Tên minh chứng không được vượt quá 500 ký tự." });
+    }
+
+    let uploadedFile;
+    try {
+      uploadedFile = await uploadMediaToCloudinary(req.file, "nghenhan/artisan-proofs");
+      const isLegacySchema = await usesLegacySchema();
+      const proofCaption = caption || req.file.originalname.slice(0, 500);
+      const result = isLegacySchema
+        ? await pool.query(
+          `INSERT INTO media_files (uploaded_by_account_id, media_type, file_url, caption, artisan_id)
+           SELECT a.account_id, 'minh_chung_file', $2, $3, a.account_id
+           FROM accounts a
+           WHERE a.account_id = $1 AND lower(a.role) IN ('artisans', 'nghe_nhan')
+           RETURNING media_id AS ma_pt, file_url AS url, caption,
+                     'file' AS loai_minh_chung, uploaded_at`,
+          [req.user.id, uploadedFile.secure_url, proofCaption]
+        )
+        : await pool.query(
+          `INSERT INTO da_phuong_tien
+             (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn,
+              cloudinary_public_id, cloudinary_resource_type)
+           SELECT tk.ma_tk, 'minh_chung_file', $2, $3, tk.ma_tk, $4, $5
+           FROM tai_khoan tk
+           WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
+           RETURNING ma_pt, duong_dan_tep AS url, chu_thich AS caption,
+                     'file' AS loai_minh_chung, ngay_tai_len AS uploaded_at`,
+          [req.user.id, uploadedFile.secure_url, proofCaption, uploadedFile.public_id, uploadedFile.resource_type]
+        );
+
+      if (!result.rowCount) {
+        await removeCloudinaryMedia(uploadedFile);
+        return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
+      }
+      return res.status(201).json({ success: true, message: "Đã tải tệp minh chứng.", data: result.rows[0] });
+    } catch (error) {
+      if (uploadedFile?.public_id) await removeCloudinaryMedia(uploadedFile);
+      return next(error);
+    }
+  },
+
+  async addProofLink(req, res, next) {
+    const url = typeof req.body.url === "string" ? req.body.url.trim() : "";
+    const caption = typeof req.body.caption === "string" ? req.body.caption.trim() : "";
+    let parsedUrl;
+    try {
+      parsedUrl = new URL(url);
+      if (!["http:", "https:"].includes(parsedUrl.protocol) || url.length > 2048) throw new Error();
+    } catch {
+      return res.status(400).json({ success: false, message: "Liên kết minh chứng phải là địa chỉ HTTP hoặc HTTPS hợp lệ." });
+    }
+    if (caption.length > 500) {
+      return res.status(400).json({ success: false, message: "Tên minh chứng không được vượt quá 500 ký tự." });
+    }
+
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `INSERT INTO media_files (uploaded_by_account_id, media_type, file_url, caption, artisan_id)
+           SELECT a.account_id, 'minh_chung_link', $2, $3, a.account_id
+           FROM accounts a
+           WHERE a.account_id = $1 AND lower(a.role) IN ('artisans', 'nghe_nhan')
+           RETURNING media_id AS ma_pt, file_url AS url, caption,
+                     'link' AS loai_minh_chung, uploaded_at`,
+          [req.user.id, parsedUrl.toString(), caption || "Liên kết minh chứng"]
+        )
+        : await pool.query(
+          `INSERT INTO da_phuong_tien
+             (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn)
+           SELECT tk.ma_tk, 'minh_chung_link', $2, $3, tk.ma_tk
+           FROM tai_khoan tk
+           WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
+           RETURNING ma_pt, duong_dan_tep AS url, chu_thich AS caption,
+                     'link' AS loai_minh_chung, ngay_tai_len AS uploaded_at`,
+          [req.user.id, parsedUrl.toString(), caption || "Liên kết minh chứng"]
+        );
+
+      if (!result.rowCount) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
+      }
+      return res.status(201).json({ success: true, message: "Đã thêm liên kết minh chứng.", data: result.rows[0] });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async deleteProof(req, res, next) {
+    if (!/^[1-9]\d*$/.test(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Mã minh chứng không hợp lệ." });
+    }
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `DELETE FROM media_files
+           WHERE media_id = $1 AND uploaded_by_account_id = $2
+             AND media_type IN ('minh_chung_file', 'minh_chung_link')
+           RETURNING file_url`,
+          [req.params.id, req.user.id]
+        )
+        : await pool.query(
+          `DELETE FROM da_phuong_tien
+           WHERE ma_pt = $1 AND ma_nn = $2
+             AND loai_tu_lieu IN ('minh_chung_file', 'minh_chung_link')
+           RETURNING duong_dan_tep, cloudinary_public_id, cloudinary_resource_type`,
+          [req.params.id, req.user.id]
+        );
+
+      if (!result.rowCount) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy minh chứng trong hồ sơ của bạn." });
+      }
+      if (!isLegacySchema && result.rows[0].cloudinary_public_id) {
+        await removeCloudinaryMedia({
+          public_id: result.rows[0].cloudinary_public_id,
+          resource_type: result.rows[0].cloudinary_resource_type,
+        });
+      }
+      return res.status(200).json({ success: true, message: "Đã xóa minh chứng." });
     } catch (error) {
       return next(error);
     }
@@ -612,23 +925,34 @@ const artisanProfileController = {
         throw error;
       }
 
-      const result = await pool.query(
-        `INSERT INTO da_phuong_tien
-           (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn,
-            cloudinary_public_id, cloudinary_resource_type)
-         SELECT tk.ma_tk, 'hinh_anh', $2, $3, tk.ma_tk, $4, $5
-         FROM tai_khoan tk
-         WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
-         RETURNING ma_pt, duong_dan_tep AS url, chu_thich AS caption,
-                   ngay_tai_len AS uploaded_at`,
-        [
-          req.user.id,
-          uploadedFile.secure_url,
-          imageCaption,
-          uploadedFile.public_id,
-          uploadedFile.resource_type,
-        ]
-      );
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `INSERT INTO media_files
+             (uploaded_by_account_id, media_type, file_url, caption, artisan_id)
+           SELECT a.account_id, 'hinh_anh', $2, $3, a.account_id
+           FROM accounts a
+           WHERE a.account_id = $1 AND lower(a.role) IN ('artisans', 'nghe_nhan')
+           RETURNING media_id AS ma_pt, file_url AS url, caption, uploaded_at`,
+          [req.user.id, uploadedFile.secure_url, imageCaption]
+        )
+        : await pool.query(
+          `INSERT INTO da_phuong_tien
+             (ma_tk_tai_len, loai_tu_lieu, duong_dan_tep, chu_thich, ma_nn,
+              cloudinary_public_id, cloudinary_resource_type)
+           SELECT tk.ma_tk, 'hinh_anh', $2, $3, tk.ma_tk, $4, $5
+           FROM tai_khoan tk
+           WHERE tk.ma_tk = $1 AND tk.vai_tro = 'nghe_nhan'
+           RETURNING ma_pt, duong_dan_tep AS url, chu_thich AS caption,
+                     ngay_tai_len AS uploaded_at`,
+          [
+            req.user.id,
+            uploadedFile.secure_url,
+            imageCaption,
+            uploadedFile.public_id,
+            uploadedFile.resource_type,
+          ]
+        );
 
       if (!result.rowCount) {
         await removeCloudinaryMedia(uploadedFile);
@@ -656,12 +980,20 @@ const artisanProfileController = {
     }
 
     try {
-      const result = await pool.query(
-        `DELETE FROM da_phuong_tien
-         WHERE ma_pt = $1 AND ma_nn = $2 AND loai_tu_lieu = 'hinh_anh'
-         RETURNING duong_dan_tep, cloudinary_public_id, cloudinary_resource_type`,
-        [req.params.id, req.user.id]
-      );
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `DELETE FROM media_files
+           WHERE media_id = $1 AND uploaded_by_account_id = $2 AND media_type = 'hinh_anh'
+           RETURNING file_url AS duong_dan_tep`,
+          [req.params.id, req.user.id]
+        )
+        : await pool.query(
+          `DELETE FROM da_phuong_tien
+           WHERE ma_pt = $1 AND ma_nn = $2 AND loai_tu_lieu = 'hinh_anh'
+           RETURNING duong_dan_tep, cloudinary_public_id, cloudinary_resource_type`,
+          [req.params.id, req.user.id]
+        );
 
       if (!result.rowCount) {
         return res.status(404).json({ success: false, message: "Không tìm thấy ảnh trong hồ sơ của bạn." });
@@ -679,6 +1011,172 @@ const artisanProfileController = {
       }
 
       return res.status(200).json({ success: true, message: "Đã xóa ảnh khỏi hồ sơ." });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async submitProfile(req, res, next) {
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      if (isLegacySchema) await ensureLegacyProfileColumns();
+      else await ensureCurrentProfileColumns();
+
+      const profile = await pool.query(profileQuery(isLegacySchema), [req.user.id]);
+      if (!profile.rowCount) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
+      }
+
+      const data = profile.rows[0];
+      if (!data.ho_ten || !data.gioi_tinh || !data.nghe_truyen_thong || !data.anh_dai_dien) {
+        return res.status(400).json({
+          success: false,
+          message: "Vui lòng điền họ tên, giới tính, nghề truyền thống và thêm ảnh đại diện trước khi gửi hồ sơ.",
+        });
+      }
+
+      const mediaCount = await pool.query(
+        isLegacySchema
+          ? `SELECT COUNT(*)::int AS total
+             FROM media_files
+             WHERE uploaded_by_account_id = $1
+               AND (media_type = 'hinh_anh' OR media_type = 'tai_lieu')`
+          : `SELECT COUNT(*)::int AS total
+             FROM da_phuong_tien
+             WHERE ma_nn = $1
+               AND loai_tu_lieu IN ('hinh_anh', 'tai_lieu', 'link')`,
+        [req.user.id]
+      );
+
+      if (Number(mediaCount.rows[0]?.total || 0) < 1) {
+        return res.status(400).json({
+          success: false,
+          message: "Hồ sơ cần có ít nhất một ảnh hoặc liên kết minh chứng.",
+        });
+      }
+
+      const result = isLegacySchema
+        ? await pool.query(
+          `UPDATE artisans
+           SET verification_status = 'cho_xac_minh'
+           WHERE artisan_id = $1
+           RETURNING verification_status AS trang_thai_xac_minh`,
+          [req.user.id]
+        )
+        : await pool.query(
+          `UPDATE nghe_nhan
+           SET trang_thai_xac_minh = 'cho_xac_minh',
+               ma_quan_tri_xac_minh = NULL,
+               ngay_xac_minh = NULL
+           WHERE ma_nn = $1
+           RETURNING trang_thai_xac_minh`,
+          [req.user.id]
+        );
+
+      if (!result.rowCount) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Đã gửi hồ sơ cho Admin xét duyệt.",
+        status: result.rows[0].trang_thai_xac_minh,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async listForAdmin(req, res, next) {
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      if (isLegacySchema) {
+        const result = await pool.query(
+          `SELECT a.account_id AS id, a.full_name AS ho_ten, a.email, a.phone_number AS sdt,
+                  a.avatar_url AS anh_dai_dien, ar.address AS dia_chi, ar.introduction AS gioi_thieu,
+                  ar.years_of_experience AS so_nam_kn, ar.craft_background AS qua_trinh_lam_nghe,
+                  ar.verification_status AS trang_thai_xac_minh,
+                  coalesce((SELECT string_agg(DISTINCT tc.craft_name, ', ')
+                            FROM artisan_crafts ac
+                            JOIN traditional_crafts tc ON tc.craft_id = ac.craft_id
+                            WHERE ac.artisan_id = a.account_id), '') AS nghe_truyen_thong,
+                  coalesce((SELECT json_agg(json_build_object('url', mf.file_url, 'caption', mf.caption, 'type', mf.media_type)
+                             FROM media_files mf
+                             WHERE mf.uploaded_by_account_id = a.account_id), '[]'::json) AS tai_lieu
+           FROM accounts a
+           JOIN artisans ar ON ar.artisan_id = a.account_id
+           WHERE lower(a.role) IN ('artisans', 'nghe_nhan')
+           ORDER BY ar.verification_status = 'cho_xac_minh' DESC, a.account_id DESC`
+        );
+        return res.status(200).json({ success: true, data: result.rows });
+      }
+
+      const result = await pool.query(
+        `SELECT tk.ma_tk AS id, tk.ho_ten, tk.email, tk.sdt, tk.anh_dai_dien,
+                nn.ngay_sinh, nn.gioi_tinh, nn.dia_chi, nn.gioi_thieu, nn.so_nam_kn,
+                nn.qua_trinh_lam_nghe, nn.lang_nghe_mo_ta, nn.hoat_dong_trai_nghiem_mo_ta,
+                nn.trang_thai_xac_minh,
+                coalesce((SELECT string_agg(DISTINCT nt.ten_nghe, ', ')
+                          FROM nghe_nhan_nghe nnn
+                          JOIN nghe_truyen_thong nt ON nt.ma_nghe = nnn.ma_nghe
+                          WHERE nnn.ma_nn = tk.ma_tk), '') AS nghe_truyen_thong,
+                coalesce((SELECT string_agg(DISTINCT ln.ten_ln, ', ')
+                          FROM nghe_nhan_lang_nghe nnln
+                          JOIN lang_nghe ln ON ln.ma_ln = nnln.ma_ln
+                          WHERE nnln.ma_nn = tk.ma_tk), '') AS lang_nghe,
+                coalesce((SELECT json_agg(json_build_object(
+                            'url', dp.duong_dan_tep, 'caption', dp.chu_thich,
+                            'type', dp.loai_tu_lieu, 'uploaded_at', dp.ngay_tai)
+                          FROM da_phuong_tien dp
+                          WHERE dp.ma_nn = tk.ma_tk), '[]'::json) AS tai_lieu
+         FROM tai_khoan tk
+         JOIN nghe_nhan nn ON nn.ma_nn = tk.ma_tk
+         WHERE tk.vai_tro = 'nghe_nhan'
+         ORDER BY nn.trang_thai_xac_minh = 'cho_xac_minh' DESC, tk.ma_tk DESC`
+      );
+      return res.status(200).json({ success: true, data: result.rows });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async updateVerificationStatus(req, res, next) {
+    if (!/^[1-9]\d*$/.test(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Mã nghệ nhân không hợp lệ." });
+    }
+    const status = req.body?.status;
+    if (!["da_xac_minh", "tu_choi"].includes(status)) {
+      return res.status(400).json({ success: false, message: "Trạng thái xét duyệt không hợp lệ." });
+    }
+
+    try {
+      const isLegacySchema = await usesLegacySchema();
+      const result = isLegacySchema
+        ? await pool.query(
+          `UPDATE artisans
+           SET verification_status = $1
+           WHERE artisan_id = $2
+           RETURNING verification_status AS trang_thai_xac_minh`,
+          [status, req.params.id]
+        )
+        : await pool.query(
+          `UPDATE nghe_nhan
+           SET trang_thai_xac_minh = $1,
+               ma_quan_tri_xac_minh = $2,
+               ngay_xac_minh = now()
+           WHERE ma_nn = $3
+           RETURNING trang_thai_xac_minh`,
+          [status, req.user.id, req.params.id]
+        );
+
+      if (!result.rowCount) {
+        return res.status(404).json({ success: false, message: "Không tìm thấy hồ sơ nghệ nhân." });
+      }
+      return res.status(200).json({
+        success: true,
+        message: status === "da_xac_minh" ? "Đã xác minh hồ sơ nghệ nhân." : "Đã từ chối xác minh hồ sơ nghệ nhân.",
+        status: result.rows[0].trang_thai_xac_minh,
+      });
     } catch (error) {
       return next(error);
     }

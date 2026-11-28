@@ -94,6 +94,7 @@ app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/artisan/stories", require("./routes/artisanStoryRoutes"));
 app.use("/api/tourist", require("./routes/touristContentRoutes"));
+app.use("/api/admin/profile", require("./routes/adminArtisanProfileRoutes"));
 
 // Xử lý lỗi
 app.use("/api", (req, res) => {

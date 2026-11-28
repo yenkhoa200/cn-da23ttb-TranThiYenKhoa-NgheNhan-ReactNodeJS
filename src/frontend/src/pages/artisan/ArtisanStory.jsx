@@ -37,6 +37,10 @@ export default function ArtisanStory() {
   const [imageFiles, setImageFiles] = useState([]);
   const [videoFile, setVideoFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [storyTab, setStoryTab] = useState("published");
+  const [viewingPublishedId, setViewingPublishedId] = useState(null);
+  const [storyToDelete, setStoryToDelete] = useState(null);
+  const [deletingStoryId, setDeletingStoryId] = useState(null);
   const notify = useArtisanToast();
 
   async function loadStories() {
@@ -166,6 +170,7 @@ export default function ArtisanStory() {
       cacheStory(story, savedMedia);
       setImageFiles([]);
       setVideoFile(null);
+      if (publish) setStoryTab("published");
       notify(publish ? "Đã đăng bài viết." : "Đã lưu bản nháp.");
     } catch (error) {
       notify(error.message, "error");
@@ -175,14 +180,23 @@ export default function ArtisanStory() {
   }
 
   async function deleteStory(story) {
-    if (!window.confirm("Bạn có chắc muốn xóa bài viết này?")) return;
+    setStoryToDelete(story);
+  }
+
+  async function confirmDeleteStory() {
+    if (!storyToDelete) return;
+    const story = storyToDelete;
+    setDeletingStoryId(story.ma_nd);
     try {
       await artisanStoryService.remove(story.ma_nd);
       if (editingId === story.ma_nd) resetEditor();
+      setStoryToDelete(null);
       notify("Đã xóa bài viết.");
       await loadStories();
     } catch (error) {
       notify(error.message, "error");
+    } finally {
+      setDeletingStoryId(null);
     }
   }
 
@@ -199,6 +213,7 @@ export default function ArtisanStory() {
   const youtubeId = getYouTubeId(videoLink);
   const savedVideo = existingMedia.find((item) => item.type === "video");
   const drafts = stories.filter((story) => story.trang_thai_kiem_duyet === "nhap");
+  const publishedStories = stories.filter((story) => story.trang_thai_kiem_duyet === "da_dang");
 
   return (
     <div className="artisan-story-container">
@@ -365,15 +380,66 @@ export default function ArtisanStory() {
         </div>
       </section>
 
-      <section className="story-section-card draft-section">
-        <div className="section-header-flex">
+      <section className="story-section-card story-library-section">
+        <div className="story-library-heading">
           <div>
-            <h3>Bản nháp đã lưu</h3>
-            <p className="sub-hint">Xem lại, sửa, xóa hoặc đăng bài ngay.</p>
+            <h3>Thư viện câu chuyện</h3>
+            <p className="sub-hint">Quản lý bài đã đăng và bản nháp riêng biệt.</p>
+          </div>
+          <div className="story-tabs" role="tablist" aria-label="Trạng thái câu chuyện">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={storyTab === "published"}
+              className={storyTab === "published" ? "active" : ""}
+              onClick={() => setStoryTab("published")}
+            >
+              Câu chuyện đã đăng <span>{publishedStories.length}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={storyTab === "draft"}
+              className={storyTab === "draft" ? "active" : ""}
+              onClick={() => setStoryTab("draft")}
+            >
+              Câu chuyện lưu nháp <span>{drafts.length}</span>
+            </button>
           </div>
         </div>
-        {drafts.length === 0 ? (
-          <p className="empty-drafts">Chưa có bản nháp.</p>
+
+        {storyTab === "published" ? (
+          publishedStories.length === 0 ? (
+            <p className="empty-drafts">Chưa có câu chuyện đã đăng.</p>
+          ) : (
+            <div className="draft-list published-story-list">
+              {publishedStories.map((story) => (
+                <article className="draft-card published-story-card" key={story.ma_nd}>
+                  <div>
+                    <strong>{story.tieu_de}</strong>
+                    <p>{story.tom_tat || "Chưa có tóm tắt"}</p>
+                    <small>Đã đăng: {story.ngay_dang ? new Date(story.ngay_dang).toLocaleString("vi-VN") : "Chưa cập nhật"}</small>
+                  </div>
+                  {viewingPublishedId === story.ma_nd && (
+                    <div className="published-story-preview">
+                      <p>{story.noi_dung_chi_tiet}</p>
+                      {story.media?.filter((item) => item.type === "hinh_anh").map((item) => (
+                        <img src={item.url} alt={item.caption || story.tieu_de} key={item.id} />
+                      ))}
+                    </div>
+                  )}
+                  <div className="draft-actions">
+                    <button type="button" onClick={() => setViewingPublishedId((current) => current === story.ma_nd ? null : story.ma_nd)}>
+                      {viewingPublishedId === story.ma_nd ? "Thu gọn" : "Xem"}
+                    </button>
+                    <button type="button" className="draft-delete" onClick={() => deleteStory(story)}>Xóa</button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )
+        ) : drafts.length === 0 ? (
+          <p className="empty-drafts">Chưa có câu chuyện lưu nháp.</p>
         ) : (
           <div className="draft-list">
             {drafts.map((story) => (
@@ -381,16 +447,20 @@ export default function ArtisanStory() {
                 <div>
                   <strong>{story.tieu_de}</strong>
                   <p>{story.tom_tat || "Chưa có tóm tắt"}</p>
-                  <small>Đã cập nhật: {new Date(story.ngay_cap_nhat).toLocaleString("vi-VN")}</small>
+                  <small>Đã cập nhật: {story.ngay_cap_nhat ? new Date(story.ngay_cap_nhat).toLocaleString("vi-VN") : "Chưa cập nhật"}</small>
                 </div>
                 <div className="draft-actions">
-                  <button type="button" onClick={() => editStory(story)}>Sửa / xem</button>
+                  <button type="button" onClick={() => editStory(story)}>Xem / Sửa</button>
                   <button type="button" className="draft-delete" onClick={() => deleteStory(story)}>Xóa</button>
                   <button type="button" className="draft-publish" onClick={async () => {
-                    await editStory(story);
-                    await artisanStoryService.publish(story.ma_nd);
-                    notify("Đã đăng bài viết.");
-                    await loadStories();
+                    try {
+                      await artisanStoryService.publish(story.ma_nd);
+                      notify("Đã đăng bài viết.");
+                      setStoryTab("published");
+                      await loadStories();
+                    } catch (error) {
+                      notify(error.message, "error");
+                    }
                   }}>Đăng bài</button>
                 </div>
               </article>
@@ -409,6 +479,49 @@ export default function ArtisanStory() {
           </button>
         </div>
       </div>
+
+      {storyToDelete && (
+        <div
+          className="artisan-story-confirm-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deletingStoryId) setStoryToDelete(null);
+          }}
+        >
+          <section
+            className="artisan-story-confirm-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="artisan-story-confirm-title"
+            aria-describedby="artisan-story-confirm-description"
+          >
+            <span className="artisan-story-confirm-icon">🗑</span>
+            <h2 id="artisan-story-confirm-title">Xác nhận xóa câu chuyện</h2>
+            <p id="artisan-story-confirm-description">
+              Bạn có muốn xóa <strong>“{storyToDelete.tieu_de}”</strong> không?
+            </p>
+            <p className="artisan-story-confirm-warning">
+              Câu chuyện và các tư liệu gắn kèm sẽ bị xóa khỏi hồ sơ nghệ nhân.
+            </p>
+            <div className="artisan-story-confirm-actions">
+              <button
+                type="button"
+                disabled={Boolean(deletingStoryId)}
+                onClick={() => setStoryToDelete(null)}
+              >
+                Hủy
+              </button>
+              <button
+                className="artisan-story-confirm-delete"
+                type="button"
+                disabled={Boolean(deletingStoryId)}
+                onClick={confirmDeleteStory}
+              >
+                {deletingStoryId ? "Đang xóa..." : "Xóa câu chuyện"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

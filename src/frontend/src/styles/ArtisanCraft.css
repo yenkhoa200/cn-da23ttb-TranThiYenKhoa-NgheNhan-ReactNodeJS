@@ -101,7 +101,7 @@
 
 .artisan-crafts-content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 310px);
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 390px);
   align-items: start;
   gap: 14px;
 }
@@ -404,7 +404,8 @@
 .artisan-craft-select-label span { color: #b34a38; }
 
 .artisan-craft-select-panel select,
-.artisan-craft-select-panel input {
+.artisan-craft-select-panel input,
+.artisan-craft-select-panel textarea {
   width: 100%;
   min-height: 38px;
   padding: 8px 10px;
@@ -418,7 +419,14 @@
 }
 
 .artisan-craft-select-panel select:focus,
-.artisan-craft-select-panel input:focus { border-color: #66876a; }
+.artisan-craft-select-panel input:focus,
+.artisan-craft-select-panel textarea:focus { border-color: #66876a; }
+
+.artisan-craft-select-panel textarea {
+  min-height: 72px;
+  resize: vertical;
+  line-height: 1.55;
+}
 
 .artisan-craft-select-panel form > button {
   display: flex;

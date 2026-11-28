@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useArtisanToast } from "../../contexts/ArtisanToastContext.js";
 import { ROUTES } from "../../routes/path.js";
@@ -17,8 +18,9 @@ const emptyProfile = {
   so_nam_kn: 0,
   qua_trinh_lam_nghe: "",
   lang_nghe_mo_ta: "",
-  hoat_dong_trai_nghiem_mo_ta: "",
   lang_nghe: "",
+  nghe_truyen_thong: "",
+  hoat_dong_trai_nghiem_mo_ta: "",
   hoat_dong: [],
 };
 
@@ -37,10 +39,16 @@ function updateCachedAuthUser(updates) {
 export default function ArtisanProfile() {
   const [profile, setProfile] = useState(emptyProfile);
   const [images, setImages] = useState([]);
+  const [proofs, setProofs] = useState([]);
   const [caption, setCaption] = useState("");
+  const [proofCaption, setProofCaption] = useState("");
+  const [proofLink, setProofLink] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploading, setUploading] = useState("");
+  const [imageToDelete, setImageToDelete] = useState(null);
+  const [deletingImageId, setDeletingImageId] = useState(null);
   const notify = useArtisanToast();
   const avatarInput = useRef(null);
   const galleryInput = useRef(null);
@@ -50,11 +58,13 @@ export default function ArtisanProfile() {
     Promise.all([
       artisanProfileService.getProfile(),
       artisanProfileService.getImages(),
+      artisanProfileService.getProofs(),
     ])
-      .then(([savedProfile, savedImages]) => {
+      .then(([savedProfile, savedImages, savedProofs]) => {
         if (!active) return;
         setProfile({ ...emptyProfile, ...savedProfile });
         setImages(savedImages);
+        setProofs(savedProofs);
         updateCachedAuthUser({
           name: savedProfile.ho_ten,
           email: savedProfile.email,
@@ -93,6 +103,8 @@ export default function ArtisanProfile() {
         yearsOfExperience: profile.so_nam_kn,
         careerHistory: profile.qua_trinh_lam_nghe,
         craftVillageDescription: profile.lang_nghe_mo_ta,
+        craftVillageName: profile.lang_nghe,
+        craftName: profile.nghe_truyen_thong,
         experienceDescription: profile.hoat_dong_trai_nghiem_mo_ta,
       });
       setProfile({ ...emptyProfile, ...savedProfile });
@@ -106,6 +118,34 @@ export default function ArtisanProfile() {
       notify(error.message, "error");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSubmitForReview = async () => {
+    setIsSubmitting(true);
+    try {
+      const savedProfile = await artisanProfileService.updateProfile({
+        name: profile.ho_ten,
+        phone: profile.sdt,
+        gender: profile.gioi_tinh,
+        birthDate: profile.ngay_sinh,
+        address: profile.dia_chi,
+        introduction: profile.gioi_thieu,
+        yearsOfExperience: profile.so_nam_kn,
+        careerHistory: profile.qua_trinh_lam_nghe,
+        craftVillageDescription: profile.lang_nghe_mo_ta,
+        craftVillageName: profile.lang_nghe,
+        craftName: profile.nghe_truyen_thong,
+        experienceDescription: profile.hoat_dong_trai_nghiem_mo_ta,
+      });
+      setProfile({ ...emptyProfile, ...savedProfile });
+      const result = await artisanProfileService.submitProfile();
+      setProfile({ ...emptyProfile, ...savedProfile, trang_thai_xac_minh: result.status });
+      notify("Đã gửi hồ sơ cho Admin xét duyệt.");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -145,13 +185,48 @@ export default function ArtisanProfile() {
     }
   };
 
-  const handleImageDelete = async (image) => {
-    if (!window.confirm("Bạn có chắc muốn xóa ảnh này khỏi hồ sơ?")) return;
-
+  const handleImageDelete = async () => {
+    if (!imageToDelete) return;
+    const image = imageToDelete;
+    setDeletingImageId(image.ma_pt);
     try {
       await artisanProfileService.deleteImage(image.ma_pt);
       setImages((current) => current.filter((item) => item.ma_pt !== image.ma_pt));
+      setImageToDelete(null);
       notify("Đã xóa ảnh khỏi hồ sơ.");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setDeletingImageId(null);
+    }
+  };
+
+  const handleProofLinkAdd = async (event) => {
+    event.preventDefault();
+    const url = proofLink.trim();
+    if (!url) return;
+
+    setUploading("proof-link");
+    try {
+      const proof = await artisanProfileService.addProofLink(url, proofCaption);
+      setProofs((current) => [proof, ...current]);
+      setProofLink("");
+      setProofCaption("");
+      notify("Đã thêm liên kết minh chứng.");
+    } catch (error) {
+      notify(error.message, "error");
+    } finally {
+      setUploading("");
+    }
+  };
+
+  const handleProofDelete = async (proof) => {
+    if (!window.confirm("Bạn có chắc muốn xóa minh chứng này khỏi hồ sơ?")) return;
+
+    try {
+      await artisanProfileService.deleteProof(proof.ma_pt);
+      setProofs((current) => current.filter((item) => item.ma_pt !== proof.ma_pt));
+      notify("Đã xóa minh chứng.");
     } catch (error) {
       notify(error.message, "error");
     }
@@ -174,8 +249,14 @@ export default function ArtisanProfile() {
           <h1>Hồ sơ nghệ nhân</h1>
           <p className="subtitle">Cập nhật thông tin giới thiệu và hình ảnh để chia sẻ với du khách.</p>
         </div>
-        <div className="verified-badge-pill">
-          {profile.trang_thai_xac_minh === "da_xac_minh" ? "✔ Đã xác minh" : "Hồ sơ nghệ nhân"}
+        <div className={`verified-badge-pill status-${profile.trang_thai_xac_minh || "chua_xac_minh"}`}>
+          {profile.trang_thai_xac_minh === "da_xac_minh"
+            ? "✔ Đã xác minh"
+            : profile.trang_thai_xac_minh === "cho_xac_minh"
+              ? "⏳ Chờ duyệt"
+              : profile.trang_thai_xac_minh === "tu_choi"
+                ? "Từ chối xác minh"
+                : "Chưa gửi hồ sơ"}
         </div>
       </div>
 
@@ -297,14 +378,25 @@ export default function ArtisanProfile() {
           </div>
           <div className="artisan-form">
             <div className="form-group full-width">
-              <label htmlFor="artisan-craft-village">Làng nghề / nghề truyền thống</label>
+              <label htmlFor="artisan-craft-village">Làng nghề</label>
               <input
                 id="artisan-craft-village"
-                name="lang_nghe_mo_ta"
-                value={profile.lang_nghe_mo_ta || ""}
+                name="lang_nghe"
+                value={profile.lang_nghe || ""}
                 onChange={updateField}
-                maxLength={1000}
-                placeholder="Nhập tên làng nghề; nếu chưa có làng nghề, nhập tên nghề truyền thống"
+                maxLength={150}
+                placeholder="Nhập tên làng nghề"
+              />
+            </div>
+            <div className="form-group full-width">
+              <label htmlFor="artisan-traditional-craft">Nghề truyền thống</label>
+              <input
+                id="artisan-traditional-craft"
+                name="nghe_truyen_thong"
+                value={profile.nghe_truyen_thong || ""}
+                onChange={updateField}
+                maxLength={150}
+                placeholder="Nhập nghề truyền thống của bạn"
               />
             </div>
             <div className="form-group full-width">
@@ -329,25 +421,49 @@ export default function ArtisanProfile() {
               <p className="header-desc">Ảnh tải lên được lưu cùng hồ sơ nghệ nhân.</p>
             </div>
           </div>
-          <div className="profile-gallery-upload">
-            <input
-              aria-label="Chú thích ảnh"
-              type="text"
-              value={caption}
-              onChange={(event) => setCaption(event.target.value)}
-              placeholder="Chú thích ảnh (không bắt buộc)"
-              maxLength={500}
-            />
-            <button type="button" className="btn-upload-cert" onClick={() => galleryInput.current?.click()} disabled={uploading !== ""}>
-              {uploading === "image" ? "Đang tải ảnh..." : "📷 Tải ảnh lên"}
-            </button>
-            <input
-              ref={galleryInput}
-              className="profile-file-input"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleImageUpload}
-            />
+          <div className="proof-and-image-upload">
+            <form className="proof-link-form proof-link-options" onSubmit={handleProofLinkAdd}>
+              <input
+                aria-label="Liên kết minh chứng"
+                type="url"
+                value={proofLink}
+                onChange={(event) => setProofLink(event.target.value)}
+                placeholder="https://... liên kết minh chứng"
+                required
+              />
+              <input
+                aria-label="Tên liên kết minh chứng"
+                type="text"
+                value={proofCaption}
+                onChange={(event) => setProofCaption(event.target.value)}
+                placeholder="Tên hoặc mô tả liên kết (không bắt buộc)"
+                maxLength={500}
+              />
+              <button type="submit" className="btn-upload-cert" disabled={uploading !== ""}>
+                {uploading === "proof-link" ? "Đang thêm..." : "🔗 Nộp bằng liên kết"}
+              </button>
+            </form>
+
+            <div className="profile-gallery-upload">
+              <input
+                aria-label="Chú thích ảnh"
+                type="text"
+                value={caption}
+                onChange={(event) => setCaption(event.target.value)}
+                placeholder="Chú thích ảnh (không bắt buộc)"
+                maxLength={500}
+              />
+              <button type="button" className="btn-upload-cert" onClick={() => galleryInput.current?.click()} disabled={uploading !== ""}>
+                {uploading === "image" ? "Đang tải ảnh..." : "📷 Tải ảnh lên"}
+              </button>
+              <input
+                ref={galleryInput}
+                className="profile-file-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageUpload}
+              />
+            </div>
           </div>
 
           {images.length ? (
@@ -360,7 +476,7 @@ export default function ArtisanProfile() {
                   <p>{image.caption || "Ảnh hồ sơ"}</p>
                   <div className="cert-footer">
                     <span>{image.uploaded_at ? new Date(image.uploaded_at).toLocaleDateString("vi-VN") : ""}</span>
-                    <button className="del-btn" type="button" onClick={() => handleImageDelete(image)}>Xóa ảnh</button>
+                    <button className="del-btn" type="button" onClick={() => setImageToDelete(image)}>Xóa ảnh</button>
                   </div>
                 </article>
               ))}
@@ -368,15 +484,81 @@ export default function ArtisanProfile() {
           ) : (
             <p className="profile-empty-gallery">Bạn chưa tải ảnh nào lên hồ sơ.</p>
           )}
+
+          {proofs.length > 0 && (
+            <div className="proof-list">
+              {proofs.map((proof) => (
+                <article className="proof-item" key={proof.ma_pt}>
+                  <div className="proof-item-type">
+                    {proof.loai_minh_chung === "link" ? "🔗" : "📎"}
+                  </div>
+                  <div className="proof-item-copy">
+                    <strong>{proof.caption || (proof.loai_minh_chung === "link" ? "Liên kết minh chứng" : "Tệp minh chứng")}</strong>
+                    {proof.loai_minh_chung === "link" ? (
+                      <a href={proof.url} target="_blank" rel="noreferrer">{proof.url}</a>
+                    ) : (
+                      <a href={getProfileImageUrl(proof.url)} target="_blank" rel="noreferrer">Mở tệp minh chứng</a>
+                    )}
+                  </div>
+                  <button type="button" className="del-btn" onClick={() => handleProofDelete(proof)}>Xóa</button>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         <div className="bottom-action-bar">
-          <button type="button" className="btn-print" onClick={() => window.print()}>🖨 In hồ sơ</button>
+          <button type="button" className="btn-save-primary" onClick={handleSubmitForReview} disabled={isSaving || isSubmitting || uploading !== ""}>
+            {isSubmitting ? "Đang gửi..." : "📤 Gửi hồ sơ xét duyệt"}
+          </button>
           <button type="submit" className="btn-save-primary" disabled={isSaving || uploading !== ""}>
             {isSaving ? "Đang lưu..." : "💾 Lưu thay đổi hồ sơ"}
           </button>
         </div>
       </form>
+
+      {imageToDelete && (
+        <div
+          className="artisan-profile-confirm-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !deletingImageId) setImageToDelete(null);
+          }}
+        >
+          <section
+            className="artisan-profile-confirm-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="artisan-profile-confirm-title"
+            aria-describedby="artisan-profile-confirm-description"
+          >
+            <span className="artisan-profile-confirm-icon"><Trash2 size={22} /></span>
+            <h2 id="artisan-profile-confirm-title">Xác nhận xóa ảnh</h2>
+            <p id="artisan-profile-confirm-description">
+              Bạn có muốn xóa <strong>“{imageToDelete.caption || "Ảnh hồ sơ"}”</strong> không?
+            </p>
+            <p className="artisan-profile-confirm-warning">
+              Ảnh này cũng sẽ bị gỡ khỏi hồ sơ nghệ nhân sau khi xóa.
+            </p>
+            <div className="artisan-profile-confirm-actions">
+              <button
+                type="button"
+                disabled={Boolean(deletingImageId)}
+                onClick={() => setImageToDelete(null)}
+              >
+                Hủy
+              </button>
+              <button
+                className="artisan-profile-confirm-delete"
+                type="button"
+                disabled={Boolean(deletingImageId)}
+                onClick={handleImageDelete}
+              >
+                {deletingImageId ? "Đang xóa..." : "Xóa ảnh"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

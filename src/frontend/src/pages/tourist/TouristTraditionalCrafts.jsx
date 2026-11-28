@@ -4,13 +4,14 @@ import {
   BookOpen,
   CalendarDays,
   ChevronDown,
+  ArrowDownUp,
   Compass,
   Heart,
   MapPin,
-  Search,
   Users,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SearchFilterBar from "../../components/common/SearchFilterBar.jsx";
 
 const craftRoute = (craft) => `/tourist/traditional-craft/${craft.id}`;
 
@@ -123,45 +124,41 @@ export default function TouristTraditionalCrafts({
       </section>
 
       <div className="tourist-traditional-main">
-        <div className="tourist-traditional-toolbar">
-          <label className="tourist-traditional-search">
-            <Search size={18} />
-            <input
-              value={query}
-              onChange={(event) => updateQuery(event.target.value)}
-              placeholder="Tìm nghề truyền thống (ví dụ: gốm, dệt lụa...)"
-              aria-label="Tìm nghề truyền thống"
-            />
-            {query && <button type="button" aria-label="Xóa tìm kiếm" onClick={() => updateQuery("")}>×</button>}
-          </label>
-          <div className="tourist-traditional-filters">
-            <label>
-              <MapPin size={15} />
+        <SearchFilterBar
+          value={query}
+          onChange={updateQuery}
+          onClear={() => updateQuery("")}
+          placeholder="Tìm nghề truyền thống (ví dụ: gốm, dệt lụa...)"
+          searchLabel="Tìm nghề truyền thống"
+        >
+          <div className="tourist-traditional-filters tourist-artisans-selects">
+            <label className={place !== "Tất cả địa điểm" ? "has-selection" : ""}>
+              <MapPin className="tourist-artisans-option-icon" size={16} />
               <select aria-label="Lọc theo làng nghề" value={place} onChange={(event) => { setPlace(event.target.value); setPage(1); }}>
                 <option>Tất cả địa điểm</option>
                 {locations.map((item) => <option key={item}>{item}</option>)}
               </select>
               <ChevronDown size={14} />
             </label>
-            <label>
-              <BookOpen size={15} />
+            <label className={selectedCraft !== "Tất cả nghề" ? "has-selection" : ""}>
+              <BookOpen className="tourist-artisans-option-icon" size={16} />
               <select aria-label="Lọc theo nghề truyền thống" value={selectedCraft} onChange={(event) => { setSelectedCraft(event.target.value); setPage(1); }}>
                 <option>Tất cả nghề</option>
                 {craftOptions.map((item) => <option key={item}>{item}</option>)}
               </select>
               <ChevronDown size={14} />
             </label>
-            <label>
-              <Compass size={15} />
+            <label className={sort !== "Mặt định" ? "has-selection" : ""}>
+              <ArrowDownUp className="tourist-artisans-option-icon" size={16} />
               <select aria-label="Sắp xếp nghề truyền thống" value={sort} onChange={(event) => setSort(event.target.value)}>
-                <option>Mặc định</option>
+                <option>Sắp xếp</option>
                 <option>Nhiều nghệ nhân</option>
-                <option>Tên A–Z</option>
+                <option>Tên A-Z</option>
               </select>
               <ChevronDown size={14} />
             </label>
           </div>
-        </div>
+        </SearchFilterBar>
 
         <div className="tourist-traditional-layout">
           <div>

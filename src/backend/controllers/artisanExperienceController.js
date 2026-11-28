@@ -10,10 +10,64 @@ function validId(value) {
   return /^[1-9]\d*$/.test(String(value));
 }
 
+async function resolveCraftId(client, artisanId, craftId, craftName) {
+  const { rows } = await client.query(
+    "SELECT to_regclass('public.accounts') AS accounts, to_regclass('public.tai_khoan') AS tai_khoan"
+  );
+  const isLegacySchema = Boolean(rows[0]?.accounts && !rows[0]?.tai_khoan);
+
+  if (craftId !== null) {
+    const exists = isLegacySchema
+      ? await client.query(
+        "SELECT 1 FROM artisan_crafts WHERE artisan_id = $1 AND craft_id = $2",
+        [artisanId, craftId]
+      )
+      : await client.query(
+        "SELECT 1 FROM nghe_nhan_nghe WHERE ma_nn = $1 AND ma_nghe = $2",
+        [artisanId, craftId]
+      );
+    if (!exists.rowCount) throw new Error("Nghề này chưa được thêm vào hồ sơ nghệ nhân.");
+    return craftId;
+  }
+
+  if (isLegacySchema) {
+    const result = await client.query(
+      `INSERT INTO traditional_crafts (craft_name)
+       VALUES ($1)
+       ON CONFLICT (craft_name) DO UPDATE SET craft_name = EXCLUDED.craft_name
+       RETURNING craft_id`,
+      [craftName]
+    );
+    await client.query(
+      `INSERT INTO artisan_crafts (artisan_id, craft_id)
+       VALUES ($1, $2)
+       ON CONFLICT (artisan_id, craft_id) DO NOTHING`,
+      [artisanId, result.rows[0].craft_id]
+    );
+    return result.rows[0].craft_id;
+  }
+
+  const result = await client.query(
+    `INSERT INTO nghe_truyen_thong (ten_nghe)
+     VALUES ($1)
+     ON CONFLICT (ten_nghe) DO UPDATE SET ten_nghe = EXCLUDED.ten_nghe
+     RETURNING ma_nghe`,
+    [craftName]
+  );
+  await client.query(
+    `INSERT INTO nghe_nhan_nghe (ma_nn, ma_nghe)
+     VALUES ($1, $2)
+     ON CONFLICT (ma_nn, ma_nghe) DO NOTHING`,
+    [artisanId, result.rows[0].ma_nghe]
+  );
+  return result.rows[0].ma_nghe;
+}
+
 function validateActivity(body) {
   const craftId = body.craftId === "" || body.craftId === null || body.craftId === undefined
     ? null
     : Number(body.craftId);
+  const craftName = typeof body.craftName === "string" ? body.craftName.trim() : "";
   const title = typeof body.title === "string" ? body.title.trim() : "";
   const location = typeof body.location === "string" ? body.location.trim() : "";
   const description = typeof body.description === "string" ? body.description.trim() : "";
@@ -29,11 +83,14 @@ function validateActivity(body) {
   if (!Number.isInteger(capacity) || capacity < 1 || capacity > 32767) return { error: "Sức chứa phải là số nguyên dương." };
   if (schedule.length > 255) return { error: "Lịch tổ chức không được vượt quá 255 ký tự." };
   if (craftId !== null && (!Number.isSafeInteger(craftId) || craftId <= 0)) return { error: "Nghề truyền thống không hợp lệ." };
+  if (craftId === null && craftName.length > 150) return { error: "Tên nghề truyền thống không được vượt quá 150 ký tự." };
+  if (craftId === null && !craftName) return { error: "Vui lòng chọn hoặc nhập nghề truyền thống." };
   if (!status) return { error: "Trạng thái hoạt động không hợp lệ." };
 
   return {
     data: {
       craftId,
+      craftName,
       title,
       location,
       description: description || null,
@@ -146,14 +203,11 @@ const artisanExperienceController = {
 
     try {
       const { data } = validated;
-      if (data.craftId !== null) {
-        const craft = await pool.query(
-          "SELECT 1 FROM nghe_nhan_nghe WHERE ma_nn = $1 AND ma_nghe = $2",
-          [req.user.id, data.craftId]
-        );
-        if (!craft.rowCount) {
-          return res.status(400).json({ success: false, message: "Nghề này chưa được thêm vào hồ sơ nghệ nhân." });
-        }
+      let resolvedCraftId;
+      try {
+        resolvedCraftId = await resolveCraftId(pool, req.user.id, data.craftId, data.craftName);
+      } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
       }
 
       const result = await pool.query(
@@ -168,7 +222,7 @@ const artisanExperienceController = {
                    thoi_gian_to_chuc AS schedule,
                    yeu_cau_tham_gia AS requirements, ngay_tao AS created_at`,
         [
-          req.user.id, data.craftId, data.title, data.description, data.location,
+          req.user.id, resolvedCraftId, data.title, data.description, data.location,
           data.duration, data.capacity, data.schedule, data.requirements, data.status,
         ]
       );
@@ -189,14 +243,11 @@ const artisanExperienceController = {
 
     try {
       const { data } = validated;
-      if (data.craftId !== null) {
-        const craft = await pool.query(
-          "SELECT 1 FROM nghe_nhan_nghe WHERE ma_nn = $1 AND ma_nghe = $2",
-          [req.user.id, data.craftId]
-        );
-        if (!craft.rowCount) {
-          return res.status(400).json({ success: false, message: "Nghề này chưa được thêm vào hồ sơ nghệ nhân." });
-        }
+      let resolvedCraftId;
+      try {
+        resolvedCraftId = await resolveCraftId(pool, req.user.id, data.craftId, data.craftName);
+      } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
       }
 
       const result = await pool.query(
@@ -211,7 +262,7 @@ const artisanExperienceController = {
                    thoi_gian_to_chuc AS schedule,
                    yeu_cau_tham_gia AS requirements, ngay_tao AS created_at`,
         [
-          data.craftId, data.title, data.description, data.location, data.duration,
+          resolvedCraftId, data.title, data.description, data.location, data.duration,
           data.capacity, data.schedule, data.requirements, data.status,
           req.params.id, req.user.id,
         ]

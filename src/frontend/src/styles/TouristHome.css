@@ -1093,6 +1093,14 @@
   font-weight: 800;
 }
 
+.tourist-profile-avatar img,
+.tourist-page .tourist-header .tourist-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .tourist-profile-intro h2 {
   margin: 4px 0 2px;
   color: #344535;
@@ -3843,63 +3851,6 @@
   padding-top: 13px;
 }
 
-.tourist-activities-toolbar {
-  display: grid;
-  grid-template-columns: minmax(320px, 1fr) auto;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 14px;
-}
-
-.tourist-activities-search {
-  display: flex;
-  min-width: 0;
-  height: 43px;
-  align-items: center;
-  gap: 11px;
-  padding: 4px 5px 4px 15px;
-  border: 1px solid #ece8de;
-  border-radius: 24px;
-  background: #fffefa;
-  box-shadow: 0 3px 11px rgba(45, 54, 39, 0.07);
-  color: #294d3a;
-}
-
-.tourist-activities-search input {
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #304337;
-  font-size: 12px;
-}
-
-.tourist-activities-search input::placeholder {
-  color: #8d8d85;
-}
-
-.tourist-activities-search > button[type="button"] {
-  flex: 0 0 auto;
-  padding: 0 4px;
-  background: transparent;
-  color: #77776d;
-  font-size: 19px;
-}
-
-.tourist-activities-search > button[type="submit"] {
-  flex: 0 0 auto;
-  min-width: 95px;
-  height: 35px;
-  border-radius: 20px;
-  background: #176444;
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.tourist-activities-search > button[type="submit"]:hover,
 .tourist-activities-promo > a:hover {
   background: #0e5035;
 }
@@ -3908,24 +3859,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.tourist-activities-selects label {
-  display: flex;
-  min-width: 136px;
-  height: 39px;
-  align-items: center;
-  gap: 7px;
-  padding: 0 10px;
-  border: 1px solid #efebe3;
-  border-radius: 22px;
-  background: #fffefa;
-  box-shadow: 0 2px 7px rgba(45, 54, 39, 0.05);
-  color: #176444;
-}
-
-.tourist-activities-selects label:first-child {
-  min-width: 143px;
 }
 
 .tourist-activities-selects select {
@@ -4274,10 +4207,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .tourist-activities-toolbar {
-    grid-template-columns: minmax(260px, 1fr);
-    gap: 10px;
-  }
 }
 
 @media (max-width: 680px) {
@@ -4326,32 +4255,6 @@
 
   .tourist-activities-main {
     padding-top: 12px;
-  }
-
-  .tourist-activities-toolbar {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .tourist-activities-search {
-    height: 42px;
-    padding-left: 11px;
-  }
-
-  .tourist-activities-search > button[type="submit"] {
-    min-width: 75px;
-    height: 33px;
-  }
-
-  .tourist-activities-selects {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
-  }
-
-  .tourist-activities-selects label,
-  .tourist-activities-selects label:first-child {
-    min-width: 0;
-    height: 37px;
   }
 
   .tourist-activities-layout {
@@ -5205,66 +5108,6 @@
   padding-top: 13px;
 }
 
-.tourist-artisans-toolbar {
-  display: grid;
-  grid-template-columns: minmax(350px, 1fr) auto;
-  align-items: center;
-  gap: 22px;
-  margin-bottom: 12px;
-}
-
-.tourist-artisans-search {
-  display: flex;
-  min-width: 0;
-  height: 43px;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 5px 4px 15px;
-  border: 1px solid #ece8de;
-  border-radius: 24px;
-  background: #fffefa;
-  box-shadow: 0 3px 11px rgba(45, 54, 39, 0.07);
-  color: #294d3a;
-}
-
-.tourist-artisans-search input {
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #304337;
-  font-size: 11px;
-}
-
-.tourist-artisans-search input::placeholder {
-  color: #8d8d85;
-}
-
-.tourist-artisans-search > button[type="button"] {
-  flex: 0 0 auto;
-  padding: 0 4px;
-  background: transparent;
-  color: #77776d;
-  font-size: 19px;
-}
-
-.tourist-artisans-search > button[type="submit"] {
-  flex: 0 0 auto;
-  min-width: 98px;
-  height: 35px;
-  border-radius: 20px;
-  background: #176444;
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.tourist-artisans-search > button[type="submit"]:hover {
-  background: #0e5035;
-}
-
 .tourist-artisans-selects {
   display: flex;
   align-items: center;
@@ -5277,12 +5120,29 @@
   height: 39px;
   align-items: center;
   gap: 7px;
+  box-sizing: border-box;
   padding: 0 10px;
   border: 1px solid #efebe3;
   border-radius: 22px;
   background: #fffefa;
   box-shadow: 0 2px 7px rgba(45, 54, 39, 0.05);
   color: #176444;
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.tourist-artisans-selects label:hover,
+.tourist-artisans-selects label:focus-within {
+  border-color: #7ebd98;
+  background: #f5fff7;
+  box-shadow: 0 0 0 3px rgba(56, 144, 94, 0.12), 0 5px 12px rgba(40, 116, 72, 0.12);
+  transform: translateY(-1px);
+}
+
+.tourist-artisans-selects label.has-selection {
+  border-color: #79b58d;
+  background: linear-gradient(135deg, #f1fff5, #fffefa);
+  box-shadow: 0 0 10px rgba(51, 142, 86, 0.16);
 }
 
 .tourist-artisans-selects label:first-child {
@@ -5308,7 +5168,41 @@
 
 .tourist-artisans-selects label > span {
   flex: 0 0 auto;
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f3fff5, #dcefe1);
+  color: #167447;
   font-size: 15px;
+  text-shadow: 0 0 5px rgba(64, 158, 95, 0.42);
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.tourist-artisans-selects .tourist-artisans-option-icon {
+  flex: 0 0 25px;
+  width: 25px;
+  height: 25px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f3fff5, #dcefe1);
+  color: #167447;
+  filter: drop-shadow(0 2px 3px rgba(31, 119, 68, 0.2));
+  transition: background 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.tourist-artisans-selects label:hover .tourist-artisans-option-icon,
+.tourist-artisans-selects label:focus-within .tourist-artisans-option-icon,
+.tourist-artisans-selects label.has-selection .tourist-artisans-option-icon,
+.tourist-artisans-selects label:hover > span,
+.tourist-artisans-selects label:focus-within > span,
+.tourist-artisans-selects label.has-selection > span {
+  background: linear-gradient(145deg, #dcffe7, #bde8cc);
+  filter: drop-shadow(0 0 6px rgba(39, 151, 77, 0.4));
+  transform: scale(1.06);
 }
 
 .tourist-artisans-layout {
@@ -6138,11 +6032,6 @@
 }
 
 @media (max-width: 1050px) {
-  .tourist-artisans-toolbar {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-  }
-
   .tourist-artisans-layout {
     grid-template-columns: minmax(0, 1fr) 220px;
     gap: 13px;
@@ -6206,29 +6095,9 @@
     padding-top: 10px;
   }
 
-  .tourist-artisans-toolbar {
-    gap: 8px;
-  }
-
-  .tourist-artisans-search {
-    height: 41px;
-    gap: 7px;
-    padding-left: 10px;
-  }
-
-  .tourist-artisans-search input {
-    font-size: 9px;
-  }
-
-  .tourist-artisans-search > button[type="submit"] {
-    min-width: 72px;
-    height: 32px;
-    font-size: 9px;
-  }
-
   .tourist-artisans-selects {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
   }
 
@@ -7864,60 +7733,9 @@
   margin: 0 auto;
 }
 
-.tourist-villages-toolbar {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) auto;
-  align-items: center;
-  gap: 16px;
-  margin: 13px 0 15px;
-}
-
-.tourist-villages-search,
-.tourist-villages-filters > label {
-  display: flex;
-  min-width: 0;
-  height: 42px;
-  align-items: center;
-  gap: 9px;
-  padding: 0 13px;
-  border: 1px solid #e8dfd3;
-  border-radius: 24px;
-  background: #fff;
-  box-shadow: 0 3px 11px rgba(48, 40, 32, 0.06);
-  color: #354c3f;
-}
-
-.tourist-villages-search input {
-  width: 100%;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #302820;
-  font-size: 11px;
-}
-
-.tourist-villages-search input::placeholder {
-  color: #8d877d;
-}
-
-.tourist-villages-search > button {
-  border: 0;
-  background: transparent;
-  color: #766b5f;
-  font-size: 20px;
-}
-
 .tourist-villages-filters {
   display: flex;
-  gap: 8px;
-}
-
-.tourist-villages-filters > label {
-  min-width: 135px;
-  height: 40px;
-  gap: 6px;
-  padding: 0 10px;
+  gap: 9px;
 }
 
 .tourist-villages-filters select {
@@ -9015,10 +8833,6 @@
 }
 
 @media (max-width: 1080px) {
-  .tourist-villages-toolbar {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .tourist-villages-layout {
     grid-template-columns: minmax(0, 1fr) 235px;
     gap: 12px;
@@ -9331,60 +9145,9 @@
   margin: 0 auto;
 }
 
-.tourist-traditional-toolbar {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) auto;
-  align-items: center;
-  gap: 16px;
-  margin: 13px 0 15px;
-}
-
-.tourist-traditional-search,
-.tourist-traditional-filters > label {
-  display: flex;
-  min-width: 0;
-  height: 42px;
-  align-items: center;
-  gap: 9px;
-  padding: 0 13px;
-  border: 1px solid #e8dfd3;
-  border-radius: 24px;
-  background: #fff;
-  box-shadow: 0 3px 11px rgba(48, 40, 32, 0.06);
-  color: #354c3f;
-}
-
-.tourist-traditional-search input {
-  width: 100%;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #302820;
-  font-size: 11px;
-}
-
-.tourist-traditional-search input::placeholder {
-  color: #8d877d;
-}
-
-.tourist-traditional-search > button {
-  border: 0;
-  background: transparent;
-  color: #766b5f;
-  font-size: 20px;
-}
-
 .tourist-traditional-filters {
   display: flex;
-  gap: 8px;
-}
-
-.tourist-traditional-filters > label {
-  min-width: 135px;
-  height: 40px;
-  gap: 6px;
-  padding: 0 10px;
+  gap: 9px;
 }
 
 .tourist-traditional-filters select {
@@ -9823,10 +9586,6 @@
 }
 
 @media (max-width: 1080px) {
-  .tourist-traditional-toolbar {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .tourist-traditional-layout {
     grid-template-columns: minmax(0, 1fr) 235px;
     gap: 12px;
@@ -9923,10 +9682,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .tourist-traditional-filters > label {
-    height: 38px;
-  }
-
   .tourist-traditional-grid {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -9990,6 +9745,13 @@
   padding: 0 0 38px;
 }
 
+.tourist-culture-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
 .tourist-products-page,
 .tourist-product-detail-page {
   color: #302820;
@@ -10025,44 +9787,8 @@
 }
 .tourist-products-hero p { margin: 0; color: rgba(255,253,246,.88); font-size: 15px; }
 .tourist-products-main { width: min(1320px, calc(100% - 48px)); margin: 0 auto; }
-.tourist-products-toolbar { display: flex; align-items: center; gap: 18px; padding: 18px 0; }
-.tourist-products-search,
-.tourist-products-filters label {
-  display: flex;
-  min-height: 44px;
-  align-items: center;
-  gap: 10px;
-  border: 1px solid #e8dfd1;
-  border-radius: 12px;
-  background: #fffefa;
-  color: #506a56;
-}
-.tourist-products-search { flex: 1 1 420px; padding: 0 14px; box-shadow: 0 3px 12px rgba(67,54,35,.035); }
-.tourist-products-search input {
-  width: 100%;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #302820;
-  font: inherit;
-  font-size: 13px;
-}
-.tourist-products-search input::placeholder { color: #988e81; }
-.tourist-products-search button {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: #f1e9dd;
-  color: #615446;
-  font-size: 18px;
-  cursor: pointer;
-}
+.tourist-products-main > .search-filter-bar { margin-top: 20px; }
 .tourist-products-filters { display: flex; gap: 9px; }
-.tourist-products-filters label { min-width: 125px; justify-content: space-between; padding: 0 11px; }
-.tourist-products-filters label:nth-child(2) { min-width: 175px; }
 .tourist-products-filters select {
   width: 100%;
   min-width: 0;
@@ -10072,10 +9798,9 @@
   background: transparent;
   color: #40382f;
   font: inherit;
-  font-size: 12px;
+  font-size: 10px;
   cursor: pointer;
 }
-.tourist-products-price-mark { color: #a34f32; font-size: 13px; font-weight: 700; }
 .tourist-products-layout { display: grid; grid-template-columns: 242px minmax(0,1fr); align-items: start; gap: 22px; padding-bottom: 30px; }
 .tourist-products-sidebar { display: grid; gap: 14px; }
 .tourist-products-category-panel,
@@ -10317,8 +10042,6 @@
   .tourist-products-main,
   .tourist-product-overview,
   .tourist-product-detail-content { width: min(100% - 32px,680px); }
-  .tourist-products-toolbar { align-items: stretch; flex-direction: column; gap: 10px; }
-  .tourist-products-search { flex-basis: auto; }
   .tourist-products-layout { grid-template-columns: 1fr; }
   .tourist-products-sidebar { grid-template-columns: 1fr 1fr; }
   .tourist-products-category-panel button:not(:first-of-type) { display: none; }
@@ -10559,6 +10282,7 @@
     url("https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=2000&q=88") center 48% / cover,
     #354c3f;
 }
+
 
 .tourist-culture-hero-inner {
   position: relative;
@@ -11750,5 +11474,2006 @@
 
   .tourist-traditional-crafts-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Tourist Culture page */
+
+/* =========================================
+   TOURIST CULTURE PAGE - REDESIGN
+   Chỉ áp dụng cho phần nội dung trang văn hóa
+========================================= */
+
+.tourist-culture-page.culture-redesign {
+  width: 100%;
+  min-height: calc(100vh - 74px);
+  margin: 0;
+  padding: 0;
+  background: #fbf7ef;
+  color: #293a2d;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   1. BANNER
+========================================= */
+
+.tourist-culture-page.culture-redesign .culture-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 308px;
+  margin: 0;
+  padding: 36px max(32px, calc((100vw - 1236px) / 2));
+
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 0 0 22px 22px;
+
+  background-color: #344c35;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(28, 27, 17, 0.78) 0%,
+      rgba(34, 31, 20, 0.57) 42%,
+      rgba(30, 29, 20, 0.12) 100%
+    ),
+    var(--culture-hero-image, linear-gradient(135deg, #5f7654, #173b2c));
+
+  background-position: center 45%;
+  background-size: cover;
+  color: #fffaf0;
+}
+
+/* Nội dung chữ banner */
+
+.culture-hero__content {
+  position: relative;
+  z-index: 1;
+  width: min(620px, 65%);
+}
+
+.culture-redesign .culture-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #eac77d;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.culture-hero h1 {
+  margin: 14px 0 10px;
+  color: #fffaf0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 3vw, 40px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.culture-hero__content > p {
+  margin: 0;
+  color: rgba(255, 250, 240, 0.94);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* Dòng chữ trang trí bên phải */
+
+.culture-hero__caption {
+  position: absolute;
+  right: max(32px, calc((100vw - 1236px) / 2));
+  bottom: 45px;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
+  text-align: right;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+.culture-hero__caption span {
+  color: #fff3d9;
+  font-size: 17px;
+}
+
+.culture-hero__caption strong {
+  color: #fffaf0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+}
+
+/* =========================================
+   2. THANH TÌM KIẾM TRONG BANNER
+========================================= */
+
+.tourist-culture-page .culture-hero .culture-search {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: min(665px, 75%);
+  min-height: 46px;
+  margin: 22px 0 0;
+  padding: 5px 6px 5px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: #fffdf8;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
+  color: #59665c;
+}
+
+.culture-search > svg {
+  flex: 0 0 auto;
+  color: #4f5b51;
+}
+
+.culture-search input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #293a2d;
+  font: inherit;
+  font-size: 14px;
+}
+
+.culture-search input::placeholder {
+  color: #8b9088;
+}
+
+.culture-search__submit {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 23px;
+  border: 0;
+  border-radius: 999px;
+  background: #315e3e;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.2s ease;
+}
+
+.culture-search__submit:hover {
+  background: #244b30;
+}
+
+.culture-search__clear {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: #edf1ec;
+  color: #526357;
+  cursor: pointer;
+  font-size: 21px;
+}
+
+/* =========================================
+   3. KHU VỰC NỘI DUNG CHÍNH
+========================================= */
+
+.tourist-culture-page .culture-main {
+  width: calc(100% - 64px);
+  max-width: 1472px;
+  margin: 0 auto;
+  padding: 20px 0 40px;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   4. CHỦ ĐỀ VĂN HÓA
+========================================= */
+
+.culture-topics {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 20px;
+  padding: 0;
+}
+
+.culture-topics__title {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  color: #315c3e;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.culture-topics__list {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 3px 1px 7px;
+  scrollbar-width: thin;
+}
+
+.culture-topic {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #e9dfcf;
+  border-radius: 999px;
+  background: #fffaf3;
+  color: #4e5148;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  transition: 0.2s ease;
+}
+
+.culture-topic svg {
+  color: #bd8b37;
+}
+
+.culture-topic:hover,
+.culture-topic.is-active {
+  border-color: #d5b77c;
+  background: #f5ead7;
+  color: #75552b;
+}
+
+.culture-topics__all {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0 8px 5px;
+  border: 0;
+  background: transparent;
+  color: #356342;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =========================================
+   5. CÂU CHUYỆN NỔI BẬT
+========================================= */
+
+.culture-stories-section {
+  margin-bottom: 24px;
+}
+
+.culture-stories-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 18px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.culture-stories-layout.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.culture-story-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(110px, 38%) minmax(0, 1fr);
+  min-width: 0;
+  min-height: 150px;
+  overflow: hidden;
+  border: 1px solid #e9e3d8;
+  border-radius: 13px;
+  background: #fffdf9;
+  box-shadow: 0 4px 12px rgba(61, 49, 29, 0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.culture-story-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(61, 49, 29, 0.12);
+}
+
+.culture-story-card__image {
+  display: block;
+  min-width: 0;
+  min-height: 100%;
+  overflow: hidden;
+  background: #e6e3d9;
+}
+
+.culture-story-card__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.culture-story-card:hover .culture-story-card__image img {
+  transform: scale(1.04);
+}
+
+.culture-story-card__copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 14px;
+}
+
+.culture-story-card__category {
+  margin-bottom: 7px;
+  color: #9a783c;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.culture-story-card__title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #293a2d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.culture-story-card__title:hover {
+  color: #397149;
+}
+
+.culture-story-card__copy p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 8px 0 10px;
+  color: #73776e;
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.culture-story-card__read {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: auto;
+  color: #356b43;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Thẻ nổi bật */
+
+.culture-story-card.is-featured {
+  display: block;
+  min-height: 294px;
+  border: 0;
+  background: #243b2c;
+}
+
+.culture-story-card.is-featured .culture-story-card__image {
+  position: absolute;
+  inset: 0;
+}
+
+.culture-story-card.is-featured .culture-story-card__image img {
+  height: 100%;
+  min-height: 100%;
+}
+
+.culture-story-card.is-featured .culture-story-card__image::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(19, 30, 22, 0.94) 0%,
+    rgba(19, 30, 22, 0.56) 45%,
+    rgba(19, 30, 22, 0.05) 100%
+  );
+  content: "";
+}
+
+.culture-story-card.is-featured .culture-story-card__copy {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 24px;
+  color: white;
+}
+
+.culture-story-card.is-featured .culture-story-card__category {
+  color: #e8ca83;
+}
+
+.culture-story-card.is-featured .culture-story-card__title {
+  max-width: 540px;
+  color: #fffaf0;
+  font-size: clamp(23px, 2vw, 29px);
+  line-height: 1.25;
+}
+
+.culture-story-card.is-featured .culture-story-card__copy p {
+  max-width: 540px;
+  color: rgba(255, 250, 240, 0.85);
+  font-size: 13px;
+}
+
+.culture-story-card.is-featured .culture-story-card__read {
+  display: inline-flex;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #f5e4bd;
+  color: #31543b;
+}
+
+.culture-story-card__favorite {
+  position: absolute;
+  z-index: 3;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(48, 65, 52, 0.12);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: #647064;
+  cursor: pointer;
+}
+
+.culture-story-card__favorite.is-saved {
+  color: #c45049;
+}
+
+/* Những câu chuyện khác */
+
+.culture-stories-right {
+  min-width: 0;
+}
+
+.culture-stories-right__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.culture-stories-right__heading h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #315c43;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+}
+
+.culture-stories-right__heading h2 svg {
+  color: #bd913e;
+}
+
+.culture-stories-right__heading > span {
+  color: #788076;
+  font-size: 11px;
+}
+
+.culture-stories-side {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+  width: 100%;
+}
+
+.culture-stories-side .culture-story-card {
+  display: flex;
+  min-height: 250px;
+  flex-direction: column;
+}
+
+.culture-stories-side .culture-story-card__image img {
+  height: 145px;
+  min-height: 145px;
+  flex: 0 0 145px;
+}
+
+.culture-stories-side .culture-story-card__copy {
+  flex: 1;
+  padding: 12px;
+}
+
+.culture-stories-side .culture-story-card__category {
+  font-size: 9px;
+}
+
+.culture-stories-side .culture-story-card__title {
+  font-size: 15px;
+}
+
+.culture-stories-side .culture-story-card__copy p {
+  font-size: 11px;
+}
+
+.culture-stories-side .culture-story-card__read {
+  display: none;
+}
+
+.culture-stories-extra {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+/* =========================================
+   6. PHÂN TRANG VÀ TRẠNG THÁI TRỐNG
+========================================= */
+
+.culture-empty {
+  display: grid;
+  min-height: 220px;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px;
+  border: 1px dashed #d6ddd1;
+  border-radius: 14px;
+  background: #fffdf8;
+  color: #718071;
+  text-align: center;
+}
+
+.culture-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 24px;
+}
+
+.culture-pagination button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #e1e7de;
+  border-radius: 9px;
+  background: #fff;
+  color: #516153;
+  cursor: pointer;
+}
+
+.culture-pagination button.is-active {
+  border-color: #387149;
+  background: #387149;
+  color: #fff;
+}
+
+/* =========================================
+   7. KHU VỰC HỌC HỎI VÀ KHÁM PHÁ
+========================================= */
+
+.culture-discovery {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: stretch;
+  padding: 18px;
+  border: 1px solid #e5e8d8;
+  border-radius: 15px;
+  background: #edf0df;
+}
+
+.culture-discovery .culture-section-heading {
+  margin-bottom: 14px;
+}
+
+.culture-discovery .culture-section-heading h2 {
+  margin: 5px 0 0;
+  color: #315c43;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+}
+
+.culture-discovery__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.culture-discovery-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 100px;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px 12px 12px 112px;
+  border-radius: 11px;
+  background: #fffdf8;
+  color: #293a2d;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.culture-discovery-card:hover {
+  transform: translateY(-3px);
+}
+
+.culture-discovery-card img {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 98px;
+  height: 100%;
+  object-fit: cover;
+}
+
+.culture-discovery-card > span {
+  margin-bottom: 5px;
+  color: #6c875d;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.culture-discovery-card strong {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.culture-discovery-card i {
+  display: none;
+}
+
+/* Banner quảng bá bên phải */
+
+.culture-discovery-promo {
+  position: relative;
+  display: flex;
+  min-height: 165px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  padding: 22px;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #315c3d, #203e2b);
+  color: #fff;
+}
+
+.culture-discovery-promo__ornament {
+  position: absolute;
+  top: 0;
+  right: 12px;
+  color: rgba(208, 229, 185, 0.18);
+  font-size: 90px;
+}
+
+.culture-discovery-promo .culture-eyebrow {
+  position: relative;
+  color: #d3dfb9;
+  font-size: 9px;
+}
+
+.culture-discovery-promo h3 {
+  position: relative;
+  margin: 9px 0 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 600;
+}
+
+.culture-discovery-promo p {
+  position: relative;
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.culture-discovery-promo > a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 13px;
+  border-radius: 999px;
+  background: #f5e8c9;
+  color: #31543b;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* =========================================
+   8. RESPONSIVE - TABLET
+========================================= */
+
+@media (max-width: 1050px) {
+  .tourist-culture-page .culture-main {
+    width: calc(100% - 40px);
+  }
+
+  .culture-topics {
+    flex-wrap: wrap;
+  }
+
+  .culture-topics__list {
+    order: 2;
+    flex-basis: 100%;
+  }
+
+  .culture-stories-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-story-card.is-featured {
+    min-height: 280px;
+  }
+
+  .culture-discovery {
+    grid-template-columns: minmax(0, 1fr) 230px;
+  }
+
+  .culture-discovery__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================
+   9. RESPONSIVE - MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+  .tourist-culture-page.culture-redesign .culture-hero {
+    min-height: 310px;
+    padding: 28px 20px;
+    border-radius: 0 0 14px 14px;
+    background-position: 60% center;
+  }
+
+  .culture-hero__content {
+    width: 100%;
+  }
+
+  .culture-hero h1 {
+    max-width: 500px;
+    font-size: clamp(27px, 7vw, 34px);
+  }
+
+  .culture-hero__content > p {
+    font-size: 12px;
+  }
+
+  .culture-hero__caption {
+    display: none;
+  }
+
+  .tourist-culture-page .culture-hero .culture-search {
+    width: 100%;
+    min-height: 43px;
+    margin-top: 20px;
+    padding-left: 12px;
+    gap: 7px;
+  }
+
+  .culture-search input {
+    font-size: 11px;
+  }
+
+  .culture-search__submit {
+    min-height: 33px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .tourist-culture-page .culture-main {
+    width: calc(100% - 28px);
+    padding: 15px 0 30px;
+  }
+
+  .culture-topics {
+    gap: 9px;
+    margin-bottom: 15px;
+  }
+
+  .culture-topics__title {
+    font-size: 13px;
+  }
+
+  .culture-topics__list {
+    gap: 7px;
+  }
+
+  .culture-topic {
+    min-height: 35px;
+    padding: 0 11px;
+    font-size: 11px;
+  }
+
+  .culture-topics__all {
+    font-size: 11px;
+  }
+
+  .culture-stories-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .culture-story-card.is-featured {
+    min-height: 260px;
+  }
+
+  .culture-story-card.is-featured .culture-story-card__copy {
+    padding: 18px;
+  }
+
+  .culture-story-card.is-featured .culture-story-card__title {
+    font-size: 23px;
+  }
+
+  .culture-stories-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .culture-stories-side .culture-story-card {
+    min-height: 190px;
+  }
+
+  .culture-stories-side .culture-story-card__image img {
+    height: 105px;
+    min-height: 105px;
+    flex-basis: 105px;
+  }
+
+  .culture-stories-extra {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-discovery {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 13px;
+  }
+
+  .culture-discovery__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .culture-discovery-card {
+    min-height: 95px;
+    padding: 10px 8px 10px 83px;
+  }
+
+  .culture-discovery-card img {
+    width: 73px;
+  }
+
+  .culture-discovery-promo {
+    min-height: 175px;
+  }
+}
+
+@media (max-width: 390px) {
+  .culture-stories-side {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-stories-side .culture-story-card {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    min-height: 112px;
+  }
+
+  .culture-stories-side .culture-story-card__image img {
+    height: 100%;
+    min-height: 112px;
+  }
+}
+
+.tourist-culture-page .culture-hero__content {
+  width: min(820px, 78%);
+}
+
+.tourist-culture-page .culture-hero__content > p {
+  max-width: 700px;
+}
+
+.tourist-culture-page .culture-hero .culture-search {
+  width: min(740px, 100%);
+}
+
+.tourist-culture-page .culture-main {
+  width: min(1320px, calc(100% - 48px));
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding-top: 30px;
+}
+
+@media (max-width: 800px) {
+  .tourist-culture-page .culture-main {
+    width: min(calc(100% - 32px), 680px);
+  }
+}
+
+@media (max-width: 540px) {
+  .tourist-culture-page .culture-main {
+    width: calc(100% - 24px);
+  }
+}
+
+.culture-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.culture-section-heading h2 {
+  margin: 6px 0;
+  color: #293a2d;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.25;
+}
+
+.culture-section-heading p {
+  max-width: 760px;
+  margin: 0;
+  color: #73776e;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.culture-section-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 0;
+  color: #356b43;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.culture-featured-section,
+.culture-topics-section,
+.culture-timeline-section,
+.culture-list-section,
+.culture-related-section {
+  margin-bottom: 42px;
+}
+
+.culture-featured-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(390px, 0.85fr);
+  align-items: stretch;
+  gap: 18px;
+}
+
+.culture-featured-grid > .culture-story-card.is-featured {
+  min-height: 420px;
+}
+
+.culture-featured-grid > .culture-story-card.is-featured .culture-story-card__image {
+  height: 100%;
+}
+
+.culture-featured-grid > .culture-story-card.is-featured .culture-story-card__copy {
+  padding: 30px;
+}
+
+.culture-featured-grid > .culture-story-card.is-featured .culture-story-card__title {
+  font-size: clamp(25px, 2.3vw, 34px);
+}
+
+.culture-featured-grid > .culture-story-card.is-featured .culture-story-card__copy p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.culture-story-card__featured-label {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 20px;
+  background: rgba(31, 57, 39, 0.78);
+  color: #fff5d8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.culture-featured-side {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.culture-featured-side .culture-story-card {
+  min-height: 0;
+  grid-template-columns: minmax(140px, 38%) minmax(0, 1fr);
+}
+
+.culture-featured-side .culture-story-card__copy {
+  padding: 18px;
+}
+
+.culture-featured-side .culture-story-card__title {
+  font-size: 19px;
+}
+
+.culture-featured-side .culture-story-card__copy p {
+  font-size: 12px;
+  -webkit-line-clamp: 3;
+}
+
+.culture-topic {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+.culture-timeline {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0;
+  padding: 28px 0 0;
+  list-style: none;
+}
+
+.culture-timeline::before {
+  position: absolute;
+  top: 13px;
+  right: 12%;
+  left: 12%;
+  height: 2px;
+  background: #cdd9c8;
+  content: "";
+}
+
+.culture-timeline-item {
+  position: relative;
+  min-width: 0;
+}
+
+.culture-timeline-marker {
+  position: absolute;
+  top: -28px;
+  left: calc(50% - 15px);
+  z-index: 1;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 3px solid #fffaf3;
+  border-radius: 50%;
+  background: #356b43;
+  color: #fff;
+  box-shadow: 0 0 0 1px #b8cdb5;
+}
+
+.culture-timeline-connector {
+  display: none;
+}
+
+.culture-timeline-card {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e8e4d9;
+  border-radius: 13px;
+  background: #fffdf8;
+  box-shadow: 0 5px 16px rgba(48, 40, 32, 0.06);
+}
+
+.culture-timeline-card > img {
+  display: block;
+  width: 100%;
+  height: 165px;
+  object-fit: cover;
+}
+
+.culture-timeline-card > div {
+  padding: 17px 18px 19px;
+}
+
+.culture-timeline-card > div > span {
+  color: #9a783c;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.culture-timeline-card h3 {
+  margin: 7px 0;
+  color: #293a2d;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.culture-timeline-card p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 0 12px;
+  color: #73776e;
+  font-size: 12px;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.culture-timeline-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #356b43;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.culture-list-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.culture-list-heading .culture-section-heading {
+  margin: 0;
+}
+
+.culture-list-controls {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 9px;
+}
+
+.culture-list-controls label {
+  display: flex;
+  min-width: 190px;
+  height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid #e4e6dc;
+  border-radius: 22px;
+  background: #fffdf8;
+  color: #356b43;
+}
+
+.culture-list-controls select {
+  width: 100%;
+  min-width: 0;
+  appearance: none;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #485548;
+  font: inherit;
+  font-size: 12px;
+}
+
+.culture-list-controls label > svg:last-child {
+  flex: 0 0 auto;
+}
+
+.culture-list-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 18px;
+}
+
+.culture-list-grid .culture-story-card {
+  display: flex;
+  min-height: 390px;
+  flex-direction: column;
+}
+
+.culture-list-grid .culture-story-card__image {
+  flex: 0 0 210px;
+  height: 210px;
+}
+
+.culture-list-grid .culture-story-card__image img {
+  height: 100%;
+  min-height: 100%;
+}
+
+.culture-list-grid .culture-story-card__copy {
+  flex: 1;
+  padding: 19px;
+}
+
+.culture-list-grid .culture-story-card__category {
+  font-size: 10px;
+}
+
+.culture-list-grid .culture-story-card__title {
+  font-size: 20px;
+}
+
+.culture-list-grid .culture-story-card__copy p {
+  font-size: 13px;
+  line-height: 1.6;
+  -webkit-line-clamp: 3;
+}
+
+.culture-list-grid .culture-story-card__read {
+  display: inline-flex;
+  padding: 8px 0;
+}
+
+.culture-related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.culture-related-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 245px;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e7e2d7;
+  border-radius: 12px;
+  background: #fffdf8;
+  color: #293a2d;
+  text-decoration: none;
+  box-shadow: 0 4px 15px rgba(48, 40, 32, 0.055);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.culture-related-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(48, 40, 32, 0.11);
+}
+
+.culture-related-card > img {
+  width: 100%;
+  height: 145px;
+  object-fit: cover;
+}
+
+.culture-related-card > span,
+.culture-related-card > strong,
+.culture-related-card > small {
+  margin-right: 40px;
+  margin-left: 14px;
+}
+
+.culture-related-card > span {
+  margin-top: 12px;
+  color: #9a783c;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.culture-related-card > strong {
+  margin-top: 5px;
+  color: #293a2d;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.culture-related-card > small {
+  margin-top: 5px;
+  margin-bottom: 13px;
+  color: #73776e;
+  font-size: 11px;
+}
+
+.culture-related-card > i {
+  position: absolute;
+  right: 13px;
+  bottom: 14px;
+  color: #356b43;
+}
+
+.culture-related-empty {
+  padding: 22px;
+  border: 1px dashed #d6ddd1;
+  border-radius: 12px;
+  color: #718071;
+}
+
+.tourist-story-detail-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin: 17px 0;
+}
+
+.tourist-story-detail-tools > a,
+.tourist-story-detail-tools > button {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #dfe7dc;
+  border-radius: 20px;
+  background: #fffdf8;
+  color: #356342;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tourist-story-detail-tools > a:hover,
+.tourist-story-detail-tools > button:hover {
+  border-color: #b7cdb5;
+  background: #f0f5ec;
+}
+
+.tourist-story-related {
+  margin: 42px 0;
+}
+
+.tourist-story-related > div:first-child {
+  margin-bottom: 16px;
+}
+
+.tourist-story-related h2 {
+  margin: 5px 0;
+  color: #293a2d;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 25px;
+}
+
+.tourist-story-related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.tourist-story-related-card {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  grid-template-columns: 90px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 10px;
+  border: 1px solid #e7e2d7;
+  border-radius: 11px;
+  background: #fffdf8;
+  color: #293a2d;
+  text-decoration: none;
+}
+
+.tourist-story-related-card > img {
+  width: 90px;
+  height: 88px;
+  grid-row: span 3;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.tourist-story-related-card > span {
+  color: #9a783c;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.tourist-story-related-card > strong {
+  overflow: hidden;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  text-overflow: ellipsis;
+}
+
+.tourist-story-related-card > small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #73776e;
+  font-size: 10px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tourist-story-related-card > svg {
+  grid-column: 3;
+  grid-row: 1 / span 3;
+  color: #356b43;
+}
+
+.tourist-story-related-empty {
+  color: #73776e;
+}
+
+@media (max-width: 1050px) {
+  .culture-featured-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-featured-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
+
+  .culture-related-grid,
+  .tourist-story-related-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .culture-list-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .culture-list-controls {
+    flex-wrap: wrap;
+  }
+
+  .culture-list-controls label {
+    flex: 1 1 190px;
+  }
+
+  .culture-list-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+
+  .culture-list-grid .culture-story-card {
+    min-height: 350px;
+  }
+
+  .culture-list-grid .culture-story-card__image {
+    flex-basis: 170px;
+    height: 170px;
+  }
+
+  .culture-list-grid .culture-story-card__copy {
+    padding: 15px;
+  }
+
+  .culture-list-grid .culture-story-card__title {
+    font-size: 17px;
+  }
+
+  .culture-timeline {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 0 0 0 25px;
+  }
+
+  .culture-timeline::before {
+    top: 12px;
+    right: auto;
+    bottom: 12px;
+    left: 11px;
+    width: 2px;
+    height: auto;
+  }
+
+  .culture-timeline-marker {
+    top: 14px;
+    left: -25px;
+  }
+
+  .culture-timeline-card {
+    display: grid;
+    grid-template-columns: 34% minmax(0, 1fr);
+  }
+
+  .culture-timeline-card > img {
+    height: 100%;
+    min-height: 170px;
+  }
+}
+
+@media (max-width: 600px) {
+  .tourist-culture-page .culture-hero__content {
+    width: 100%;
+  }
+
+  .culture-featured-grid > .culture-story-card.is-featured {
+    min-height: 330px;
+  }
+
+  .culture-featured-grid > .culture-story-card.is-featured .culture-story-card__copy {
+    padding: 20px;
+  }
+
+  .culture-featured-side {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-featured-side .culture-story-card {
+    min-height: 145px;
+  }
+
+  .culture-list-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-list-grid .culture-story-card {
+    min-height: 0;
+  }
+
+  .culture-list-grid .culture-story-card__image {
+    flex-basis: 205px;
+    height: 205px;
+  }
+
+  .culture-related-grid,
+  .tourist-story-related-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-timeline-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culture-timeline-card > img {
+    height: 145px;
+    min-height: 0;
+  }
+
+  .culture-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+}
+
+.tourist-settings-backdrop {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  overflow-y: auto;
+  place-items: center;
+  padding: 18px;
+  background: rgb(25 31 27 / 58%);
+}
+
+.tourist-settings-dialog {
+  width: min(100%, 520px);
+  padding: 22px;
+  border: 1px solid #e8e4d9;
+  border-radius: 15px;
+  background: #fffefa;
+  color: #30332c;
+  box-shadow: 0 18px 55px rgb(23 30 26 / 24%);
+}
+
+.tourist-settings-header,
+.tourist-settings-group-title,
+.tourist-settings-footer,
+.tourist-settings-options {
+  display: flex;
+  align-items: center;
+}
+
+.tourist-settings-header {
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ece8df;
+}
+
+.tourist-settings-header > div > span {
+  color: #73806d;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.tourist-settings-header h2 {
+  margin: 4px 0 0;
+  color: #30332c;
+  font-size: 21px;
+}
+
+.tourist-settings-header > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #e8e4d9;
+  border-radius: 8px;
+  background: #fffefa;
+  color: #666b60;
+  cursor: pointer;
+}
+
+.tourist-settings-group {
+  padding: 17px 0;
+  border-bottom: 1px solid #efede6;
+}
+
+.tourist-settings-group-title {
+  gap: 10px;
+  color: #315d4c;
+}
+
+.tourist-settings-group-title > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tourist-settings-group-title h3 {
+  margin: 0;
+  color: #383b33;
+  font-size: 14px;
+}
+
+.tourist-settings-group-title p {
+  margin: 0;
+  color: #77776e;
+  font-size: 12px;
+}
+
+.tourist-settings-options {
+  gap: 9px;
+  margin-top: 13px;
+}
+
+.tourist-settings-options > button {
+  display: flex;
+  min-height: 48px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #e5e5dc;
+  border-radius: 9px;
+  background: #fffefa;
+  color: #555b50;
+  cursor: pointer;
+  font: inherit;
+}
+
+.tourist-settings-options > button.selected {
+  border-color: #7d9d7c;
+  background: #edf4e9;
+  color: #315d4c;
+  box-shadow: 0 0 0 2px rgb(93 132 93 / 10%);
+}
+
+.tourist-font-options > button {
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px;
+}
+
+.tourist-font-options > button > strong {
+  color: #315d4c;
+  line-height: 1.2;
+}
+
+.tourist-font-options > button > span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tourist-font-options > button > small {
+  color: #7b7f75;
+  font-size: 10px;
+}
+
+.tourist-settings-error {
+  margin: 12px 0 0;
+  color: #a23e35;
+  font-size: 12px;
+}
+
+.tourist-settings-footer {
+  justify-content: flex-end;
+  gap: 9px;
+  padding-top: 17px;
+}
+
+.tourist-settings-footer > button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #dfe3d9;
+  border-radius: 8px;
+  background: #fffefa;
+  color: #4a544b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tourist-settings-footer > .tourist-settings-save {
+  border-color: #315d4c;
+  background: #315d4c;
+  color: #fffefa;
+}
+
+.tourist-settings-footer > .tourist-settings-save:hover {
+  background: #244b3d;
+}
+
+.tourist-page[data-font-size="small"] {
+  --tourist-font-scale: .875;
+}
+
+.tourist-page[data-font-size="medium"] {
+  --tourist-font-scale: 1;
+}
+
+.tourist-page[data-font-size="large"] {
+  --tourist-font-scale: 1.125;
+}
+
+.tourist-page[data-font-size] .tourist-main :is(button, input, select, textarea, label, a, li, span, small, strong, b) {
+  font-size: calc(14px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-main h1 {
+  font-size: calc(36px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-main h2 {
+  font-size: calc(26px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-main h3 {
+  font-size: calc(18px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-main p {
+  font-size: calc(15px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-nav a {
+  font-size: calc(16px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-settings-dialog :is(button, p, span, strong, small) {
+  font-size: calc(14px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-settings-dialog h2 {
+  font-size: calc(21px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-settings-dialog h3 {
+  font-size: calc(14px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-font-size] .tourist-settings-dialog small {
+  font-size: calc(10px * var(--tourist-font-scale));
+}
+
+.tourist-page[data-theme="dark"] {
+  --tourist-ink: #e7eae4;
+  --tourist-green: #c9dfc0;
+  --tourist-green-dark: #d3e2cb;
+  --tourist-primary: #e3b18d;
+  --tourist-primary-dark: #d7ad8a;
+  --tourist-pale: #303831;
+  --tourist-cream: #171a18;
+  --tourist-muted: #aeb5aa;
+  --tourist-line: #424a42;
+  background: #171a18;
+  color: #e7eae4;
+  color-scheme: dark;
+}
+
+.tourist-page[data-theme="dark"] .tourist-header,
+.tourist-page[data-theme="dark"] .tourist-footer,
+.tourist-page[data-theme="dark"] .tourist-main {
+  border-color: #424a42;
+  background-color: #171a18;
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-header *,
+.tourist-page[data-theme="dark"] .tourist-footer * {
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-header a:hover,
+.tourist-page[data-theme="dark"] .tourist-header a.is-current,
+.tourist-page[data-theme="dark"] .tourist-footer a {
+  color: #c9dfc0;
+}
+
+.tourist-page[data-theme="dark"] .tourist-header {
+  background-color: rgb(32 37 33 / 96%);
+}
+
+.tourist-page[data-theme="dark"] .tourist-footer {
+  border-top-color: #424a42;
+  background-color: #202521;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main :is(
+  .tourist-account-popover,
+  .tourist-notification-popover,
+  .tourist-result-card,
+  .tourist-artisan-card,
+  .tourist-village-card,
+  .tourist-traditional-card,
+  .tourist-product-card,
+  .tourist-activity-card,
+  .tourist-story-card,
+  .culture-story-card,
+  .culture-timeline-card,
+  .culture-related-card,
+  .tourist-story-related-card,
+  .tourist-view-filters,
+  .tourist-detail-copy,
+  .tourist-detail-review,
+  .tourist-detail-tab-content,
+  .tourist-profile-edit,
+  .tourist-review-summary,
+  .tourist-review-write
+) {
+  border-color: #424a42 !important;
+  background-color: #242a25 !important;
+  color: #e7eae4 !important;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main :is(
+  section:not([class*="hero"]),
+  article,
+  aside,
+  form:not([class*="search"]),
+  [class*="card"],
+  [class*="panel"],
+  [class*="filters"],
+  [class*="filter"],
+  [class*="topics"],
+  [class*="empty"],
+  [class*="sidebar"]
+) {
+  border-color: #424a42;
+  background-color: #242a25;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main * {
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main svg {
+  color: #c9dfc0;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main button:not([class*="primary"]):not([class*="submit"]) {
+  border-color: #4b554b;
+  background-color: #303831;
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main :is(
+  h1, h2, h3, h4, p, span, small, strong, b, label,
+  .tourist-view-heading, .tourist-detail-meta, .tourist-story-card__title,
+  .culture-story-card__title, .culture-section-heading h2
+) {
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main :is(a, .tourist-more, .tourist-text-button, .culture-story-card__read) {
+  color: #c9dfc0;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main :is(.tourist-primary-button, .tourist-product-buy-button, .tourist-book-button) {
+  color: #fff;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main :is(input, select, textarea) {
+  border-color: #4b554b;
+  background-color: #1d221e;
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-main :is(.tourist-primary-button, .tourist-settings-save) {
+  border-color: #557657;
+  background-color: #3a6041;
+  color: #fff;
+}
+
+.tourist-page[data-theme="dark"] .tourist-account-popover,
+.tourist-page[data-theme="dark"] .tourist-notification-popover {
+  border-color: #424a42;
+  background: #242a25;
+}
+
+.tourist-page[data-theme="dark"] .tourist-account-popover::before {
+  border-color: #424a42;
+  background: #242a25;
+}
+
+.tourist-page[data-theme="dark"] .tourist-account-popover > :is(a, button) {
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-settings-dialog {
+  border-color: #424a42;
+  background: #242a25;
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-settings-dialog :is(h2, h3, p, span, strong, small) {
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-settings-dialog :is(button:not(.tourist-settings-save)) {
+  border-color: #4b554b;
+  background: #1d221e;
+  color: #e7eae4;
+}
+
+.tourist-page[data-theme="dark"] .tourist-settings-options > button.selected {
+  border-color: #a4c39a;
+  background: #354438;
+}
+
+@media (max-width: 560px) {
+  .tourist-settings-dialog {
+    padding: 17px;
+  }
+
+  .tourist-settings-options {
+    gap: 6px;
+  }
+
+  .tourist-font-options > button {
+    padding: 9px 5px;
   }
 }

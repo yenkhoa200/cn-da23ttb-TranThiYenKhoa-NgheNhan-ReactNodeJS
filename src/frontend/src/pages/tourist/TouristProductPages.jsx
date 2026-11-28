@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  ArrowDownUp,
   ArrowRight,
   ChevronDown,
   Heart,
@@ -9,6 +10,7 @@ import {
   Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import SearchFilterBar from "../../components/common/SearchFilterBar.jsx";
 
 const formatPrice = (price) => `${Number(price || 0).toLocaleString("vi-VN")}₫`;
 
@@ -81,36 +83,32 @@ export default function TouristProductPages({ products, crafts, favoriteIds, onF
       </section>
 
       <div className="tourist-products-main">
-        <div className="tourist-products-toolbar">
-          <form className="tourist-products-search" onSubmit={(event) => event.preventDefault()}>
-            <Search size={18} aria-hidden="true" />
-            <input
-              aria-label="Tìm kiếm sản phẩm"
-              placeholder="Tìm kiếm sản phẩm..."
-              value={query}
-              onChange={(event) => onQuery(event.target.value)}
-            />
-            {query && <button type="button" aria-label="Xóa tìm kiếm" onClick={() => onQuery("")}>×</button>}
-          </form>
-          <div className="tourist-products-filters">
-            <label>
-              <SlidersHorizontal size={15} />
+        <SearchFilterBar
+          value={query}
+          onChange={onQuery}
+          onClear={() => onQuery("")}
+          placeholder="Tìm kiếm sản phẩm..."
+          searchLabel="Tìm kiếm sản phẩm"
+        >
+          <div className="tourist-products-filters tourist-artisans-selects">
+            <label className={category !== "Tất cả sản phẩm" ? "has-selection" : ""}>
+              <SlidersHorizontal className="tourist-artisans-option-icon" size={16} />
               <select aria-label="Lọc theo danh mục" value={category} onChange={(event) => setCategory(event.target.value)}>
                 <option>Tất cả sản phẩm</option>
                 {categories.map((option) => <option key={option}>{option}</option>)}
               </select>
               <ChevronDown size={14} />
             </label>
-            <label>
-              <MapPin size={15} />
+            <label className={villageId !== "Tất cả làng nghề" ? "has-selection" : ""}>
+              <MapPin className="tourist-artisans-option-icon" size={16} />
               <select aria-label="Lọc theo làng nghề" value={villageId} onChange={(event) => setVillageId(event.target.value)}>
                 <option>Tất cả làng nghề</option>
                 {crafts.map((village) => <option value={village.id} key={village.id}>{village.title}</option>)}
               </select>
               <ChevronDown size={14} />
             </label>
-            <label>
-              <span className="tourist-products-price-mark">₫</span>
+            <label className={sort !== "Mới nhất" ? "has-selection" : ""}>
+              <ArrowDownUp className="tourist-artisans-option-icon" size={16} />
               <select aria-label="Sắp xếp sản phẩm" value={sort} onChange={(event) => setSort(event.target.value)}>
                 <option>Mới nhất</option>
                 <option>Giá thấp đến cao</option>
@@ -120,7 +118,7 @@ export default function TouristProductPages({ products, crafts, favoriteIds, onF
               <ChevronDown size={14} />
             </label>
           </div>
-        </div>
+        </SearchFilterBar>
 
         <div className="tourist-products-layout">
           <aside className="tourist-products-sidebar">
